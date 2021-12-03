@@ -1,0 +1,32 @@
+#--- General parameters
+n_thread = 3
+interp_degree = 2
+mode = 0
+
+#--- Spectra to be fitted
+observation = obs_fal_no_B.fits
+noise = 0
+weights = 1,0,0,0
+vmac = 0
+
+#--- Output spectra
+spectrum = obs.fits
+
+#--- wavelength window (in Angstroms)
+linelist = /media/dusan/storage/RH/globin_results/inv_CS/spinor_window
+wave_min = 4015
+wave_max = 4017
+wave_step = 0.01
+
+#--- Reference atmosphere (optional)
+range = 1,1,1,1
+
+#--- RH root folder path
+rh_path = /media/dusan/storage/RH/rh
+
+#============================= garbage =============================#
+
+
+#--- Parameter regularization (way down the road)
+
+#--- Spatial coupling by PSF (way down the road; even possible?)
