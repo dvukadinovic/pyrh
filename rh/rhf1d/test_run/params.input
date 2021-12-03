@@ -13,16 +13,17 @@ vmac = 0
 spectrum = obs.fits
 
 #--- wavelength window (in Angstroms)
-linelist = /media/dusan/storage/RH/globin_results/inv_CS/spinor_window
+linelist = spinor_window
 wave_min = 4015
 wave_max = 4017
 wave_step = 0.01
 
 #--- Reference atmosphere (optional)
+cube_atmosphere = atm_0_0.atmos
 range = 1,1,1,1
 
 #--- RH root folder path
-rh_path = /media/dusan/storage/RH/rh
+rh_path = /home/dusan/Documents/rh-globin
 
 #============================= garbage =============================#
 

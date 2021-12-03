@@ -181,12 +181,12 @@
 # Input Stokes mode (KEYWORD_OPTIONAL). 
 # Options are: NO_STOKES, FIELD_FREE, POLARIZATION_FREE, and FULL_STOKES.
 
-#  STOKES_MODE = FULL_STOKES
-   STOKES_MODE = NO_STOKES
+  STOKES_MODE = FULL_STOKES
+#   STOKES_MODE = NO_STOKES
 
 # Include magneto-optical effects (KEYWORD_DEFAULT). Default is TRUE.
 
-#  MAGNETO_OPTICAL = FALSE
+  MAGNETO_OPTICAL = FALSE
 
 # Typical value of magnetic field in Tesla (1 T = 1.0E+4 Gauss)
 # (KEYWORD_DEFAULT).

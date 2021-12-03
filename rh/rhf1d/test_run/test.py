@@ -1,21 +1,22 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pyrh
+import time
 import sys
 
-argv = "rhf1d -i keyword.input"
-argc = len(argv.split(" "))
-
-inData = pyrh.read_input(argc, argv)
-print()
-# print(inData["magneto_optical"])
-print(inData)
-
-sys.exit()
-
-import time
-
 import globin
+
+import pyrh
+
+# argv = "rhf1d -i keyword.input"
+# argc = len(argv.split(" "))
+
+# inData = pyrh.read_input(argc, argv)
+# print()
+# # print(inData["magneto_optical"])
+# print(inData)
+
+# sys.exit()
+
 atmos = globin.Atmosphere("atm_0_0.atmos")
 
 start = time.time()
@@ -38,5 +39,18 @@ spec = pyrh.py_rhf1d(argc, argv,
 			mag, gamma, chi, nH, 0)
 
 print(time.time() - start)
-# plt.plot(spec.lam, spec.I[:,-1])
+plt.plot(spec.I[:-1,-1])
 # plt.show()
+
+start = time.time()
+
+run_name = "dummy"
+globin.read_input(run_name=run_name)
+
+if globin.mode==0:
+	spec = globin.make_synthetic_observations(globin.atm, globin.noise)
+	print(time.time() - start)
+
+plt.plot(spec.spec[0,0,:,0])
+
+plt.show()

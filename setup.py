@@ -1,6 +1,7 @@
 from setuptools import Extension, setup
 from Cython.Build import cythonize
 import glob
+import numpy
 
 rh_c_files = glob.glob("rh/*.c")
 rh_c_files.remove("rh/collision_Oslo.c")
@@ -30,5 +31,7 @@ setup(
 	name="pyrh",
 	version="0.1",
 	author="Dusan Vukadionvic",
-	ext_modules=cythonize([Extension("pyrh", rh_c_files)])
+	ext_modules=cythonize([Extension("pyrh", rh_c_files)],
+							compiler_directives={'language_level' : "3"}),
+	include_dirs=[numpy.get_include()]
 )
