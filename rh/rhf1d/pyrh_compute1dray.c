@@ -204,8 +204,8 @@ double** rhf1d(int argc, char *argv[], int Ndep,
 
   // getCPU(1, TIME_START, NULL);
 
-  writeInput();
-  writeAtmos(&atmos);
+  // writeInput();
+  // writeAtmos(&atmos);
   // writeGeometry(&geometry);
   writeSpectrum(&spectrum);
   // writeFlux(FLUX_DOT_OUT);

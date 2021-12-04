@@ -4,7 +4,7 @@ typedef struct{
     double **J;
 } mySpectrum;
 
-void _getnumber();
+int _getnumber(int* z);
 
 mySpectrum _solveray(int argc, char *argv[], int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,

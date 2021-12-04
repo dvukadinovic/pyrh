@@ -60,9 +60,17 @@ class Spectrum(object):
 		else:
 			self.stokes = False
 
+def grabnum(int[:] z):
+	# cdef cnp.ndarray[int, ndim=1, mode="c"] arr
+	# arr = np.ascontiguousarray(z, dtype=ctypes.c_int)
+	a = rh._getnumber(&z[0])
+	return a
+
 def rhf1d(argc, py_argv, 
-		scale, temp, ne, vz, vmic,
-		mag, gamma, chi, nH, atm_scale):
+		  scale, temp, ne, 
+	 	  vz, vmic, 
+	 	  mag, gamma, chi, 
+		  nH, atm_scale):
 	Ndep = len(temp)
 	rh_scale = pyarray2double_1d(scale)
 	rh_temp = pyarray2double_1d(temp)
@@ -84,13 +92,30 @@ def rhf1d(argc, py_argv,
 	cdef double** Jarr;
 	Jarr = rh.rhf1d(argc, argv, Ndep,
 			 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
-			 rh_mag, rh_gamma, rh_chi, rh_nH, atm_scale)
+			 rh_mag, rh_gamma, rh_chi, 
+			 rh_nH, atm_scale)
 
 	return 1
 
+# ToDo:
+#
+#   -- compare the speed with and without writting on disk
+#
+#   -- read input parameters
+#   -- forward them to the rhf1d() and solveray() as
+#      an InputData type
+#   -- check if the spectrum is good
+#   -- repeat this for Atoms
+#   -- check consistensy
+#   -- repeat this for Molecules
+#   -- check consistensy
+#   -- input wavelengts (not from file)
+
 def solveray(argc, py_argv, 
-		scale, temp, ne, vz, vmic,
-		mag, gamma, chi, nH, atm_scale):
+	 		scale, temp, ne, 
+	 		vz, vmic, 
+	 		mag, gamma, chi,
+			nH, atm_scale):
 	Ndep = len(temp)
 	rh_scale = pyarray2double_1d(scale)
 	rh_temp = pyarray2double_1d(temp)
@@ -111,8 +136,9 @@ def solveray(argc, py_argv,
 
 	cdef rh.mySpectrum spec
 	spec = rh._solveray(argc, argv, Ndep,
-				rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
-				rh_mag, rh_gamma, rh_chi, rh_nH, 1.0, atm_scale)
+					rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
+			 		rh_mag, rh_gamma, rh_chi,
+			  		rh_nH, 1.0, atm_scale)
 
 	lam = convert_1d(spec.lam, spec.nlw)
 	sI = convert_1d(spec.sI, spec.nlw)

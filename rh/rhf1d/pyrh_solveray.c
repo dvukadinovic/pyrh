@@ -58,21 +58,12 @@ CommandLine commandline;
 char messageStr[MAX_LINE_SIZE];
 
 
-void _getnumber()
+int _getnumber(int* z)
 {
-  printf("atm.ne = %e\n", atmos.ne[0]);
-  printf("atm.nH = %e\n", atmos.nH[0][0]);
- 
-  // printf("nH[n][0] = %e\n", rh_nH[0][0]);
-  // atmos.nH = matrix_double(atmos.NHydr, Ndep);
-  // for (int k=0; k<Ndep; k++)
-  // {
-  //   for (int n=0; n<atmos.NHydr; n++)
-  //   {
-  //     atmos.nH[n][k] = rh_nH[n][k];
-  //   }
-  // }
- }
+  int a = 1;
+  printf("z = %d\n", z[0]);
+  return a+z[0];
+}
 
 /* ------- begin -------------------------- solveray.c -------------- */
 

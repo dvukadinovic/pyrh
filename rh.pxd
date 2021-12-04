@@ -1,6 +1,6 @@
 # cdef extern from "/usr/include/pthread.h":
-	# ctypedef struct pthread_attr_t_ *pthread_attr_t
-	# cdef pthread_attr_t dummy
+# ctypedef struct pthread_attr_t_ *pthread_attr_t
+# cdef pthread_attr_t dummy
 
 cdef extern from "rh/rh.h":
 	cdef double **matrix_double(int Nrow, int Ncol)
@@ -83,6 +83,8 @@ cdef extern from "rh/rhf1d/pyrh_solveray.h":
 		double *sU
 		double *sV
 		double **J
+
+	cdef int _getnumber(int* z)
 
 	cdef mySpectrum _solveray(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
