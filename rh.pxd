@@ -63,23 +63,29 @@ cdef extern from "rh/inputs.h":
 
 		# pthread_attr_t thread_attr;
 
-cdef extern from "rh/rhf1d/rhf1d.h":
-	ctypedef struct mySpectrum:
-		int nlw
-		int Nrays
-		int stokes
-		double *lam
-		double **sI
-		double **sQ
-		double **sU
-		double **sV
-		double **J
-		double **J20
-
-	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
+cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
+	cdef double** rhf1d(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
 			double **rh_nH,
 			int atm_scale)
 	
 	cdef InputData readMe(int argc, char *argv[])
+
+cdef extern from "rh/rhf1d/pyrh_solveray.h":
+	ctypedef struct mySpectrum:
+		int nlw
+		int Nrays
+		int stokes
+		double *lam
+		double *sI
+		double *sQ
+		double *sU
+		double *sV
+		double **J
+
+	cdef mySpectrum _solveray(int argc, char *argv[], int Ndep,
+			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
+			double *rh_mag, double *rh_gamma, double *rh_chi,
+			double **rh_nH, double muz,
+			int atm_scale)

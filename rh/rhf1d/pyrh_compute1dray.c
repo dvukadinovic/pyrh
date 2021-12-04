@@ -31,7 +31,7 @@
 #include "xdr.h"
 #include "constant.h"
 
-#include "rhf1d.h"
+#include "pyrh_compute1dray.h"
 #include "inputs.h"
 
 
@@ -60,11 +60,10 @@ InputData readMe(int argc, char *argv[])
   return input;
 }
 
-mySpectrum rhf1d(int argc, char *argv[], int Ndep,
+double** rhf1d(int argc, char *argv[], int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
               double *rh_mag, double *rh_gamma, double *rh_chi,
-              double **rh_nH,
-              int atm_scale)
+              double **rh_nH, int atm_scale)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -113,7 +112,14 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   atmos.Stokes = TRUE;
 
   atmos.nH = matrix_double(atmos.NHydr, Ndep);
-  atmos.nH = rh_nH;
+  for (int k=0; k<Ndep; k++)
+  {
+    for (int n=0; n<atmos.NHydr; n++)
+    {
+      atmos.nH[n][k] = rh_nH[n][k];
+      atmos.nH[n][k] /= CUBE(CM_TO_M);
+    }
+  }
   atmos.nHtot = (double *) calloc(Ndep, sizeof(double));
   
   // check if atmosphere is non-static
@@ -123,7 +129,7 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   {
     for (int n=0;  n<atmos.NHydr;  n++)
     {
-      atmos.nH[n][k] /= CUBE(CM_TO_M);
+      // atmos.nH[n][k] /= CUBE(CM_TO_M);
       atmos.nHtot[k] += atmos.nH[n][k];
     }
     geometry.vel[k] *= KM_TO_M;
@@ -140,7 +146,7 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   }
 
   if (atmos.Stokes) Bproject();
-
+  
   readAtomicModels();
   readMolecularModels();
   SortLambda();
@@ -158,6 +164,7 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 
   /* --- Solve radiative transfer for active ingredients -- --------- */
 
+  // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
 
   adjustStokesMode();
@@ -173,36 +180,34 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
     convertScales(&atmos, &geometry);
   }
 
-  mySpectrum spec;
-  spec.nlw = spectrum.Nspect;
-  spec.Nrays = atmos.Nrays;
-  spec.lam = spectrum.lambda;
-  spec.sI = spectrum.I;
-  if (atmos.Stokes)
-  {
-    spec.sQ = spectrum.Stokes_Q;
-    spec.sU = spectrum.Stokes_U;
-    spec.sV = spectrum.Stokes_V;
-    spec.stokes = 1;
-  }
-  else
-  {
-    spec.sQ = NULL;
-    spec.sU = NULL;
-    spec.sV = NULL;
-    spec.stokes = 0;
-  }
-  spec.J = spectrum.J;
-  spec.J20 = spectrum.J20;
-
-  return spec;
+  // mySpectrum spec;
+  // spec.nlw = spectrum.Nspect;
+  // spec.Nrays = atmos.Nrays;
+  // spec.lam = spectrum.lambda;
+  // spec.sI = spectrum.I;
+  // if (atmos.Stokes)
+  // {
+  //   spec.sQ = spectrum.Stokes_Q;
+  //   spec.sU = spectrum.Stokes_U;
+  //   spec.sV = spectrum.Stokes_V;
+  //   spec.stokes = 1;
+  // }
+  // else
+  // {
+  //   spec.sQ = NULL;
+  //   spec.sU = NULL;
+  //   spec.sV = NULL;
+  //   spec.stokes = 0;
+  // }
+  // spec.J = spectrum.J;
+  // spec.J20 = spectrum.J20;
 
   // getCPU(1, TIME_START, NULL);
 
-  // writeInput();
-  // writeAtmos(&atmos);
+  writeInput();
+  writeAtmos(&atmos);
   // writeGeometry(&geometry);
-  // writeSpectrum(&spectrum);
+  writeSpectrum(&spectrum);
   // writeFlux(FLUX_DOT_OUT);
 
   // for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
@@ -213,15 +218,18 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   //   writeRadRate(atom);
   //   writeCollisionRate(atom);
   //   writeDamping(atom);
-  // } 
+  // }
+
   // for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
   //   molecule = atmos.activemols[nact];
   //   writeMolPops(molecule);
   // }
 
   // writeOpacity();
-
+  
   // getCPU(1, TIME_POLL, "Write output");
   // printTotalCPU();
+
+  return spectrum.J;
 }
 /* ------- end ---------------------------- rhf1d.c ----------------- */

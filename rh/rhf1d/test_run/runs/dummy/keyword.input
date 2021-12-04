@@ -8,7 +8,7 @@
 # (both KEYWORD_REQUIRED).
 
 #  ATMOS_FILE = ../../Atmos/FALC_82.atmos
-  ATMOS_FILE = atm_0_0
+  ATMOS_FILE = atm_0_0.atmos
   ABUND_FILE = ../../Atoms/abundance.input
 
 # Set choice of number of rays (KEYWORD_OPTIONAL).
@@ -25,7 +25,7 @@
 
 ##  Table of additional wavelengths  KEYWORD_OPTIONAL
 
-  WAVETABLE = /home/dusan/Documents/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window.wave
+  WAVETABLE = /media/dusan/storage/RH/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window.wave
 
 # Maximum number of iterations to initialize scattering radiation
 # field in the background (KEYWORD_OPTIONAL). In LTE case it needs
@@ -181,8 +181,8 @@
 # Input Stokes mode (KEYWORD_OPTIONAL). 
 # Options are: NO_STOKES, FIELD_FREE, POLARIZATION_FREE, and FULL_STOKES.
 
-  STOKES_MODE = FULL_STOKES
-#   STOKES_MODE = NO_STOKES
+#  STOKES_MODE = FULL_STOKES
+   STOKES_MODE = NO_STOKES
 
 # Include magneto-optical effects (KEYWORD_DEFAULT). Default is TRUE.
 

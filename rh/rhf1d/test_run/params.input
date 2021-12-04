@@ -23,7 +23,8 @@ cube_atmosphere = atm_0_0.atmos
 range = 1,1,1,1
 
 #--- RH root folder path
-rh_path = /home/dusan/Documents/rh-globin
+#rh_path = /home/dusan/Documents/rh-globin
+rh_path = /media/dusan/storage/RH/rh
 
 #============================= garbage =============================#
 
