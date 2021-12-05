@@ -66,11 +66,8 @@ def grabnum(int[:] z):
 	a = rh._getnumber(&z[0])
 	return a
 
-def rhf1d(argc, py_argv, 
-		  scale, temp, ne, 
-	 	  vz, vmic, 
-	 	  mag, gamma, chi, 
-		  nH, atm_scale):
+def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic, 
+	 	  mag, gamma, chi, nH, atm_scale):
 	Ndep = len(temp)
 	rh_scale = pyarray2double_1d(scale)
 	rh_temp = pyarray2double_1d(temp)
@@ -89,13 +86,22 @@ def rhf1d(argc, py_argv,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	cdef double** Jarr;
-	Jarr = rh.rhf1d(argc, argv, Ndep,
+	cdef rh.mySpectrum spec;
+	spec = rh.rhf1d(argc, argv, Ndep,
 			 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
 			 rh_mag, rh_gamma, rh_chi, 
 			 rh_nH, atm_scale)
 
-	return 1
+	lam = convert_1d(spec.lam, spec.nlw)
+	sI = convert_1d(spec.sI, spec.nlw)
+	sQ, sU, sV = None, None, None
+	if spec.stokes:
+		sQ = convert_1d(spec.sQ, spec.nlw)
+		sU = convert_1d(spec.sU, spec.nlw)
+		sV = convert_1d(spec.sV, spec.nlw)
+	J = convert_2d(spec.J, spec.nlw, spec.Nrays)
+	
+	return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 
 # ToDo:
 #
@@ -134,22 +140,23 @@ def solveray(argc, py_argv,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	cdef rh.mySpectrum spec
-	spec = rh._solveray(argc, argv, Ndep,
-					rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
-			 		rh_mag, rh_gamma, rh_chi,
-			  		rh_nH, 1.0, atm_scale)
+	# cdef rh.mySpectrum spec
+	# spec = rh._solveray(argc, argv, Ndep,
+	# 				rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
+	# 		 		rh_mag, rh_gamma, rh_chi,
+	# 		  		rh_nH, 1.0, atm_scale)
 
-	lam = convert_1d(spec.lam, spec.nlw)
-	sI = convert_1d(spec.sI, spec.nlw)
-	sQ, sU, sV = None, None, None
-	if spec.stokes:
-		sQ = convert_1d(spec.sQ, spec.nlw)
-		sU = convert_1d(spec.sU, spec.nlw)
-		sV = convert_1d(spec.sV, spec.nlw)
-	J = convert_2d(spec.J, spec.nlw, spec.Nrays)
+	# lam = convert_1d(spec.lam, spec.nlw)
+	# sI = convert_1d(spec.sI, spec.nlw)
+	# sQ, sU, sV = None, None, None
+	# if spec.stokes:
+	# 	sQ = convert_1d(spec.sQ, spec.nlw)
+	# 	sU = convert_1d(spec.sU, spec.nlw)
+	# 	sV = convert_1d(spec.sV, spec.nlw)
+	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 	
-	return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
+	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
+	return 1
 
 def read_input(argc, py_argv):
 	py_list = py_argv.split(" ")

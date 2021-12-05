@@ -24,7 +24,6 @@
 
 #define  MOLECULAR_CONCENTRATION_FILE  "molecules.out"
 
-
 /* --- Angle set identifications. Most are Carlsson type -- --------- */
 
 enum angleset  {SET_VERTICAL, SET_GL, SET_A2, SET_A4, SET_A6, SET_A8,

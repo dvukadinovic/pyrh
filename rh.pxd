@@ -64,15 +64,6 @@ cdef extern from "rh/inputs.h":
 		# pthread_attr_t thread_attr;
 
 cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
-	cdef double** rhf1d(int argc, char *argv[], int Ndep,
-			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
-			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double **rh_nH,
-			int atm_scale)
-	
-	cdef InputData readMe(int argc, char *argv[])
-
-cdef extern from "rh/rhf1d/pyrh_solveray.h":
 	ctypedef struct mySpectrum:
 		int nlw
 		int Nrays
@@ -83,11 +74,15 @@ cdef extern from "rh/rhf1d/pyrh_solveray.h":
 		double *sU
 		double *sV
 		double **J
-
-	cdef int _getnumber(int* z)
-
-	cdef mySpectrum _solveray(int argc, char *argv[], int Ndep,
+	
+	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double **rh_nH, double muz,
+			double **rh_nH,
 			int atm_scale)
+	
+	cdef InputData readMe(int argc, char *argv[])
+
+cdef extern from "rh/rhf1d/pyrh_solveray.h":
+	cdef int _getnumber(int* z)
+	cdef void _solveray(char *argv[], double muz, mySpectrum *spec)

@@ -21,7 +21,7 @@ wave_step = 0.01
 #--- Reference atmosphere (optional)
 #cube_atmosphere = atm_0_0.atmos
 cube_atmosphere = atmos_combined_ss_v2.fits
-#range = 1,1,1,1
+range = 1,1,1,1
 
 #--- RH root folder path
 #rh_path = /home/dusan/Documents/rh-globin

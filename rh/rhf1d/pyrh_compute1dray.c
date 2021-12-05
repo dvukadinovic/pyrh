@@ -32,8 +32,6 @@
 #include "constant.h"
 
 #include "pyrh_compute1dray.h"
-#include "inputs.h"
-
 
 /* --- Function prototypes --                          -------------- */
 
@@ -60,7 +58,7 @@ InputData readMe(int argc, char *argv[])
   return input;
 }
 
-double** rhf1d(int argc, char *argv[], int Ndep,
+mySpectrum rhf1d(int argc, char *argv[], int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
               double *rh_mag, double *rh_gamma, double *rh_chi,
               double **rh_nH, int atm_scale)
@@ -230,6 +228,9 @@ double** rhf1d(int argc, char *argv[], int Ndep,
   // getCPU(1, TIME_POLL, "Write output");
   // printTotalCPU();
 
-  return spectrum.J;
+  mySpectrum spec;
+  _solveray(argv, 1.0, &spec);
+
+  return spec;
 }
 /* ------- end ---------------------------- rhf1d.c ----------------- */

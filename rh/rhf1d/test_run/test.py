@@ -25,30 +25,26 @@ start = time.time()
 argv = "rhf1d -i keyword.input"
 argc = len(argv.split(" "))
 
-for idx in range(atmos.nx):
-	for idy in range(atmos.ny):
+for idx in range(1):
+	for idy in range(1):
 		scale = atmos.data[idx,idy,0]
 		temp = atmos.data[idx,idy,1]
 		ne = atmos.data[idx,idy,2]
 		vz = atmos.data[idx,idy,3]
 		vmic = atmos.data[idx,idy,4]
-		mag = atmos.data[idx,idy,5]
+		mag = atmos.data[idx,idy,5]/1e4
 		gamma = atmos.data[idx,idy,6]
 		chi = atmos.data[idx,idy,7]
 		nH = atmos.data[idx,idy,8:]
 
-		j = pyrh.rhf1d(argc, argv, 
+		spec = pyrh.rhf1d(argc, argv, 
 					scale, temp, ne, vz, vmic,
 					mag, gamma, chi, nH, 0)
-
-		spec = pyrh.solveray(argc, argv, 
-					scale, temp, ne, vz, vmic,
-					mag, gamma, chi, nH, 0)
-# plt.plot(spec.I[:-1])
-# plt.show()
 
 print(time.time() - start)
 
+plt.plot(spec.I[:-1])
+# plt.show()
 
 start = time.time()
 
@@ -60,6 +56,6 @@ if globin.mode==0:
 
 print(time.time() - start)
 
-# plt.plot(spec.spec[0,0,:,0])
+plt.plot(spec.spec[0,0,:,0])
 
-# plt.show()
+plt.show()

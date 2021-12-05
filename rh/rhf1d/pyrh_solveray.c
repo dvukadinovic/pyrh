@@ -34,13 +34,13 @@
 #include "xdr.h"
 #include "constant.h"
 
+#include "pyrh_compute1dray.h"
 #include "pyrh_solveray.h"
 
 #define COMMENT_CHAR        "#"
 
 #define RAY_INPUT_FILE      "ray.input"
 #define ASCII_SPECTRUM_FILE "spectrum_%4.2f.asc"
-
 
 /* --- Function prototypes --                          -------------- */
 
@@ -49,12 +49,13 @@
 
 // enum Topology topology = ONE_D_PLANE;
 
-Atmosphere atmos;
-Geometry geometry;
+extern Atmosphere atmos;
+extern Geometry geometry;
+// ProgramStats stats;
+extern InputData input;
+// CommandLine commandline;
+
 Spectrum spectrum;
-ProgramStats stats;
-InputData input;
-CommandLine commandline;
 char messageStr[MAX_LINE_SIZE];
 
 
@@ -67,11 +68,12 @@ int _getnumber(int* z)
 
 /* ------- begin -------------------------- solveray.c -------------- */
 
-mySpectrum _solveray(int argc, char *argv[], int Ndep,
-              double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
-              double *rh_mag, double *rh_gamma, double *rh_chi,
-              double **rh_nH, double muz,
-              int atm_scale)
+// mySpectrum _solveray(int argc, char *argv[], int Ndep,
+//               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
+//               double *rh_mag, double *rh_gamma, double *rh_chi,
+//               double **rh_nH, double muz,
+//               int atm_scale)
+void _solveray(char *argv[], double muz, mySpectrum *spec)
 {
   register int n, k, la;
 
@@ -84,22 +86,22 @@ mySpectrum _solveray(int argc, char *argv[], int Ndep,
   XDR     xdrs;
   ActiveSet *as;
 
-  setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
-  SetFPEtraps();
+  // setOptions(argc, argv);
+  // getCPU(0, TIME_START, NULL);
+  // SetFPEtraps();
 
   /* --- Read input data and initialize --             -------------- */
 
-  readInput();
+  // readInput();
   input.startJ = OLD_J;
   spectrum.updateJ = FALSE;
 
   /* --- Read input data for atmosphere --             -------------- */
 
-  geometry.Ndep = Ndep;
+  // geometry.Ndep = Ndep;
 
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  // MULTIatmos(&atmos, &geometry);
 
   /* --- Read direction cosine for ray --              -------------- */
 
@@ -112,83 +114,83 @@ mySpectrum _solveray(int argc, char *argv[], int Ndep,
   // Nread = sscanf(inputLine, "%lf", &muz);
   // checkNread(Nread, Nrequired=1, argv[0], checkPoint=1);
 
-  if (muz <= 0.0  ||  muz > 1.0) {
-    sprintf(messageStr,
-	    "Value of muz = %f does not lie in interval <0.0, 1.0]\n", muz);
-    Error(ERROR_LEVEL_2, argv[0], messageStr);
-  }
+  // if (muz <= 0.0  ||  muz > 1.0) {
+  //   sprintf(messageStr,
+	 //    "Value of muz = %f does not lie in interval <0.0, 1.0]\n", muz);
+  //   Error(ERROR_LEVEL_2, argv[0], messageStr);
+  // }
   
-  if (atm_scale==0){
-    geometry.scale = TAU500;
-    for (k=0; k<Ndep; k++){ 
-      geometry.tau_ref[k] = POW10(rh_scale[k]);
-    }
-  }
-  if (atm_scale==1){
-    geometry.scale = COLUMN_MASS;
-    for (k=0; k<Ndep; k++){
-      geometry.cmass[k] = POW10(rh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
-    }
-  }
-  if (input.StokesMode == FIELD_FREE ||
-      input.StokesMode == POLARIZATION_FREE) {
-    input.StokesMode = FULL_STOKES;
-  }
+  // if (atm_scale==0){
+  //   geometry.scale = TAU500;
+  //   for (k=0; k<Ndep; k++){ 
+  //     geometry.tau_ref[k] = POW10(rh_scale[k]);
+  //   }
+  // }
+  // if (atm_scale==1){
+  //   geometry.scale = COLUMN_MASS;
+  //   for (k=0; k<Ndep; k++){
+  //     geometry.cmass[k] = POW10(rh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
+  //   }
+  // }
+  // if (input.StokesMode == FIELD_FREE ||
+  //     input.StokesMode == POLARIZATION_FREE) {
+  //   input.StokesMode = FULL_STOKES;
+  // }
   /* --- redefine geometry for just this one ray --    -------------- */
 
-  atmos.T = rh_temp;
-  atmos.ne = rh_ne;
-  geometry.vel = rh_vz;
-  atmos.vturb = rh_vmic;
+  // atmos.T = rh_temp;
+  // atmos.ne = rh_ne;
+  // geometry.vel = rh_vz;
+  // atmos.vturb = rh_vmic;
 
-  atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
-  atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
-  atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
 
-  atmos.B = rh_mag;
-  atmos.gamma_B = rh_gamma;
-  atmos.chi_B = rh_chi;
-  atmos.Stokes = TRUE;
+  // atmos.B = rh_mag;
+  // atmos.gamma_B = rh_gamma;
+  // atmos.chi_B = rh_chi;
+  // atmos.Stokes = TRUE;
 
-  atmos.Nrays = geometry.Nrays = 1;
+  // atmos.Nrays = geometry.Nrays = 1;
   geometry.muz[0] = muz;
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
   geometry.muy[0] = 0.0;
   geometry.wmu[0] = 1.0;
-  if (atmos.Stokes) Bproject();
+  // if (atmos.Stokes) Bproject();
   
-  atmos.nH = matrix_double(atmos.NHydr, Ndep);
-  atmos.nH = rh_nH;
-  atmos.nHtot = (double *) calloc(Ndep, sizeof(double));
+  // atmos.nH = matrix_double(atmos.NHydr, Ndep);
+  // atmos.nH = rh_nH;
+  // atmos.nHtot = (double *) calloc(Ndep, sizeof(double));
 
-  for (k=0; k<Ndep; k++)
-  {
-    for (n=0;  n<atmos.NHydr;  n++)
-    {
-      atmos.nH[n][k] /= CUBE(CM_TO_M);
-      atmos.nHtot[k] += atmos.nH[n][k];
-    }
-    geometry.vel[k] *= KM_TO_M;
-    atmos.vturb[k]  *= KM_TO_M;
-    atmos.ne[k]     /= CUBE(CM_TO_M);
-  }
+  // for (k=0; k<Ndep; k++)
+  // {
+  //   for (n=0;  n<atmos.NHydr;  n++)
+  //   {
+  //     atmos.nH[n][k] /= CUBE(CM_TO_M);
+  //     atmos.nHtot[k] += atmos.nH[n][k];
+  //   }
+  //   geometry.vel[k] *= KM_TO_M;
+  //   atmos.vturb[k]  *= KM_TO_M;
+  //   atmos.ne[k]     /= CUBE(CM_TO_M);
+  // }
   
-  atmos.moving = FALSE;
-  for (k=0; k<Ndep; k++)
-  {
-    if (fabs(geometry.vel[k]) >= atmos.vmacro_tresh) {
-      atmos.moving = TRUE;
-      break;
-    }
-  }
+  // atmos.moving = FALSE;
+  // for (k=0; k<Ndep; k++)
+  // {
+  //   if (fabs(geometry.vel[k]) >= atmos.vmacro_tresh) {
+  //     atmos.moving = TRUE;
+  //     break;
+  //   }
+  // }
 
   // this is how far I edited
 
-  readAtomicModels();
-  readMolecularModels();
-  SortLambda();
+  // readAtomicModels();
+  // readMolecularModels();
+  // SortLambda();
 
-  getBoundary(&geometry);
+  // getBoundary(&geometry);
 
   /* --- Open file with background opacities --        -------------- */
   
@@ -206,7 +208,7 @@ mySpectrum _solveray(int argc, char *argv[], int Ndep,
     }
     readBRS();
   }
-  convertScales(&atmos, &geometry);
+  // convertScales(&atmos, &geometry);
 
   getProfiles();
   initSolution();
@@ -218,30 +220,26 @@ mySpectrum _solveray(int argc, char *argv[], int Ndep,
 
   solveSpectrum(FALSE, FALSE);
   
-  mySpectrum spec;
-
-  spec.nlw = spectrum.Nspect;
-  spec.Nrays = atmos.Nrays;
-  spec.lam = spectrum.lambda;
-  spec.sI = spectrum.I[0];
+  spec->nlw = spectrum.Nspect;
+  spec->Nrays = atmos.Nrays;
+  spec->lam = spectrum.lambda;
+  spec->sI = spectrum.I[0];
 
   if (atmos.Stokes)
   {
-    spec.sQ = spectrum.Stokes_Q[0];
-    spec.sU = spectrum.Stokes_U[0];
-    spec.sV = spectrum.Stokes_V[0];
-    spec.stokes = 1;
+    spec->sQ = spectrum.Stokes_Q[0];
+    spec->sU = spectrum.Stokes_U[0];
+    spec->sV = spectrum.Stokes_V[0];
+    spec->stokes = 1;
   }
   else
   {
-    spec.sQ = NULL;
-    spec.sU = NULL;
-    spec.sV = NULL;
-    spec.stokes = 0;
+    spec->sQ = NULL;
+    spec->sU = NULL;
+    spec->sV = NULL;
+    spec->stokes = 0;
   }
-  spec.J = spectrum.J;
-  
-  return spec;
+  spec->J = spectrum.J;
 }
 
   /* --- Write emergent spectrum to output file --     -------------- */

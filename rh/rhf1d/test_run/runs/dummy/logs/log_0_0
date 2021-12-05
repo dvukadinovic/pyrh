@@ -20,6 +20,10 @@
 -WARNING in routine readValues
  Overriding default value FALSE for keyword LIMIT_MEMORY with FALSE
 
+-WARNING in routine readInput
+ Parameter atmos.B_char not set or set to zero
+ Wavelength grids of line profiles do not take account  of Zeeman splitting
+
  -- reading input file: /media/dusan/storage/RH/pyrh/rh/rhf1d/test_run/runs/dummy/atmospheres/atm_0_0
 
  -- reading input file: ../../Atoms/H_6.atom (passive)
