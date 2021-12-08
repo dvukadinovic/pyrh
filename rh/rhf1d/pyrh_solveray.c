@@ -152,7 +152,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   // atmos.chi_B = rh_chi;
   // atmos.Stokes = TRUE;
 
-  // atmos.Nrays = geometry.Nrays = 1;
+  atmos.Nrays = geometry.Nrays = 1;
   geometry.muz[0] = muz;
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
   geometry.muy[0] = 0.0;

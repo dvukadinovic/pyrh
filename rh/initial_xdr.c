@@ -141,6 +141,7 @@ void initSolution(Atom *atom, Molecule *molecule)
   openJfile = FALSE;
 
   if (input.startJ == OLD_J) {
+    // here we enter when performing _solveray()
     if (spectrum.updateJ) {
       strcpy(permission, "r+"); 
       oflag |= O_RDWR;
@@ -156,7 +157,9 @@ void initSolution(Atom *atom, Molecule *molecule)
       openJfile = TRUE;
     }
   }
+
   if (openJfile) {
+    // here we enter when performing _solveray()
     if ((spectrum.fd_J = open(input.JFile, oflag, PERMISSIONS)) == -1) {
       sprintf(messageStr,
 	      "Unable to open input file %s with permission %s",
@@ -173,6 +176,7 @@ void initSolution(Atom *atom, Molecule *molecule)
       }
     }
   }
+  
   if (input.limit_memory) {
     if (oflag & O_CREAT) {
       J = (double *) malloc(atmos.Nspace * sizeof(double));
@@ -196,21 +200,22 @@ void initSolution(Atom *atom, Molecule *molecule)
     }
   } else {
     if (input.startJ == OLD_J) {
+      // Here we enter when performing _solveray() or want to start rhf1d() from OLD_J
 
       /* --- Fill matrix J with old values from previous run ----- -- */
 
       for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
-	readJlambda(nspect, spectrum.J[nspect]);
+	       readJlambda(nspect, spectrum.J[nspect]);
     
       close(spectrum.fd_J);
       spectrum.fd_J = -1;
 
       if (input.backgr_pol) {
-	for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
-	  readJ20lambda(nspect, spectrum.J20[nspect]);
-    
-	close(spectrum.fd_J20);
-	spectrum.fd_J20 = -1;
+      	for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
+      	  readJ20lambda(nspect, spectrum.J20[nspect]);
+          
+      	close(spectrum.fd_J20);
+      	spectrum.fd_J20 = -1;
       }
     }
   }
@@ -221,16 +226,17 @@ void initSolution(Atom *atom, Molecule *molecule)
     oflag = 0;
     if (input.startJ == OLD_J) {
       if (spectrum.updateJ) {
-	strcpy(permission, "r+");
-	oflag |= O_RDWR;
+      	strcpy(permission, "r+");
+      	oflag |= O_RDWR;
       } else {
-	strcpy(permission, "r");
-	oflag |= O_RDONLY;
+      	strcpy(permission, "r");
+      	oflag |= O_RDONLY;
       }
     } else {
       strcpy(permission, "w+");
       oflag |= (O_RDWR | O_CREAT);
     }
+
     if ((spectrum.fd_Imu = open(IMU_FILENAME, oflag, PERMISSIONS)) == -1) {
       sprintf(messageStr, "Unable to open %s file %s with permission %s",
 	      (spectrum.updateJ) ? "update" : "input",
@@ -245,11 +251,14 @@ void initSolution(Atom *atom, Molecule *molecule)
     index = 0;
     for (nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
       if (containsPRDline(&spectrum.as[nspect])) {
-	spectrum.PRDindex[nspect] = index;
-        index++;
+	       spectrum.PRDindex[nspect] = index;
+         index++;
       }
     }
   }
+
+  // in LTE I do not care about the bottom part of the code (only for active ATOMs and MOLECULEs)
+
   for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
     atom = atmos.activeatoms[nact];
 
@@ -299,7 +308,7 @@ void initSolution(Atom *atom, Molecule *molecule)
 	    
 	    if (la == 0) {
 	      for (k = 0;  k < atmos.Nspace;  k++)
-		atom->Gamma[ij][k] += line->Aji;
+		      atom->Gamma[ij][k] += line->Aji;
 	    }
 	    break;
 
@@ -315,9 +324,9 @@ void initSolution(Atom *atom, Molecule *molecule)
 	    twohnu3_c2 = twoc / CUBE(continuum->lambda[la]);
 	    for (k = 0;  k < atmos.Nspace;  k++) {
 	      gijk = atom->nstar[i][k]/atom->nstar[j][k] *
-		exp(-hc_k/(continuum->lambda[la] * atmos.T[k]));
+		            exp(-hc_k/(continuum->lambda[la] * atmos.T[k]));
 	      atom->Gamma[ij][k] += gijk * twohnu3_c2 *
-		continuum->alpha[la]*wla;
+		            continuum->alpha[la]*wla;
 	    }
 	    break;
 	  default:

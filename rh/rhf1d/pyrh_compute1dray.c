@@ -75,6 +75,7 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 
   readInput();
   spectrum.updateJ = TRUE;
+  input.limit_memory = FALSE;
 
   Atom *atom;
 
@@ -155,6 +156,10 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   convertScales(&atmos, &geometry);
 
   getProfiles();
+  // here it initializes the spectrum 
+  // and reads the J computed in rhf1d();
+  // not only that, but takes PRD data also;
+  // watch it! J is connected with LIMIT_MEMORY keyword
   initSolution();
   initScatter();
 
@@ -177,28 +182,6 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
     geometry.scale = COLUMN_MASS;
     convertScales(&atmos, &geometry);
   }
-
-  // mySpectrum spec;
-  // spec.nlw = spectrum.Nspect;
-  // spec.Nrays = atmos.Nrays;
-  // spec.lam = spectrum.lambda;
-  // spec.sI = spectrum.I;
-  // if (atmos.Stokes)
-  // {
-  //   spec.sQ = spectrum.Stokes_Q;
-  //   spec.sU = spectrum.Stokes_U;
-  //   spec.sV = spectrum.Stokes_V;
-  //   spec.stokes = 1;
-  // }
-  // else
-  // {
-  //   spec.sQ = NULL;
-  //   spec.sU = NULL;
-  //   spec.sV = NULL;
-  //   spec.stokes = 0;
-  // }
-  // spec.J = spectrum.J;
-  // spec.J20 = spectrum.J20;
 
   // getCPU(1, TIME_START, NULL);
 

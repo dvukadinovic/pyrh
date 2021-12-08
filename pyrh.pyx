@@ -105,7 +105,7 @@ def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic,
 
 # ToDo:
 #
-#   -- compare the speed with and without writting on disk
+#   -- compare the speed with and without writting to the disk
 #
 #   -- read input parameters
 #   -- forward them to the rhf1d() and solveray() as

@@ -11,13 +11,9 @@ import pyrh
 # argc = len(argv.split(" "))
 
 # inData = pyrh.read_input(argc, argv)
-# print()
-# # print(inData["magneto_optical"])
-# print(inData)
 
 # sys.exit()
 
-atmos = globin.Atmosphere("atm_0_0.atmos")
 atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
 
 start = time.time()
@@ -37,11 +33,23 @@ for idx in range(1):
 		chi = atmos.data[idx,idy,7]
 		nH = atmos.data[idx,idy,8:]
 
-		spec = pyrh.rhf1d(argc, argv, 
-					scale, temp, ne, vz, vmic,
-					mag, gamma, chi, nH, 0)
+def run_():
+	spec = pyrh.rhf1d(argc, argv, 
+			scale, temp, ne, vz, vmic,
+			mag, gamma, chi, nH, 0)
 
-print(time.time() - start)
+import timeit
+
+Nrepeat = 1
+
+times = timeit.Timer(run_).repeat(1,Nrepeat)
+times = np.array(times)
+print(times)
+print(times/Nrepeat)
+
+# print(time.time() - start)
+
+sys.exit()
 
 plt.plot(spec.I[:-1])
 # plt.show()

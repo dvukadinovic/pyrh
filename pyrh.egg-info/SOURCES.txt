@@ -1,4 +1,5 @@
 .gitignore
+.install
 pyrh.c
 pyrh.pyx
 rh.pxd
@@ -342,6 +343,8 @@ rh/rhf1d/test_run/runs/dummy/params.input
 rh/rhf1d/test_run/runs/dummy/ray.input
 rh/rhf1d/test_run/runs/dummy/spinor_window
 rh/rhf1d/test_run/runs/dummy/spinor_window.wave
+rh/rhf1d/test_run/runs/dummy/atmospheres/atm_0_0
+rh/rhf1d/test_run/runs/dummy/atmospheres/atm_0_0.B
 rh/rhf1d/test_run/runs/dummy/logs/log_0_0
 rh/tools/Makefile
 rh/tools/addgrad.c
