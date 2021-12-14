@@ -82,7 +82,3 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int atm_scale)
 	
 	cdef InputData readMe(int argc, char *argv[])
-
-cdef extern from "rh/rhf1d/pyrh_solveray.h":
-	cdef int _getnumber(int* z)
-	cdef void _solveray(char *argv[], double muz, mySpectrum *spec)

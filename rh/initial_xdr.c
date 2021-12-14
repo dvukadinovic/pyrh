@@ -59,7 +59,7 @@ extern enum Topology topology;
 
 /* ------- begin -------------------------- initSolution.c ---------- */
 
-void initSolution(Atom *atom, Molecule *molecule)
+void initSolution(bool_t pyrh_io_flag)
 {
   const char routineName[] = "initSolution";
   register int k, i, ij, nspect, n, kr, nact;
@@ -72,6 +72,9 @@ void initSolution(Atom *atom, Molecule *molecule)
   AtomicLine *line;
   AtomicContinuum *continuum;
   XDR xdrs;
+
+  Atom *atom;
+  Molecule *molecule;
 
   getCPU(2, TIME_START, NULL);
 
@@ -140,8 +143,7 @@ void initSolution(Atom *atom, Molecule *molecule)
   oflag = 0;
   openJfile = FALSE;
 
-  if (input.startJ == OLD_J) {
-    // here we enter when performing _solveray()
+  if ((input.startJ==OLD_J) && pyrh_io_flag) { // check this! 
     if (spectrum.updateJ) {
       strcpy(permission, "r+"); 
       oflag |= O_RDWR;
@@ -199,7 +201,7 @@ void initSolution(Atom *atom, Molecule *molecule)
       }
     }
   } else {
-    if (input.startJ == OLD_J) {
+    if ((input.startJ==OLD_J) && pyrh_io_flag) {
       // Here we enter when performing _solveray() or want to start rhf1d() from OLD_J
 
       /* --- Fill matrix J with old values from previous run ----- -- */
@@ -219,6 +221,9 @@ void initSolution(Atom *atom, Molecule *molecule)
       }
     }
   }
+
+  // in LTE I do not care about the bottom part of the code (only for active ATOMs and MOLECULEs)
+
   /* --- Need storage for angle-dependent specific intensities for
          angle-dependent PRD --                        -------------- */
 
@@ -256,8 +261,6 @@ void initSolution(Atom *atom, Molecule *molecule)
       }
     }
   }
-
-  // in LTE I do not care about the bottom part of the code (only for active ATOMs and MOLECULEs)
 
   for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
     atom = atmos.activeatoms[nact];

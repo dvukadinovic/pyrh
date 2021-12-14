@@ -24,8 +24,8 @@ cube_atmosphere = atmos_combined_ss_v2.fits
 range = 1,1,1,1
 
 #--- RH root folder path
-#rh_path = /home/dusan/Documents/rh-globin
-rh_path = /media/dusan/storage/RH/rh
+rh_path = /home/dusan/Documents/rh-globin
+#rh_path = /media/dusan/storage/RH/rh
 
 #============================= garbage =============================#
 

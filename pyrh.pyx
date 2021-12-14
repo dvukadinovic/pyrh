@@ -1,5 +1,5 @@
 # distutils: language = c
-# distutils: sources = [rh/rhf1d/pyrh_compute1dray.c, rh/rhf1d/pyrh_solveray.c]
+# distutils: sources = [rh/rhf1d/pyrh_compute1dray.c]
 # distutils: include_dirs = rh/
 
 cimport rh
@@ -8,6 +8,7 @@ import numpy as np
 cimport numpy as cnp
 import cython
 from libc.stdlib cimport malloc
+import time
 
 # cimport tools
 
@@ -60,11 +61,11 @@ class Spectrum(object):
 		else:
 			self.stokes = False
 
-def grabnum(int[:] z):
-	# cdef cnp.ndarray[int, ndim=1, mode="c"] arr
-	# arr = np.ascontiguousarray(z, dtype=ctypes.c_int)
-	a = rh._getnumber(&z[0])
-	return a
+# def grabnum(int[:] z):
+# 	# cdef cnp.ndarray[int, ndim=1, mode="c"] arr
+# 	# arr = np.ascontiguousarray(z, dtype=ctypes.c_int)
+# 	a = rh._getnumber(&z[0])
+# 	return a
 
 def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic, 
 	 	  mag, gamma, chi, nH, atm_scale):

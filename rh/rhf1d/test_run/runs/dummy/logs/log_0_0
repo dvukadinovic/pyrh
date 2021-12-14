@@ -24,7 +24,7 @@
  Parameter atmos.B_char not set or set to zero
  Wavelength grids of line profiles do not take account  of Zeeman splitting
 
- -- reading input file: /media/dusan/storage/RH/pyrh/rh/rhf1d/test_run/runs/dummy/atmospheres/atm_0_0
+ -- reading input file: /home/dusan/Documents/pyrh/rh/rhf1d/test_run/runs/dummy/atmospheres/atm_0_0
 
  -- reading input file: ../../Atoms/H_6.atom (passive)
  -- reading input file: ../../Atoms/He.atom (passive)
@@ -51,7 +51,7 @@
  -- reading input file: ../../Molecules/H2O.molecule (passive)
 
  SortLambda: Found 202 unique wavelengths
-Read 18 Kurucz lines from file /media/dusan/storage/RH/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window
+Read 18 Kurucz lines from file /home/dusan/Documents/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window
 
  initScatter: Lambda iterating background scattering...
 

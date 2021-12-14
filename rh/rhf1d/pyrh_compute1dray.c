@@ -58,10 +58,10 @@ InputData readMe(int argc, char *argv[])
   return input;
 }
 
-mySpectrum rhf1d(int argc, char *argv[], int Ndep,
-              double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
-              double *rh_mag, double *rh_gamma, double *rh_chi,
-              double **rh_nH, int atm_scale)
+mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
+              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
+              double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
+              double **pyrh_nH, int pyrh_atm_scale)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -79,52 +79,52 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 
   Atom *atom;
 
-  geometry.Ndep = Ndep;
+  geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry);
   
-  if (atm_scale==0){
+  if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
-    for (int k=0; k<Ndep; k++) 
-      geometry.tau_ref[k] = POW10(rh_scale[k]);
+    for (int k=0; k<geometry.Ndep; k++) 
+      geometry.tau_ref[k] = POW10(pyrh_scale[k]);
   }
-  if (atm_scale==1){
+  if (pyrh_atm_scale==1){
     geometry.scale = COLUMN_MASS;
-    for (int k=0; k<Ndep; k++){
-      geometry.cmass[k] = POW10(rh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
+    for (int k=0; k<geometry.Ndep; k++){
+      geometry.cmass[k] = POW10(pyrh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
     }
   }
 
-  atmos.T = rh_temp;
-  atmos.ne = rh_ne;
-  geometry.vel = rh_vz;
-  atmos.vturb = rh_vmic;
+  atmos.T = pyrh_temp;
+  atmos.ne = pyrh_ne;
+  geometry.vel = pyrh_vz;
+  atmos.vturb = pyrh_vmic;
   
-  atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
-  atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
-  atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
+  // atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
 
-  atmos.B = rh_mag;
-  atmos.gamma_B = rh_gamma;
-  atmos.chi_B = rh_chi;
+  atmos.B = pyrh_mag;
+  atmos.gamma_B = pyrh_gamma;
+  atmos.chi_B = pyrh_chi;
   atmos.Stokes = TRUE;
 
-  atmos.nH = matrix_double(atmos.NHydr, Ndep);
-  for (int k=0; k<Ndep; k++)
+  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
+  for (int k=0; k<geometry.Ndep; k++)
   {
     for (int n=0; n<atmos.NHydr; n++)
     {
-      atmos.nH[n][k] = rh_nH[n][k];
+      atmos.nH[n][k] = pyrh_nH[n][k];
       atmos.nH[n][k] /= CUBE(CM_TO_M);
     }
   }
-  atmos.nHtot = (double *) calloc(Ndep, sizeof(double));
+  atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
   
   // check if atmosphere is non-static
   atmos.moving = FALSE;
   
-  for (int k=0; k<Ndep; k++)
+  for (int k=0; k<geometry.Ndep; k++)
   {
     for (int n=0;  n<atmos.NHydr;  n++)
     {
@@ -136,7 +136,7 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
     atmos.ne[k]     /= CUBE(CM_TO_M);
   }
 
-  for (int k=0; k<Ndep; k++)
+  for (int k=0; k<geometry.Ndep; k++)
   {
     if (fabs(geometry.vel[k]) >= atmos.vmacro_tresh) {
       atmos.moving = TRUE;
@@ -155,12 +155,14 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   Background(write_analyze_output=TRUE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
 
+  bool_t pyrh_io_flag = FALSE;
+
   getProfiles();
   // here it initializes the spectrum 
   // and reads the J computed in rhf1d();
   // not only that, but takes PRD data also;
   // watch it! J is connected with LIMIT_MEMORY keyword
-  initSolution();
+  initSolution(pyrh_io_flag);
   initScatter();
 
   getCPU(1, TIME_POLL, "Total Initialize");
@@ -183,12 +185,12 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
     convertScales(&atmos, &geometry);
   }
 
-  // getCPU(1, TIME_START, NULL);
+  getCPU(1, TIME_START, NULL);
 
   // writeInput();
   // writeAtmos(&atmos);
   // writeGeometry(&geometry);
-  writeSpectrum(&spectrum);
+  // writeSpectrum(&spectrum);
   // writeFlux(FLUX_DOT_OUT);
 
   // for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
@@ -209,10 +211,11 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
   // writeOpacity();
   
   // getCPU(1, TIME_POLL, "Write output");
-  // printTotalCPU();
+  
+  printTotalCPU();
 
   mySpectrum spec;
-  _solveray(argv, 1.0, &spec);
+  _solveray(argv, 1.0, &spec, spectrum.J, spectrum.J20);
 
   return spec;
 }

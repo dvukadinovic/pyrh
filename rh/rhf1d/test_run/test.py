@@ -38,21 +38,25 @@ def run_():
 			scale, temp, ne, vz, vmic,
 			mag, gamma, chi, nH, 0)
 
+	return spec
+
 import timeit
 
-Nrepeat = 1
+# Nrepeat = 100
 
-times = timeit.Timer(run_).repeat(1,Nrepeat)
-times = np.array(times)
-print(times)
-print(times/Nrepeat)
+# times = timeit.Timer(run_).repeat(1,Nrepeat)
+# times = np.array(times)
+# print(times)
+# print(times/Nrepeat)
 
-# print(time.time() - start)
+specRH = run_()
 
-sys.exit()
+print(time.time() - start)
 
-plt.plot(spec.I[:-1])
+plt.plot(specRH.I[:-1])
 # plt.show()
+
+# sys.exit()
 
 start = time.time()
 
@@ -65,5 +69,6 @@ if globin.mode==0:
 print(time.time() - start)
 
 plt.plot(spec.spec[0,0,:,0])
+# plt.plot(spec.spec[0,0,:,0] - specRH.I[:-1])
 
 plt.show()
