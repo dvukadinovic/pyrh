@@ -35,7 +35,6 @@
 #include "constant.h"
 
 #include "pyrh_compute1dray.h"
-// #include "pyrh_solveray.h"
 
 #define COMMENT_CHAR        "#"
 

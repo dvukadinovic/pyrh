@@ -45,6 +45,16 @@ cdef double** pyarray2double_2d(arr, Nrows, Ncols):
 
 	return rh_matrix
 
+cdef rh.InputData mapping_input_keys(dictionary):
+	cdef rh.InputData inData;
+
+	inData.atmos_input = dictionary["atoms_input"]
+	inData.abund_input = dictionary["abund_input"]
+	inData.wavetable_input = dictionary["wavetable_input"]
+	inData.atoms_input = dictionary["atoms_input"]
+
+	return inData
+
 class Spectrum(object):
 	def __init__(self, nlw, lam, sI, sQ, sU, sV, J, Jrh, stokes):
 		self.nlw = nlw
@@ -68,7 +78,7 @@ class Spectrum(object):
 # 	return a
 
 def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic, 
-	 	  mag, gamma, chi, nH, atm_scale):
+	 	  mag, gamma, chi, nH, atm_scale, inData):
 	Ndep = len(temp)
 	rh_scale = pyarray2double_1d(scale)
 	rh_temp = pyarray2double_1d(temp)
@@ -86,6 +96,8 @@ def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic,
 	cdef char *argv[10]
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
+
+	cdef rh.InputData pyrh_inData = mapping_input_keys(inData)
 
 	cdef rh.mySpectrum spec;
 	spec = rh.rhf1d(argc, argv, Ndep,
@@ -167,6 +179,7 @@ def read_input(argc, py_argv):
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	InputData = rh.readMe(argc, argv)
+	cdef rh.InputData inData;
+	inData = rh.readMe(argc, argv)
 
-	return InputData
+	return inData

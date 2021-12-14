@@ -73,7 +73,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
-  readInput();
+  // readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
 

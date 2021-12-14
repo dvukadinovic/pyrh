@@ -7,10 +7,12 @@ import globin
 
 import pyrh
 
-# argv = "rhf1d -i keyword.input"
-# argc = len(argv.split(" "))
+argv = "rhf1d -i keyword.input"
+argc = len(argv.split(" "))
 
-# inData = pyrh.read_input(argc, argv)
+inData = pyrh.read_input(argc, argv)
+print(inData)
+# print(type(inData))
 
 # sys.exit()
 
@@ -20,6 +22,13 @@ start = time.time()
 
 argv = "rhf1d -i keyword.input"
 argc = len(argv.split(" "))
+
+def run_():
+	spec = pyrh.rhf1d(argc, argv, 
+			scale, temp, ne, vz, vmic,
+			mag, gamma, chi, nH, 0, inData)
+
+	return spec
 
 for idx in range(1):
 	for idy in range(1):
@@ -33,30 +42,21 @@ for idx in range(1):
 		chi = atmos.data[idx,idy,7]
 		nH = atmos.data[idx,idy,8:]
 
-def run_():
-	spec = pyrh.rhf1d(argc, argv, 
-			scale, temp, ne, vz, vmic,
-			mag, gamma, chi, nH, 0)
+		specRH = run_()
 
-	return spec
-
-import timeit
-
+# import timeit
 # Nrepeat = 100
-
 # times = timeit.Timer(run_).repeat(1,Nrepeat)
 # times = np.array(times)
 # print(times)
 # print(times/Nrepeat)
 
-specRH = run_()
-
 print(time.time() - start)
 
 plt.plot(specRH.I[:-1])
-# plt.show()
+plt.show()
 
-# sys.exit()
+sys.exit()
 
 start = time.time()
 
@@ -68,7 +68,7 @@ if globin.mode==0:
 
 print(time.time() - start)
 
-plt.plot(spec.spec[0,0,:,0])
+# plt.plot(spec.spec[0,0,:,0])
 # plt.plot(spec.spec[0,0,:,0] - specRH.I[:-1])
 
-plt.show()
+# plt.show()
