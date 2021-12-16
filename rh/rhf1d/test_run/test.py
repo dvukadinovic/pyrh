@@ -11,14 +11,13 @@ atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
 
 start = time.time()
 
-aux = pyrh.RH()
 
 argv = "rhf1d -i keyword.input"
 argc = len(argv.split(" "))
 
-aux.read_RLK_lines(argc, argv)
-print(aux.Nrlk)
-sys.exit()
+aux = pyrh.RH(argc, argv)
+
+aux.read_RLK_lines()
 
 for idx in range(1):
 	for idy in range(1):
@@ -33,9 +32,7 @@ for idx in range(1):
 		nH = atmos.data[idx,idy,8:]
 
 def run_():
-	spec = aux.rhf1d(argc, argv, 
-			scale, temp, ne, vz, vmic,
-			mag, gamma, chi, nH, 0)
+	spec = aux.rhf1d(scale, temp, ne, vz, vmic, mag, gamma, chi, nH, 0)
 
 	return spec
 

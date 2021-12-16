@@ -71,11 +71,19 @@ cdef class RH:
 	cdef rh.mySpectrum spec
 	cdef rh.RLK_Line *rlk_lines
 	cdef public int Nrlk
+	cdef int argc
+	cdef char *argv[10]
 
-	def __init__(self):
-		pass	
+	def __init__(self, in_argc, py_argv):
+		self.argc = in_argc
 
-	cpdef rhf1d(self, argc, py_argv, scale, temp, ne, vz, vmic, 
+		py_list = py_argv.split(" ")
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * self.argc)(*py_string)
+		for i_ in range(self.argc):
+			self.argv[i_] = arr[i_]
+
+	cpdef rhf1d(self, scale, temp, ne, vz, vmic, 
 		 	  mag, gamma, chi, nH, atm_scale):
 		Ndep = len(temp)
 		rh_scale = pyarray2double_1d(scale)
@@ -88,14 +96,7 @@ cdef class RH:
 		rh_chi = pyarray2double_1d(chi)
 		rh_nH = pyarray2double_2d(nH, 6, Ndep)
 
-		py_list = py_argv.split(" ")
-		py_string = [item.encode("utf-8") for item in py_list]
-		arr = (ctypes.c_char_p * argc)(*py_string)
-		cdef char *argv[10]
-		for i_ in range(argc):
-			argv[i_] = arr[i_]
-
-		self.spec = rh.rhf1d(argc, argv, Ndep,
+		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
 				 rh_mag, rh_gamma, rh_chi, 
 				 rh_nH, atm_scale, 0)
@@ -111,15 +112,8 @@ cdef class RH:
 		
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
-	cpdef read_RLK_lines(self, argc, py_argv):
-		py_list = py_argv.split(" ")
-		py_string = [item.encode("utf-8") for item in py_list]
-		arr = (ctypes.c_char_p * argc)(*py_string)
-		cdef char *argv[10]
-		for i_ in range(argc):
-			argv[i_] = arr[i_]
-
-		self.Nrlk = rh.get_RLK_lines(argc, argv, self.rlk_lines)
+	cpdef read_RLK_lines(self):
+		self.Nrlk = rh.get_RLK_lines(self.argc, self.argv, self.rlk_lines)
 
 # ToDo:
 #
