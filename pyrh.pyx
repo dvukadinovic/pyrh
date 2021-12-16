@@ -67,42 +67,57 @@ class Spectrum(object):
 # 	a = rh._getnumber(&z[0])
 # 	return a
 
-def rhf1d(argc, py_argv, scale, temp, ne, vz, vmic, 
-	 	  mag, gamma, chi, nH, atm_scale):
-	Ndep = len(temp)
-	rh_scale = pyarray2double_1d(scale)
-	rh_temp = pyarray2double_1d(temp)
-	rh_ne = pyarray2double_1d(ne)
-	rh_vz = pyarray2double_1d(vz)
-	rh_vmic= pyarray2double_1d(vmic)
-	rh_mag = pyarray2double_1d(mag)
-	rh_gamma = pyarray2double_1d(gamma)
-	rh_chi = pyarray2double_1d(chi)
-	rh_nH = pyarray2double_2d(nH, 6, Ndep)
+cdef class RH:
+	cdef rh.mySpectrum spec
 
-	py_list = py_argv.split(" ")
-	py_string = [item.encode("utf-8") for item in py_list]
-	arr = (ctypes.c_char_p * argc)(*py_string)
-	cdef char *argv[10]
-	for i_ in range(argc):
-		argv[i_] = arr[i_]
+	def __init__(self):
+		pass	
 
-	cdef rh.mySpectrum spec;
-	spec = rh.rhf1d(argc, argv, Ndep,
-			 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
-			 rh_mag, rh_gamma, rh_chi, 
-			 rh_nH, atm_scale)
+	cpdef rhf1d(self, argc, py_argv, scale, temp, ne, vz, vmic, 
+		 	  mag, gamma, chi, nH, atm_scale):
+		Ndep = len(temp)
+		rh_scale = pyarray2double_1d(scale)
+		rh_temp = pyarray2double_1d(temp)
+		rh_ne = pyarray2double_1d(ne)
+		rh_vz = pyarray2double_1d(vz)
+		rh_vmic= pyarray2double_1d(vmic)
+		rh_mag = pyarray2double_1d(mag)
+		rh_gamma = pyarray2double_1d(gamma)
+		rh_chi = pyarray2double_1d(chi)
+		rh_nH = pyarray2double_2d(nH, 6, Ndep)
 
-	lam = convert_1d(spec.lam, spec.nlw)
-	sI = convert_1d(spec.sI, spec.nlw)
-	sQ, sU, sV = None, None, None
-	if spec.stokes:
-		sQ = convert_1d(spec.sQ, spec.nlw)
-		sU = convert_1d(spec.sU, spec.nlw)
-		sV = convert_1d(spec.sV, spec.nlw)
-	J = convert_2d(spec.J, spec.nlw, spec.Nrays)
+		py_list = py_argv.split(" ")
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		cdef char *argv[10]
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		self.spec = rh.rhf1d(argc, argv, Ndep,
+				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
+				 rh_mag, rh_gamma, rh_chi, 
+				 rh_nH, atm_scale)
+
+		lam = convert_1d(self.spec.lam, self.spec.nlw)
+		sI = convert_1d(self.spec.sI, self.spec.nlw)
+		sQ, sU, sV = None, None, None
+		if self.spec.stokes:
+			sQ = convert_1d(self.spec.sQ, self.spec.nlw)
+			sU = convert_1d(self.spec.sU, self.spec.nlw)
+			sV = convert_1d(self.spec.sV, self.spec.nlw)
+		J = convert_2d(self.spec.J, self.spec.nlw, self.spec.Nrays)
+		
+		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
-	return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
+	cpdef get_RLK_lines(self, argc, py_argv):
+		py_list = py_argv.split(" ")
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		cdef char *argv[10]
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		rh.get_RLK_lines(argc, argv)
 
 # ToDo:
 #
@@ -158,15 +173,3 @@ def solveray(argc, py_argv,
 	
 	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 	return 1
-
-def read_input(argc, py_argv):
-	py_list = py_argv.split(" ")
-	py_string = [item.encode("utf-8") for item in py_list]
-	arr = (ctypes.c_char_p * argc)(*py_string)
-	cdef char *argv[10]
-	for i_ in range(argc):
-		argv[i_] = arr[i_]
-
-	InputData = rh.readMe(argc, argv)
-
-	return InputData

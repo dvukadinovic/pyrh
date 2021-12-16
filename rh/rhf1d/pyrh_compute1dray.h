@@ -11,4 +11,4 @@ mySpectrum rhf1d(int argc, char *argv[], int Ndep,
               double *rh_mag, double *rh_gamma, double *rh_chi,
               double **rh_nH, int atm_scale);
 
-InputData readMe(int argc, char *argv[]);
+void get_RLK_lines(int argc, char *argv[]);

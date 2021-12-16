@@ -124,6 +124,8 @@ void readKuruczLines(char *inputFile)
   Barklemstruct bs_SP, bs_PD, bs_DF;
   FILE  *fp_Kurucz, *fp_linelist;
 
+
+
   if (!strcmp(inputFile, "none")) return;
 
   /* --- Read in the data files for Barklem collisional broadening -- */
@@ -140,6 +142,7 @@ void readKuruczLines(char *inputFile)
     Error(ERROR_LEVEL_1, routineName, messageStr);
     return;
   }
+
   /* --- Go through each of the linelist files listed in input file - */  
 
   while (getLine(fp_Kurucz, commentChar, listName, FALSE) != EOF) {
@@ -148,6 +151,7 @@ void readKuruczLines(char *inputFile)
       sprintf(messageStr, "Unable to open input file %s", filename);
       Error(ERROR_LEVEL_1, routineName, messageStr);
     }
+
     /* --- Count the number of lines in this file --   -------------- */
 
     Nline = 0;
@@ -265,6 +269,7 @@ void readKuruczLines(char *inputFile)
         if (!useBarklem) {
 	  getUnsoldcross(rlk);
 	}
+
 	/* --- Radiative broadening --                 -------------- */
 
 	if (Grad != 0.0) {
@@ -275,6 +280,7 @@ void readKuruczLines(char *inputFile)
 
 	  rlk->Grad = rlk->Aji;
 	}
+
 	/* --- Isotope and hyperfine fractions and slpittings -- ---- */
 
 	Nread += sscanf(inputLine+106, "%d", &rlk->isotope);
@@ -867,9 +873,10 @@ void getUnsoldcross(RLK_Line *rlk)
   const double FOURPIEPS0 = 4.0 * PI * EPSILON_0;
 
   double   Z, deltaR, vrel35_H, vrel35_He, C625;
-  Element *element, *He;
+  Element *element, *H, *He;
 
   element = &atmos.elements[rlk->pt_index - 1];
+  H = &atmos.elements[0];
   He = &atmos.elements[1];
 
   if (rlk->stage > element->Nstage - 1) {
@@ -887,10 +894,9 @@ void getUnsoldcross(RLK_Line *rlk)
   }
 
   vrel35_H  = pow(8.0*KBOLTZMANN/(PI * AMU * element->weight) * 
-		  (1.0 + element->weight/atmos.H->weight), 0.3);
+		  (1.0 + element->weight/H->weight), 0.3);
   vrel35_He = pow(8.0*KBOLTZMANN/(PI * AMU * element->weight) * 
 		  (1.0 + element->weight/He->weight), 0.3);
-
   C625 = pow(2.5 * (SQ(Q_ELECTRON)/FOURPIEPS0) *
 	     (ABARH/FOURPIEPS0) *
 	     2*PI * SQ(Z*RBOHR)/HPLANCK * deltaR, 0.4);

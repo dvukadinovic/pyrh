@@ -50,12 +50,27 @@ char messageStr[MAX_MESSAGE_LENGTH];
 
 /* ------- begin -------------------------- rhf1d.c ----------------- */
 
-InputData readMe(int argc, char *argv[])
+// We need in input here START_J key value:
+//   if it is new, we then compute it
+//   if it is old, we read it from the input
+//
+// The same is also true for the PRD, and atom/mol Populations
+// (it they are started with OLD_POPULATIONS key; 
+//  which is read from atoms.input file)
+//
+// These things should also be returned from rhf1d() in case we need it
+// for later. Additionally, we should have separate calls to rhf1d() and 
+// solveray(). Someone does not want to compute sovleray() maybe. If we 
+// save every output from rhf1d() that we need for solveray(), then we can
+// make it. For now, let us stick to solveray() call directly from the rhf1d().
+
+void get_RLK_lines(int argc, char *argv[])
 {
+  atmos.Stokes = TRUE;
   setOptions(argc, argv);
   readInput();
-
-  return input;
+  readAbundance(&atmos);
+  readKuruczLines(input.KuruczData);
 }
 
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
@@ -147,7 +162,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   
   getBoundary(&geometry);
   
-  Background(write_analyze_output=TRUE, equilibria_only=FALSE);
+  Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
 
   bool_t pyrh_io_flag = FALSE;

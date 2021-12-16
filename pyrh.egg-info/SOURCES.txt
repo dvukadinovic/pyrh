@@ -352,17 +352,6 @@ rh/rhf1d/test_run/runs/dummy/ray.input
 rh/rhf1d/test_run/runs/dummy/spinor_window
 rh/rhf1d/test_run/runs/dummy/spinor_window.wave
 rh/rhf1d/test_run/runs/dummy/logs/log_0_0
-rh/rhf1d/test_run/runs/dummy/logs/log_0_1
-rh/rhf1d/test_run/runs/dummy/logs/log_0_2
-rh/rhf1d/test_run/runs/dummy/logs/log_1_0
-rh/rhf1d/test_run/runs/dummy/logs/log_1_1
-rh/rhf1d/test_run/runs/dummy/logs/log_1_2
-rh/rhf1d/test_run/runs/dummy/logs/log_2_0
-rh/rhf1d/test_run/runs/dummy/logs/log_2_1
-rh/rhf1d/test_run/runs/dummy/logs/log_2_2
-rh/rhf1d/test_run/runs/dummy/logs/log_3_0
-rh/rhf1d/test_run/runs/dummy/logs/log_3_1
-rh/rhf1d/test_run/runs/dummy/logs/log_3_2
 rh/tools/Makefile
 rh/tools/addgrad.c
 rh/tools/adjustbf.c
