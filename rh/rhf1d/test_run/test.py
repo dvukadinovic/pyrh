@@ -16,8 +16,9 @@ aux = pyrh.RH()
 argv = "rhf1d -i keyword.input"
 argc = len(argv.split(" "))
 
-# aux.get_RLK_lines(argc, argv, "kurucz.input")
-# sys.exit()
+aux.read_RLK_lines(argc, argv)
+print(aux.Nrlk)
+sys.exit()
 
 for idx in range(1):
 	for idy in range(1):

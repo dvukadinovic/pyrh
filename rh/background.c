@@ -334,10 +334,9 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   // if we already read lines, skip reading
   // important only when we do SOLVE_NE in ITERATION mode
   // for large line files it will speed things up
-  // if (atmos.Nrlk == 0){
-  atmos.Nrlk = 0;
-  readKuruczLines(input.KuruczData);
-  // }
+  if (atmos.Nrlk == 0){
+    readKuruczLines(input.KuruczData);
+  }
   
   if (atmos.Nrlk > 0) {
     qsort(atmos.rlk_lines, atmos.Nrlk, sizeof(RLK_Line), rlk_ascend);

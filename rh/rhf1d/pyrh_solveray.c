@@ -95,6 +95,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   input.startJ = OLD_J;
   spectrum.updateJ = FALSE;
   input.limit_memory = FALSE;
+  // atmos.Nrlk = 0; // whether to read again or not the RLK lines
 
   /* --- Read input data for atmosphere --             -------------- */
 

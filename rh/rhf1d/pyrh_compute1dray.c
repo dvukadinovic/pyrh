@@ -64,19 +64,23 @@ char messageStr[MAX_MESSAGE_LENGTH];
 // save every output from rhf1d() that we need for solveray(), then we can
 // make it. For now, let us stick to solveray() call directly from the rhf1d().
 
-void get_RLK_lines(int argc, char *argv[])
+int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
 {
   atmos.Stokes = TRUE;
+  atmos.Nrlk = 0;
   setOptions(argc, argv);
   readInput();
   readAbundance(&atmos);
   readKuruczLines(input.KuruczData);
+  rlk_lines = atmos.rlk_lines;
+  
+  return atmos.Nrlk;
 }
 
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double **pyrh_nH, int pyrh_atm_scale)
+              double **pyrh_nH, int pyrh_atm_scale, int pyrh_Nrlk)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -91,6 +95,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
+  atmos.Nrlk = pyrh_Nrlk;
 
   Atom *atom;
 

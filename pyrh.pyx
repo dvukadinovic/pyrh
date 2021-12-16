@@ -69,6 +69,8 @@ class Spectrum(object):
 
 cdef class RH:
 	cdef rh.mySpectrum spec
+	cdef rh.RLK_Line *rlk_lines
+	cdef public int Nrlk
 
 	def __init__(self):
 		pass	
@@ -96,7 +98,7 @@ cdef class RH:
 		self.spec = rh.rhf1d(argc, argv, Ndep,
 				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
 				 rh_mag, rh_gamma, rh_chi, 
-				 rh_nH, atm_scale)
+				 rh_nH, atm_scale, 0)
 
 		lam = convert_1d(self.spec.lam, self.spec.nlw)
 		sI = convert_1d(self.spec.sI, self.spec.nlw)
@@ -109,7 +111,7 @@ cdef class RH:
 		
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
-	cpdef get_RLK_lines(self, argc, py_argv):
+	cpdef read_RLK_lines(self, argc, py_argv):
 		py_list = py_argv.split(" ")
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * argc)(*py_string)
@@ -117,7 +119,7 @@ cdef class RH:
 		for i_ in range(argc):
 			argv[i_] = arr[i_]
 
-		rh.get_RLK_lines(argc, argv)
+		self.Nrlk = rh.get_RLK_lines(argc, argv, self.rlk_lines)
 
 # ToDo:
 #
