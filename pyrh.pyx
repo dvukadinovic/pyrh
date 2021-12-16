@@ -70,8 +70,10 @@ class Spectrum(object):
 
 cdef class RH:
 	cdef rh.mySpectrum spec
-	cdef rh.RLK_Line rlk_lines
+	
 	cdef public int Nrlk
+	cdef rh.myRLK_Line rlk_lines
+	
 	cdef int argc
 	cdef char *argv[10]
 
@@ -99,10 +101,13 @@ cdef class RH:
 		rh_chi = pyarray2double_1d(chi)
 		rh_nH = pyarray2double_2d(nH, 6, Ndep)
 
+		# for i_ in range(self.argc):
+		# 	print(self.argv[i_])
+
 		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
 				 rh_mag, rh_gamma, rh_chi, 
-				 rh_nH, atm_scale, self.Nrlk, &self.rlk_lines)
+				 rh_nH, atm_scale, &self.rlk_lines)
 
 		lam = convert_1d(self.spec.lam, self.spec.nlw)
 		sI = convert_1d(self.spec.sI, self.spec.nlw)
@@ -116,26 +121,9 @@ cdef class RH:
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
 	cpdef read_RLK_lines(self):
-		self.Nrlk = rh.get_RLK_lines(self.argc, self.argv, &self.rlk_lines)
-		if (&self.rlk_lines is not NULL):
-			return "ima!"
-		else:
-			return "nista..."
+		self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
+		self.Nrlk = self.rlk_lines.Nrlk
 
-	cpdef check(self):
-		if (&self.rlk_lines is not NULL):
-			print("Ima i dalje!")
-		else:
-			print("Kurac")
-		cdef rh.myRLK_Line aux
-		aux.rlk_lines = &self.rlk_lines
-		aux.Nrlk = self.Nrlk
-		rh.dummy(&aux)
-
-	# cpdef get_something(self):
-	# 	return &self.rlk_lines[0].lambda0
-		# a = cython.operator.dereference(aux).Nrlk
-		# printf("%d\n", aux.Nrlk)
 # ToDo:
 #
 #   -- compare the speed with and without writting to the disk

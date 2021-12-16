@@ -17,27 +17,30 @@ cdef extern from "rh/atom.h":
 	cdef enum vdWaals: UNSOLD, RIDDER_RENSBERGEN, BARKLEM, KURUCZ
 
 	ctypedef struct ZeemanMultiplet:
-		int Ncomponent, *q
-		double *shift, *strength
+		int Ncomponent
+		int *q
+		double *shift
+		double *strength
 
 	ctypedef struct RLK_Line:
-		bint polarizable
-		vdWaals vdwaals;
-		int pt_index
-		int stage
-		int isotope
-		int Li
-		int Lj
-		double lambda0, gi, gj, Ei, Ej, Bji, Aji, Bij, Si, Sj
-		double Grad, GStark, GvdWaals, hyperfine_frac
-		double isotope_frac, gL_i, gL_j, hfs_i, hfs_j, iso_dl
-		double cross, alpha
-		ZeemanMultiplet *zm;
+		pass
+		# bint polarizable
+		# vdWaals vdwaals;
+		# int pt_index
+		# int stage
+		# int isotope
+		# int Li
+		# int Lj
+		# double lambda0, gi, gj, Ei, Ej, Bji, Aji, Bij, Si, Sj
+		# double Grad, GStark, GvdWaals, hyperfine_frac
+		# double isotope_frac, gL_i, gL_j, hfs_i, hfs_j, iso_dl
+		# double cross, alpha
+		# ZeemanMultiplet *zm;
 	
 cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	ctypedef struct myRLK_Line:
-		RLK_Line *rlk_lines
 		int Nrlk
+		RLK_Line *rlk_lines
 
 	ctypedef struct mySpectrum:
 		int nlw
@@ -53,7 +56,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double **rh_nH, int atm_scale, int pyrh_Nrlk, RLK_Line *pyrh_rlk_lines)
+			double **rh_nH, int atm_scale, myRLK_Line *pyrh_rlk_lines)
 
-	cdef int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
+	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
 	cdef void dummy(myRLK_Line *rlk_lines)

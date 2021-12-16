@@ -68,37 +68,34 @@ void dummy(myRLK_Line *pyrh_rlk_lines);
 
 void dummy(myRLK_Line *pyrh_rlk_lines)
 {
+  printf("%d\n", sizeof(pyrh_rlk_lines));
   printf("Nrlk = %d\n", pyrh_rlk_lines->Nrlk);
-  for (int l=0; l<pyrh_rlk_lines->Nrlk; l++){
-    printf("lam0[%d] = %d\n", l, pyrh_rlk_lines->rlk_lines[l].isotope);
-  }
+  printf("lam0 = %f\n", pyrh_rlk_lines->rlk_lines->lambda0);
+  pyrh_rlk_lines->rlk_lines += 1;
+  printf("lam0 = %f\n", pyrh_rlk_lines->rlk_lines->lambda0);
 }
 
-int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
+myRLK_Line get_RLK_lines(int argc, char *argv[])
 {
+  myRLK_Line output;
+
   atmos.Stokes = TRUE;
   atmos.Nrlk = 0;
   setOptions(argc, argv);
   readInput();
   readAbundance(&atmos);
   readKuruczLines(input.KuruczData);
-  // RLK_Line *dummy;
-  rlk_lines = (RLK_Line *) malloc(atmos.Nrlk * sizeof(RLK_Line));
-  // memcpy(rlk_lines, atmos.rlk_lines, sizeof(RLK_Line)*atmos.Nrlk);
-  rlk_lines = atmos.rlk_lines;
 
-  // printf("Done!\n");
+  output.rlk_lines = atmos.rlk_lines;
+  output.Nrlk = atmos.Nrlk;
 
-  // printf("Size is = %d\n", sizeof(dummy));
-  // printf("Lam0 = %e\n", dummy[0].lambda0);
-
-  return atmos.Nrlk;
+  return output;
 }
 
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double **pyrh_nH, int pyrh_atm_scale, int pyrh_Nrlk, RLK_Line *pyrh_rlk_lines)
+              double **pyrh_nH, int pyrh_atm_scale, myRLK_Line *pyrh_rlk_lines)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -113,10 +110,9 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
-  printf("lam0 = %e\n", pyrh_rlk_lines[0].lambda0);
-  if (pyrh_Nrlk!=0){
-    atmos.Nrlk = pyrh_Nrlk;
-    atmos.rlk_lines = pyrh_rlk_lines;
+  if (pyrh_rlk_lines->Nrlk!=0){
+    atmos.Nrlk = pyrh_rlk_lines->Nrlk;
+    atmos.rlk_lines = pyrh_rlk_lines->rlk_lines;
   } else {
     atmos.Nrlk = 0;
   }

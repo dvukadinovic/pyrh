@@ -12,16 +12,11 @@ atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
 start = time.time()
 
 
-argv = "rhf1d -i keyword.input"
+argv = "rhf1d"# -i keyword.input"
 argc = len(argv.split(" "))
 
 aux = pyrh.RH(argc, argv)
-
-a = aux.read_RLK_lines()
-print(a)
-print(aux.Nrlk)
-aux.check()
-sys.exit()
+aux.read_RLK_lines()
 
 for idx in range(1):
 	for idy in range(1):
@@ -41,13 +36,12 @@ def run_():
 	return spec
 
 # import timeit
-
 # Nrepeat = 100
-
 # times = timeit.Timer(run_).repeat(1,Nrepeat)
 # times = np.array(times)
 # print(times)
 # print(times/Nrepeat)
+# sys.exit()
 
 specRH = run_()
 

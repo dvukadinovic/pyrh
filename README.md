@@ -16,6 +16,11 @@ Kurucz lines which will later be simply passed to the RH code to compute the
 spectrum.
 
 Added condition in 'Background()' (from 'background.c'). If there are no
-RLK lines ('atmos.Nrlk') we will enetr the function 'readKuruczLines()'. If we
+RLK lines ('atmos.Nrlk') we will enter the function 'readKuruczLines()'. If we
 already have them, no need to read because they will be copied into the memory 
 where are they needed based on the input to 'rhf1d()' function.
+
+# Issues
+
+argv[] list is not send to the rhf1d() in the format it should have as it is 
+constructed in __init__().
