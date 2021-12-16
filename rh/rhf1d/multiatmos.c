@@ -93,10 +93,6 @@ void MULTIatmos(Atmosphere *atmos, Geometry *geometry)
   geometry->tau_ref = (double *) malloc(Ndep * sizeof(double));
   geometry->cmass   = (double *) malloc(Ndep * sizeof(double));
   geometry->height  = (double *) malloc(Ndep * sizeof(double));
-  // atmos->T      = (double *) malloc(Ndep * sizeof(double));
-  // atmos->ne     = (double *) malloc(Ndep * sizeof(double));
-  // atmos->vturb  = (double *) malloc(Ndep * sizeof(double));
-  // geometry->vel = (double *) malloc(Ndep * sizeof(double));
 
   getAngleQuad(geometry);
   atmos->wmu = geometry->wmu;

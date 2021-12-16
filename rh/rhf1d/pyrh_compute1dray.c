@@ -73,7 +73,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
-  // readInput();
+  readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
 
@@ -100,11 +100,6 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   atmos.ne = pyrh_ne;
   geometry.vel = pyrh_vz;
   atmos.vturb = pyrh_vmic;
-  
-  // atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
-  // atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
-  // atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
-
   atmos.B = pyrh_mag;
   atmos.gamma_B = pyrh_gamma;
   atmos.chi_B = pyrh_chi;

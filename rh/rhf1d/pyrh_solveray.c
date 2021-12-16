@@ -35,6 +35,7 @@
 #include "constant.h"
 
 #include "pyrh_compute1dray.h"
+// #include "pyrh_solveray.h"
 
 #define COMMENT_CHAR        "#"
 
@@ -156,7 +157,8 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
   geometry.muy[0] = 0.0;
   geometry.wmu[0] = 1.0;
-  // if (atmos.Stokes) Bproject();
+  // this has to be reprojected for new muz (but from input B vector, not from already projected from rhf1d())
+  if (atmos.Stokes) Bproject();
   
   // atmos.nH = matrix_double(atmos.NHydr, Ndep);
   // atmos.nH = rh_nH;

@@ -78,6 +78,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double **rh_nH, int atm_scale)
+			double **rh_nH,
+			int atm_scale)
 	
 	cdef InputData readMe(int argc, char *argv[])
