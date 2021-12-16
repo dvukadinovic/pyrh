@@ -8,6 +8,7 @@ import numpy as np
 cimport numpy as cnp
 import cython
 from libc.stdlib cimport malloc
+from libc.stdio cimport printf
 import time
 
 # cimport tools
@@ -69,7 +70,7 @@ class Spectrum(object):
 
 cdef class RH:
 	cdef rh.mySpectrum spec
-	cdef rh.RLK_Line *rlk_lines
+	cdef rh.RLK_Line rlk_lines
 	cdef public int Nrlk
 	cdef int argc
 	cdef char *argv[10]
@@ -82,6 +83,8 @@ cdef class RH:
 		arr = (ctypes.c_char_p * self.argc)(*py_string)
 		for i_ in range(self.argc):
 			self.argv[i_] = arr[i_]
+
+		self.Nrlk = 0
 
 	cpdef rhf1d(self, scale, temp, ne, vz, vmic, 
 		 	  mag, gamma, chi, nH, atm_scale):
@@ -99,7 +102,7 @@ cdef class RH:
 		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
 				 rh_mag, rh_gamma, rh_chi, 
-				 rh_nH, atm_scale, 0)
+				 rh_nH, atm_scale, self.Nrlk, &self.rlk_lines)
 
 		lam = convert_1d(self.spec.lam, self.spec.nlw)
 		sI = convert_1d(self.spec.sI, self.spec.nlw)
@@ -113,20 +116,29 @@ cdef class RH:
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
 	cpdef read_RLK_lines(self):
-		self.Nrlk = rh.get_RLK_lines(self.argc, self.argv, self.rlk_lines)
+		self.Nrlk = rh.get_RLK_lines(self.argc, self.argv, &self.rlk_lines)
+		if (&self.rlk_lines is not NULL):
+			return "ima!"
+		else:
+			return "nista..."
 
+	cpdef check(self):
+		if (&self.rlk_lines is not NULL):
+			print("Ima i dalje!")
+		else:
+			print("Kurac")
+		cdef rh.myRLK_Line aux
+		aux.rlk_lines = &self.rlk_lines
+		aux.Nrlk = self.Nrlk
+		rh.dummy(&aux)
+
+	# cpdef get_something(self):
+	# 	return &self.rlk_lines[0].lambda0
+		# a = cython.operator.dereference(aux).Nrlk
+		# printf("%d\n", aux.Nrlk)
 # ToDo:
 #
 #   -- compare the speed with and without writting to the disk
-#
-#   -- read input parameters
-#   -- forward them to the rhf1d() and solveray() as
-#      an InputData type
-#   -- check if the spectrum is good
-#   -- repeat this for Atoms
-#   -- check consistensy
-#   -- repeat this for Molecules
-#   -- check consistensy
 #   -- input wavelengts (not from file)
 
 def solveray(argc, py_argv, 

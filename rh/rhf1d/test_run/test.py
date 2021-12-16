@@ -17,7 +17,11 @@ argc = len(argv.split(" "))
 
 aux = pyrh.RH(argc, argv)
 
-aux.read_RLK_lines()
+a = aux.read_RLK_lines()
+print(a)
+print(aux.Nrlk)
+aux.check()
+sys.exit()
 
 for idx in range(1):
 	for idy in range(1):

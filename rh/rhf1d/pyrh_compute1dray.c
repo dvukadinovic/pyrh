@@ -64,6 +64,16 @@ char messageStr[MAX_MESSAGE_LENGTH];
 // save every output from rhf1d() that we need for solveray(), then we can
 // make it. For now, let us stick to solveray() call directly from the rhf1d().
 
+void dummy(myRLK_Line *pyrh_rlk_lines);
+
+void dummy(myRLK_Line *pyrh_rlk_lines)
+{
+  printf("Nrlk = %d\n", pyrh_rlk_lines->Nrlk);
+  for (int l=0; l<pyrh_rlk_lines->Nrlk; l++){
+    printf("lam0[%d] = %d\n", l, pyrh_rlk_lines->rlk_lines[l].isotope);
+  }
+}
+
 int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
 {
   atmos.Stokes = TRUE;
@@ -72,15 +82,23 @@ int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
   readInput();
   readAbundance(&atmos);
   readKuruczLines(input.KuruczData);
+  // RLK_Line *dummy;
+  rlk_lines = (RLK_Line *) malloc(atmos.Nrlk * sizeof(RLK_Line));
+  // memcpy(rlk_lines, atmos.rlk_lines, sizeof(RLK_Line)*atmos.Nrlk);
   rlk_lines = atmos.rlk_lines;
-  
+
+  // printf("Done!\n");
+
+  // printf("Size is = %d\n", sizeof(dummy));
+  // printf("Lam0 = %e\n", dummy[0].lambda0);
+
   return atmos.Nrlk;
 }
 
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double **pyrh_nH, int pyrh_atm_scale, int pyrh_Nrlk)
+              double **pyrh_nH, int pyrh_atm_scale, int pyrh_Nrlk, RLK_Line *pyrh_rlk_lines)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -95,7 +113,13 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
-  atmos.Nrlk = pyrh_Nrlk;
+  printf("lam0 = %e\n", pyrh_rlk_lines[0].lambda0);
+  if (pyrh_Nrlk!=0){
+    atmos.Nrlk = pyrh_Nrlk;
+    atmos.rlk_lines = pyrh_rlk_lines;
+  } else {
+    atmos.Nrlk = 0;
+  }
 
   Atom *atom;
 

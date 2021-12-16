@@ -35,6 +35,10 @@ cdef extern from "rh/atom.h":
 		ZeemanMultiplet *zm;
 	
 cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
+	ctypedef struct myRLK_Line:
+		RLK_Line *rlk_lines
+		int Nrlk
+
 	ctypedef struct mySpectrum:
 		int nlw
 		int Nrays
@@ -49,6 +53,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double **rh_nH, int atm_scale, int pyrh_Nrlk)
+			double **rh_nH, int atm_scale, int pyrh_Nrlk, RLK_Line *pyrh_rlk_lines)
 
 	cdef int get_RLK_lines(int argc, char *argv[], RLK_Line *rlk_lines)
+	cdef void dummy(myRLK_Line *rlk_lines)

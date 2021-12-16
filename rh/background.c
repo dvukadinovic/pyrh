@@ -334,13 +334,16 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   // if we already read lines, skip reading
   // important only when we do SOLVE_NE in ITERATION mode
   // for large line files it will speed things up
+  printf("We good for now?\n");
   if (atmos.Nrlk == 0){
     readKuruczLines(input.KuruczData);
   }
+  printf("You did not read anything?\n");
   
   if (atmos.Nrlk > 0) {
     qsort(atmos.rlk_lines, atmos.Nrlk, sizeof(RLK_Line), rlk_ascend);
   }
+  printf("I sorted them\n");
   /* --- Allocate memory for the boolean array that stores whether
          a wavelength overlaps with a Bound-Bound transition in the
          background, or whether it is polarized --     -------------- */
@@ -350,6 +353,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     atmos.backgrflags[nspect].hasline = FALSE;
     atmos.backgrflags[nspect].ispolarized = FALSE;
   }
+  printf("And have more info here\n");
   /* --- Allocate memory for the list of record numbers that specifies
          for each wavelength where to find the background opacity,
          scattering opacity, and emissivity --         -------------- */
