@@ -16,7 +16,7 @@ argv = "rhf1d"# -i keyword.input"
 argc = len(argv.split(" "))
 
 aux = pyrh.RH(argc, argv)
-aux.read_RLK_lines()
+# aux.read_RLK_lines()
 
 for idx in range(1):
 	for idy in range(1):
@@ -48,9 +48,9 @@ specRH = run_()
 print(time.time() - start)
 
 plt.plot(specRH.I[:-1])
-plt.show()
+# plt.show()
 
-sys.exit()
+# sys.exit()
 
 start = time.time()
 

@@ -31,7 +31,8 @@ cdef convert_2d(double **arr, int nx, int ny):
 
 cdef double* pyarray2double_1d(arr):
 	cdef double *rh_arr
-	nz = len(arr)
+	cdef int nz = len(arr)
+	cdef int i
 	rh_arr = <double *>malloc(nz*cython.sizeof(double))
 	for i in range(nz):
 		rh_arr[i] = arr[i]
@@ -169,3 +170,6 @@ def solveray(argc, py_argv,
 	
 	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 	return 1
+
+for i_ in range(10):
+	print(i_)
