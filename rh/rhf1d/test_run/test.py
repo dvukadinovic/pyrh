@@ -8,9 +8,10 @@ import globin
 import pyrh
 
 atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
+aux = atmos.data.astype(np.float64, order="C", copy=True)
+atmos.data = aux
 
 start = time.time()
-
 
 argv = "rhf1d"# -i keyword.input"
 argc = len(argv.split(" "))
@@ -47,10 +48,10 @@ specRH = run_()
 
 print(time.time() - start)
 
-plt.plot(specRH.I[:-1])
-# plt.show()
+# plt.plot(specRH.I[:-1])
 
-# sys.exit()
+plt.show()
+sys.exit()
 
 start = time.time()
 

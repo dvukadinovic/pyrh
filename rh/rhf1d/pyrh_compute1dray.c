@@ -95,7 +95,7 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double **pyrh_nH, int pyrh_atm_scale, myRLK_Line *pyrh_rlk_lines)
+              double *pyrh_nH, int pyrh_atm_scale, myRLK_Line *pyrh_rlk_lines)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -146,14 +146,17 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   atmos.Stokes = TRUE;
 
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  for (int k=0; k<geometry.Ndep; k++)
+  int index=0;
+  for (int n=0; n<atmos.NHydr; n++)
   {
-    for (int n=0; n<atmos.NHydr; n++)
+    for (int k=0; k<geometry.Ndep; k++)
     {
-      atmos.nH[n][k] = pyrh_nH[n][k];
+      atmos.nH[n][k] = pyrh_nH[index];
       atmos.nH[n][k] /= CUBE(CM_TO_M);
+      index++;
     }
   }
+
   atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
   
   // check if atmosphere is non-static
@@ -246,7 +249,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   // writeOpacity();
   
   // getCPU(1, TIME_POLL, "Write output");
-  
+
   printTotalCPU();
 
   mySpectrum spec;

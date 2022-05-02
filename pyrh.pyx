@@ -10,6 +10,7 @@ import cython
 from libc.stdlib cimport malloc
 from libc.stdio cimport printf
 import time
+import sys
 
 # cimport tools
 
@@ -89,26 +90,28 @@ cdef class RH:
 
 		self.Nrlk = 0
 
-	cpdef rhf1d(self, scale, temp, ne, vz, vmic, 
-		 	  mag, gamma, chi, nH, atm_scale):
-		Ndep = len(temp)
-		rh_scale = pyarray2double_1d(scale)
-		rh_temp = pyarray2double_1d(temp)
-		rh_ne = pyarray2double_1d(ne)
-		rh_vz = pyarray2double_1d(vz)
-		rh_vmic= pyarray2double_1d(vmic)
-		rh_mag = pyarray2double_1d(mag)
-		rh_gamma = pyarray2double_1d(gamma)
-		rh_chi = pyarray2double_1d(chi)
-		rh_nH = pyarray2double_2d(nH, 6, Ndep)
+	@cython.boundscheck(False)
+	@cython.wraparound(False)
+	cpdef rhf1d(self,
+	            cnp.ndarray[double, ndim=1, mode="c"] scale,
+	            cnp.ndarray[double, ndim=1, mode="c"] temp,
+	            cnp.ndarray[double, ndim=1, mode="c"] ne,
+	            cnp.ndarray[double, ndim=1, mode="c"] vz,
+	            cnp.ndarray[double, ndim=1, mode="c"] vmic,
+		 	    cnp.ndarray[double, ndim=1, mode="c"] mag,
+		 	    cnp.ndarray[double, ndim=1, mode="c"] gamma,
+		 	    cnp.ndarray[double, ndim=1, mode="c"] chi,
+		 	    cnp.ndarray[double, ndim=2, mode="c"] nH,
+                int atm_scale):
+		cdef int Ndep = scale.shape[0]
 
 		# for i_ in range(self.argc):
 		# 	print(self.argv[i_])
 
 		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
-				 rh_scale, rh_temp, rh_ne, rh_vz, rh_vmic,
-				 rh_mag, rh_gamma, rh_chi, 
-				 rh_nH, atm_scale, &self.rlk_lines)
+				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
+				 &mag[0], &gamma[0], &chi[0],
+				 &nH[0,0], atm_scale, &self.rlk_lines)
 
 		lam = convert_1d(self.spec.lam, self.spec.nlw)
 		sI = convert_1d(self.spec.sI, self.spec.nlw)
@@ -118,7 +121,9 @@ cdef class RH:
 			sU = convert_1d(self.spec.sU, self.spec.nlw)
 			sV = convert_1d(self.spec.sV, self.spec.nlw)
 		J = convert_2d(self.spec.J, self.spec.nlw, self.spec.Nrays)
-		
+
+		#lam_ = np.ctypeslib.as_array(self.spec.lam, shape=(self.spec.nlw,))
+
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
 	
 	cpdef read_RLK_lines(self):
@@ -170,6 +175,3 @@ def solveray(argc, py_argv,
 	
 	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 	return 1
-
-for i_ in range(10):
-	print(i_)

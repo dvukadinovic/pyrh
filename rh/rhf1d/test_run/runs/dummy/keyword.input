@@ -25,7 +25,7 @@
 
 ##  Table of additional wavelengths  KEYWORD_OPTIONAL
 
-  WAVETABLE = /media/dusan/storage/RH/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window.wave
+  WAVETABLE = /home/dusan/Documents/pyrh/rh/rhf1d/test_run/runs/dummy/spinor_window.wave
 
 # Maximum number of iterations to initialize scattering radiation
 # field in the background (KEYWORD_OPTIONAL). In LTE case it needs
