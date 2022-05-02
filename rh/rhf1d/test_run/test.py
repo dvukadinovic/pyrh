@@ -17,22 +17,14 @@ argv = "rhf1d"# -i keyword.input"
 argc = len(argv.split(" "))
 
 aux = pyrh.RH(argc, argv)
-# aux.read_RLK_lines()
-
-for idx in range(1):
-	for idy in range(1):
-		scale = atmos.data[idx,idy,0]
-		temp = atmos.data[idx,idy,1]
-		ne = atmos.data[idx,idy,2]
-		vz = atmos.data[idx,idy,3]
-		vmic = atmos.data[idx,idy,4]
-		mag = atmos.data[idx,idy,5]/1e4
-		gamma = atmos.data[idx,idy,6]
-		chi = atmos.data[idx,idy,7]
-		nH = atmos.data[idx,idy,8:]
+aux.read_RLK_lines()
 
 def run_():
-	spec = aux.rhf1d(scale, temp, ne, vz, vmic, mag, gamma, chi, nH, 0)
+	idx, idy = 0,0
+	spec = aux.rhf1d(atmos.data[idx,idy,0], atmos.data[idx,idy,1], atmos.data[idx,idy,2],
+					 atmos.data[idx,idy,3], atmos.data[idx,idy,4],
+					 atmos.data[idx,idy,5]/1e4, atmos.data[idx,idy,6], atmos.data[idx,idy,7],
+					 atmos.data[idx,idy,8:], 0)
 
 	return spec
 
@@ -48,7 +40,7 @@ specRH = run_()
 
 print(time.time() - start)
 
-# plt.plot(specRH.I[:-1])
+plt.plot(specRH.I[:-1])
 
 plt.show()
 sys.exit()
