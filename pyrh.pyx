@@ -7,10 +7,6 @@ import ctypes
 import numpy as np
 cimport numpy as cnp
 import cython
-from libc.stdlib cimport malloc
-from libc.stdio cimport printf
-import time
-import sys
 
 # cimport tools
 
@@ -29,24 +25,6 @@ cdef convert_2d(double **arr, int nx, int ny):
 		for j in range(ny):
 			pyarr[i,j] = arr[i][j]
 	return pyarr
-
-cdef double* pyarray2double_1d(arr):
-	cdef double *rh_arr
-	cdef int nz = len(arr)
-	cdef int i
-	rh_arr = <double *>malloc(nz*cython.sizeof(double))
-	for i in range(nz):
-		rh_arr[i] = arr[i]
-
-	return rh_arr
-
-cdef double** pyarray2double_2d(arr, Nrows, Ncols):
-	cdef double **rh_matrix = rh.matrix_double(Nrows,Ncols)
-	for i in range(Nrows):
-		for j in range(Ncols):
-			rh_matrix[i][j] = arr[i,j]
-
-	return rh_matrix
 
 class Spectrum(object):
 	def __init__(self, nlw, lam, sI, sQ, sU, sV, J, Jrh, stokes):
@@ -104,9 +82,6 @@ cdef class RH:
 		 	    cnp.ndarray[double, ndim=2, mode="c"] nH,
                 int atm_scale):
 		cdef int Ndep = scale.shape[0]
-
-		# for i_ in range(self.argc):
-		# 	print(self.argv[i_])
 
 		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
