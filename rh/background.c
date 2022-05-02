@@ -158,9 +158,6 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   static int ne_iter = 0;
   char    inputLine[MAX_LINE_SIZE];
   bool_t  exit_on_EOF, do_fudge, fromscratch;
-  // bool_t  do_of_sasha; // D.Vukadinovic
-  // double  line_fudge = 1.0, *lambda_fudge_sasha, *fudge_sasha, total_sasha_fudge; // D.Vukadinovic
-  // int     Nfudge_sasha; // D.Vukadinovic
   int     backgrrecno, index, Nfudge, NrecStokes;
   double *chi, *eta, *scatt, wavelength, *thomson, *chi_ai, *eta_ai, *sca_ai,
           Hmin_fudge, scatt_fudge, metal_fudge, *lambda_fudge, **fudge,
@@ -234,34 +231,6 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     fclose(fp_fudge);
   } else
     do_fudge = FALSE;
-
-  // D.Vukadinovic
-  //   reading OF coefficients from Shapiro+10
-  //   ! wavelengths are in Angstroms
-  // if (strcmp(input.of_sasha, "none")){
-  //   do_of_sasha = TRUE;
-
-  //   if ((fp_fudge = fopen(input.of_sasha, "r")) == NULL) {
-  //     sprintf(messageStr, "Unable to open input file %s", input.of_sasha);
-  //     Error(ERROR_LEVEL_2, routineName, messageStr);
-  //   }
-  //   sprintf(messageStr,
-  //     "\n-Fudging background opacities with file\n  %s\n\n",
-  //     input.of_sasha);
-  //   Error(MESSAGE, routineName, messageStr);
-
-  //   getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
-  //   sscanf(inputLine, "%d", &Nfudge_sasha);
-  //   lambda_fudge_sasha = (double *) malloc(Nfudge_sasha * sizeof(double));
-  //   fudge_sasha = (double *) malloc(Nfudge_sasha * sizeof(double));
-  //   for (n = 0;  n < Nfudge_sasha;  n++) {
-  //     getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
-  //     sscanf(inputLine, "%lf %lf", &lambda_fudge_sasha[n], &fudge_sasha[n]);
-  //     lambda_fudge_sasha[n] /= 10; // from Angstroms to nanometers
-  //   }
-  //   fclose(fp_fudge);
-  // } else
-  //   do_of_sasha = FALSE;
 
   /* --- Allocate temporary storage space. The quantities are used
          for the following purposes:

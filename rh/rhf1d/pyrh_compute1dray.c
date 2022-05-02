@@ -64,17 +64,6 @@ char messageStr[MAX_MESSAGE_LENGTH];
 // save every output from rhf1d() that we need for solveray(), then we can
 // make it. For now, let us stick to solveray() call directly from the rhf1d().
 
-void dummy(myRLK_Line *pyrh_rlk_lines);
-
-void dummy(myRLK_Line *pyrh_rlk_lines)
-{
-  printf("%d\n", sizeof(pyrh_rlk_lines));
-  printf("Nrlk = %d\n", pyrh_rlk_lines->Nrlk);
-  printf("lam0 = %f\n", pyrh_rlk_lines->rlk_lines->lambda0);
-  pyrh_rlk_lines->rlk_lines += 1;
-  printf("lam0 = %f\n", pyrh_rlk_lines->rlk_lines->lambda0);
-}
-
 myRLK_Line get_RLK_lines(int argc, char *argv[])
 {
   myRLK_Line output;

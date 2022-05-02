@@ -28,14 +28,6 @@ def run_():
 
 	return spec
 
-# import timeit
-# Nrepeat = 100
-# times = timeit.Timer(run_).repeat(1,Nrepeat)
-# times = np.array(times)
-# print(times)
-# print(times/Nrepeat)
-# sys.exit()
-
 specRH = run_()
 
 print(time.time() - start)
