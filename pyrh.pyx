@@ -64,27 +64,27 @@ class Spectrum(object):
 		else:
 			self.stokes = False
 
-# def grabnum(int[:] z):
-# 	# cdef cnp.ndarray[int, ndim=1, mode="c"] arr
-# 	# arr = np.ascontiguousarray(z, dtype=ctypes.c_int)
-# 	a = rh._getnumber(&z[0])
-# 	return a
-
 cdef class RH:
 	cdef rh.mySpectrum spec
-	
+
 	cdef int Nrlk
 	cdef rh.myRLK_Line rlk_lines
-	
-	cdef int argc
-	cdef char *argv[10]
 
-	def __init__(self, in_argc, py_argv):
-		self.argc = in_argc
+	cdef int argc
+	cdef char* argv[10]
+
+	def __init__(self, input="keyword.input", logfile=None, quiet=True):
+		py_argv = "rhf1d" + " -input " + input
+		if logfile is not None:
+			py_argv += " -logfile " + logfile
+		if quiet:
+			py_argv += " -quiet"
 
 		py_list = py_argv.split(" ")
+		self.argc = len(py_list)
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * self.argc)(*py_string)
+		cdef int i_
 		for i_ in range(self.argc):
 			self.argv[i_] = arr[i_]
 
@@ -92,7 +92,7 @@ cdef class RH:
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
-	cpdef rhf1d(self,
+	cpdef compute1d(self,
 	            cnp.ndarray[double, ndim=1, mode="c"] scale,
 	            cnp.ndarray[double, ndim=1, mode="c"] temp,
 	            cnp.ndarray[double, ndim=1, mode="c"] ne,
@@ -125,7 +125,10 @@ cdef class RH:
 		#lam_ = np.ctypeslib.as_array(self.spec.lam, shape=(self.spec.nlw,))
 
 		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
-	
+
 	cpdef read_RLK_lines(self):
 		self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
 		self.Nrlk = self.rlk_lines.Nrlk
+
+	def get_Nrlk(self):
+		return self.Nrlk
