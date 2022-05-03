@@ -25,21 +25,22 @@
 #include "atmos.h"
 #include "constant.h"
 #include "error.h"
+#include "inputs.h"
 
 
-#define BARKLEM_SP_DATA     "../../Atoms/Barklem_spdata.dat"
+// #define BARKLEM_SP_DATA     "../../Atoms/Barklem_spdata.dat"
 #define BARKLEM_SP_NS       21
 #define BARKLEM_SP_NP       18
 #define BARKLEM_SP_NEFF1    1.0
 #define BARKLEM_SP_NEFF2    1.3
 
-#define BARKLEM_PD_DATA     "../../Atoms/Barklem_pddata.dat"
+// #define BARKLEM_PD_DATA     "../../Atoms/Barklem_pddata.dat"
 #define BARKLEM_PD_NP       18
 #define BARKLEM_PD_ND       18
 #define BARKLEM_PD_NEFF1    1.3
 #define BARKLEM_PD_NEFF2    2.3
 
-#define BARKLEM_DF_DATA     "../../Atoms/Barklem_dfdata.dat"
+// #define BARKLEM_DF_DATA     "../../Atoms/Barklem_dfdata.dat"
 #define BARKLEM_DF_ND       18
 #define BARKLEM_DF_NF       18
 #define BARKLEM_DF_NEFF1    2.3
@@ -51,6 +52,7 @@
 /* --- Global variables --                             -------------- */
 
 extern Atmosphere atmos;
+extern InputData input;
 extern char messageStr[];
 
 
@@ -66,9 +68,11 @@ bool_t readBarklemTable(enum Barklemtype type, Barklemstruct *bs)
   double  neff1_0, neff2_0;
   FILE   *fp_Barklem;
 
+
+
   switch (type) {
   case SP:
-    strcpy(filename, BARKLEM_SP_DATA);
+    strcpy(filename, input.barklem_sp_data);
     bs->N1 = BARKLEM_SP_NS;
     bs->N2 = BARKLEM_SP_NP;
 
@@ -77,7 +81,7 @@ bool_t readBarklemTable(enum Barklemtype type, Barklemstruct *bs)
     break;
 
   case PD:
-    strcpy(filename, BARKLEM_PD_DATA);
+    strcpy(filename, input.barklem_pd_data);
     bs->N1 = BARKLEM_PD_NP;
     bs->N2 = BARKLEM_PD_ND;
 
@@ -86,7 +90,7 @@ bool_t readBarklemTable(enum Barklemtype type, Barklemstruct *bs)
     break;
 
   case DF:
-    strcpy(filename, BARKLEM_DF_DATA);
+    strcpy(filename, input.barklem_df_data);
     bs->N1 = BARKLEM_DF_ND;
     bs->N2 = BARKLEM_DF_NF;
 

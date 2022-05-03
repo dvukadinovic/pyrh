@@ -57,6 +57,9 @@ typedef struct {
          abund_input[MAX_VALUE_LENGTH],
          wavetable_input[MAX_VALUE_LENGTH],
          atoms_input[MAX_VALUE_LENGTH],
+         barklem_sp_data[MAX_VALUE_LENGTH], // D.Vukadinovic
+         barklem_pd_data[MAX_VALUE_LENGTH], // D.Vukadinovic
+         barklem_df_data[MAX_VALUE_LENGTH], // D.Vukadinovic
          molecules_input[MAX_VALUE_LENGTH],
          Stokes_input[MAX_VALUE_LENGTH],
          KuruczData[MAX_VALUE_LENGTH],

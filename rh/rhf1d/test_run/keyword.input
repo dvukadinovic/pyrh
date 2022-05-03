@@ -19,6 +19,11 @@
 
   ATOMS_FILE = atoms.input
 
+# Barklem tables for the collisional coefficients
+  BARKLEM_SP_DATA = /home/dusan/Documents/pyrh/rh/Atoms/Barklem_spdata.dat
+  BARKLEM_PD_DATA = /home/dusan/Documents/pyrh/rh/Atoms/Barklem_pddata.dat
+  BARKLEM_DF_DATA = /home/dusan/Documents/pyrh/rh/Atoms/Barklem_dfdata.dat
+
 # Input file for all molecules (KEYWORD_REQUIRED).
 
   MOLECULES_FILE = molecules.input

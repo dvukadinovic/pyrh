@@ -1,5 +1,14 @@
 
 -WARNING in routine readValues
+ Did not recognize keyword BARKLEM_SP_DATA with value /home/dusan/Documents/pyrh/rh/Atoms/Barklem_spdata.dat
+
+-WARNING in routine readValues
+ Did not recognize keyword BARKLEM_PD_DATA with value /home/dusan/Documents/pyrh/rh/Atoms/Barklem_pddata.dat
+
+-WARNING in routine readValues
+ Did not recognize keyword BARKLEM_DF_DATA with value /home/dusan/Documents/pyrh/rh/Atoms/Barklem_dfdata.dat
+
+-WARNING in routine readValues
  Overriding default value NONE for keyword SOLVE_NE with NONE
 
 -WARNING in routine readValues

@@ -65,6 +65,15 @@ void readInput()
      setcharValue},
     {"ATOMS_FILE",  "", FALSE, KEYWORD_REQUIRED, input.atoms_input,
      setcharValue},
+    
+    // D.Vukadinovic (03.05.2022.) -- path to Barklem tables
+    {"BARKLEM_SP_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_sp_data,
+     setcharValue},
+    {"BARKLEM_PD_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_pd_data,
+     setcharValue},
+    {"BARKLEM_DF_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_df_data,
+     setcharValue},
+
     {"MOLECULES_FILE",  "", FALSE, KEYWORD_REQUIRED, input.molecules_input,
      setcharValue},
     {"NON_ICE", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.NonICE,
