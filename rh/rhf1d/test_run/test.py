@@ -1,27 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import multiprocessing as mp
 import time
 import sys
 
 import globin
-
 import pyrh
 
 atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
-aux = atmos.data.astype(np.float64, order="C", copy=True)
-atmos.data = aux
 
 start = time.time()
 
-aux = pyrh.RH(input="keyword.input", logfile="log.out", quiet=True)
-
-# idx, idy = 0, 0
-# specRH = aux.rhf1d(atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
-#                    atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],
-#                    atmos.data[idx, idy, 5] / 1e4, atmos.data[idx, idy, 6], atmos.data[idx, idy, 7],
-#                    atmos.data[idx, idy, 8:], 0)
-
-# import multiprocessing as mp
+aux = pyrh.RH(input="keyword.input", quiet=True)
 
 # def spec(args):
 idx, idy = 0, 0
@@ -42,8 +32,8 @@ print(time.time() - start)
 
 plt.plot(specRH.I[:-1])
 #
-plt.show()
-sys.exit()
+# plt.show()
+# sys.exit()
 
 start = time.time()
 

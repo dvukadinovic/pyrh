@@ -13,20 +13,11 @@ rhf1d = ["rh/rhf1d/anglequad.c", "rh/rhf1d/feautrier.c", "rh/rhf1d/multiatmos.c"
 	"rh/rhf1d/pyrh_compute1dray.c", "rh/rhf1d/pyrh_solveray.c",
 	"rh/rhf1d/project.c", "rh/rhf1d/writegeom_xdr.c"]
 
-"""
-had to delete:
-rh/rhf1d/writegeom_xdr.c --> multiple topology definitions
-
-"""
-
 for item in rhf1d:
 	rh_c_files.append(item)
 
 rh_c_files.append("pyrh.pyx")
 # rh_c_files.append("tools.pyx")
-
-# rh_c_files.append("rh/options.c")
-# rh_c_files.append("rh/parse.c")
 
 setup(
 	name="pyrh",

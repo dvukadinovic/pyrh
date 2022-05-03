@@ -1,17 +1,17 @@
-   ......Read Atmosphere:   0.025 [sec]
+   ......Read Atmosphere:   0.058 [sec]
 
-    ........Read Atom H :   0.000 [sec]
-    ........Read Atom HE:   0.002 [sec]
-    ........Read Atom C :   0.001 [sec]
-    ........Read Atom N :   0.001 [sec]
-    ........Read Atom O :   0.001 [sec]
-    ........Read Atom S :   0.001 [sec]
-    ........Read Atom FE:   0.000 [sec]
-    ........Read Atom SI:   0.002 [sec]
-    ........Read Atom AL:   0.002 [sec]
-    ........Read Atom NA:   0.001 [sec]
-    ........Read Atom MG:   0.002 [sec]
-   ....Read atomic input:   0.013 [sec]
+    ........Read Atom H :   0.001 [sec]
+    ........Read Atom HE:   0.009 [sec]
+    ........Read Atom C :   0.007 [sec]
+    ........Read Atom N :   0.003 [sec]
+    ........Read Atom O :   0.005 [sec]
+    ........Read Atom S :   0.004 [sec]
+    ........Read Atom FE:   0.002 [sec]
+    ........Read Atom SI:   0.010 [sec]
+    ........Read Atom AL:   0.008 [sec]
+    ........Read Atom NA:   0.003 [sec]
+    ........Read Atom MG:   0.012 [sec]
+   ....Read atomic input:   0.066 [sec]
 
     ...Read Molecule  H2:   0.000 [sec]
     ...Read Molecule H2+:   0.000 [sec]
@@ -25,9 +25,9 @@
     ...Read Molecule  NO:   0.000 [sec]
     ...Read Molecule  OH:   0.000 [sec]
     ...Read Molecule H2O:   0.000 [sec]
-   .Read molecular input:   0.001 [sec]
+   .Read molecular input:   0.003 [sec]
 
-   ...........SortLambda:   0.000 [sec]
+   ...........SortLambda:   0.001 [sec]
 
     ..........LTEpops H :   0.000 [sec]
     ..........LTEpops HE:   0.000 [sec]
@@ -40,25 +40,25 @@
     ..........LTEpops AL:   0.000 [sec]
     ..........LTEpops NA:   0.000 [sec]
     ..........LTEpops MG:   0.000 [sec]
-    Chemical equilibrium:   0.005 [sec]
-    ..Background Opacity:   0.229 [sec]
-   .....Total Background:   0.235 [sec]
+    Chemical equilibrium:   0.021 [sec]
+    ..Background Opacity:   0.469 [sec]
+   .....Total Background:   0.493 [sec]
 
    .............Profiles:   0.000 [sec]
 
    .....Initial solution:   0.000 [sec]
 
-  ......Total Initialize:   0.275 [sec]
+  ......Total Initialize:   0.621 [sec]
 
 
-    .Spectrum & Operator:   0.007 [sec]
-   ..Total Iteration   1:   0.007 [sec]
+    .Spectrum & Operator:   0.011 [sec]
+   ..Total Iteration   1:   0.011 [sec]
 
-  .......Iteration Total:   0.007 [sec]
+  .......Iteration Total:   0.011 [sec]
 
 
 
-Total_time____:    1.330 [sec]  (user: 78.2%, system: 21.8%)
+Total_time____:    1.610 [sec]  (user: 42.9%, system: 57.1%)
 
     ..........LTEpops H :   0.000 [sec]
     ..........LTEpops HE:   0.000 [sec]
@@ -72,14 +72,14 @@ Total_time____:    1.330 [sec]  (user: 78.2%, system: 21.8%)
     ..........LTEpops NA:   0.000 [sec]
     ..........LTEpops MG:   0.000 [sec]
     Chemical equilibrium:   0.001 [sec]
-    ..Background Opacity:   0.200 [sec]
-   .....Total Background:   0.201 [sec]
+    ..Background Opacity:   0.137 [sec]
+   .....Total Background:   0.139 [sec]
 
    .............Profiles:   0.000 [sec]
 
    .....Initial solution:   0.000 [sec]
 
-  ......Total initialize:   0.201 [sec]
+  ......Total initialize:   0.139 [sec]
 
 
-    ......Solve Spectrum:   0.007 [sec]
+    ......Solve Spectrum:   0.012 [sec]

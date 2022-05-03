@@ -71,16 +71,16 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef compute1d(self,
-	            cnp.ndarray[double, ndim=1, mode="c"] scale,
-	            cnp.ndarray[double, ndim=1, mode="c"] temp,
-	            cnp.ndarray[double, ndim=1, mode="c"] ne,
-	            cnp.ndarray[double, ndim=1, mode="c"] vz,
-	            cnp.ndarray[double, ndim=1, mode="c"] vmic,
-		 	    cnp.ndarray[double, ndim=1, mode="c"] mag,
-		 	    cnp.ndarray[double, ndim=1, mode="c"] gamma,
-		 	    cnp.ndarray[double, ndim=1, mode="c"] chi,
-		 	    cnp.ndarray[double, ndim=2, mode="c"] nH,
-                int atm_scale):
+				cnp.ndarray[double, ndim=1, mode="c"] scale,
+				cnp.ndarray[double, ndim=1, mode="c"] temp,
+				cnp.ndarray[double, ndim=1, mode="c"] ne,
+				cnp.ndarray[double, ndim=1, mode="c"] vz,
+				cnp.ndarray[double, ndim=1, mode="c"] vmic,
+				cnp.ndarray[double, ndim=1, mode="c"] mag,
+				cnp.ndarray[double, ndim=1, mode="c"] gamma,
+				cnp.ndarray[double, ndim=1, mode="c"] chi,
+				cnp.ndarray[double, ndim=2, mode="c"] nH,
+				int atm_scale):
 		cdef int Ndep = scale.shape[0]
 
 		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,

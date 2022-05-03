@@ -38,8 +38,9 @@ void Error(enum errorlevel level, const char *routineName,
       fprintf(commandline.logfile, "%s", (messageStr) ? messageStr : "");
     return;
   case WARNING:
-    fprintf(commandline.logfile, "\n-WARNING in routine %s\n %s\n",
-	    routineName, (messageStr) ? messageStr : " (Undocumented)\n");
+    if (!commandline.quiet)
+      fprintf(commandline.logfile, "\n-WARNING in routine %s\n %s\n",
+  	    routineName, (messageStr) ? messageStr : " (Undocumented)\n");
     return;
   default:
     if (level < defaultLevel) {
