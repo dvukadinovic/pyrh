@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
   readAtomicModels();
   readMolecularModels();
-  SortLambda();
+  // SortLambda();
 
   getBoundary(&geometry);
 

@@ -11,7 +11,11 @@ atmos = globin.Atmosphere("atmos_combined_ss_v2.fits")
 
 start = time.time()
 
-aux = pyrh.RH(input="keyword.input", quiet=True)
+
+aux = pyrh.RH(quiet=False)
+
+wave = np.linspace(401.5, 401.7, num=201)
+aux.set_wavetable(wave)
 
 # def spec(args):
 idx, idy = 0, 0
@@ -31,9 +35,9 @@ specRH = aux.compute1d(atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.d
 print(time.time() - start)
 
 plt.plot(specRH.I[:-1])
-#
-# plt.show()
-# sys.exit()
+
+plt.show()
+sys.exit()
 
 start = time.time()
 

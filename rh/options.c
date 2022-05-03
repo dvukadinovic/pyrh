@@ -41,7 +41,7 @@ void setOptions(int argc, char *argv[])
     {"logfile", 1, TRUE, "",
        logfileName,
        setcharValue, "File name log file"},
-    {"quiet", 1, FALSE, "FALSE", &commandline.quiet, setboolValue,
+    {"quiet", 1, FALSE, "TRUE", &commandline.quiet, setboolValue,
        "Turns off warning messages"},
     {"showkeywords", 1, FALSE, "FALSE", &commandline.showkeywords,
        setboolValue,

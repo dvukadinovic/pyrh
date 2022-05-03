@@ -7,8 +7,9 @@
 # First specify input files for atmosphere and abundances
 # (both KEYWORD_REQUIRED).
 
-#  ATMOS_FILE = ../../Atmos/FALC_82.atmos
+# obsolete for the pyrh (since we provide the atmosphere model)
   ATMOS_FILE = atm_0_0.atmos
+
   ABUND_FILE = ../../Atoms/abundance.input
 
 # Set choice of number of rays (KEYWORD_OPTIONAL).

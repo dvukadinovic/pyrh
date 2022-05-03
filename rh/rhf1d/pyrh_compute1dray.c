@@ -84,7 +84,8 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double *pyrh_nH, int pyrh_atm_scale, myRLK_Line *pyrh_rlk_lines)
+              double *pyrh_nH, int pyrh_atm_scale, myRLK_Line *pyrh_rlk_lines,
+              double *wavetable, int Nwave)
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact;
@@ -99,6 +100,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
+
   if (pyrh_rlk_lines->Nrlk!=0){
     atmos.Nrlk = pyrh_rlk_lines->Nrlk;
     atmos.rlk_lines = pyrh_rlk_lines->rlk_lines;
@@ -175,7 +177,7 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   
   readAtomicModels();
   readMolecularModels();
-  SortLambda();
+  SortLambda(wavetable, Nwave);
   
   getBoundary(&geometry);
   

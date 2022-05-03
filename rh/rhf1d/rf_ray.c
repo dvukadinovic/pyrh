@@ -258,7 +258,7 @@ void get_spec(char *argv[], double muz, int pID, int idz, double perturbation)
 
   readAtomicModels();
   readMolecularModels();
-  SortLambda();
+  // SortLambda(NULL);
 
   getBoundary(&geometry);
 

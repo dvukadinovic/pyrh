@@ -85,74 +85,16 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   XDR     xdrs;
   ActiveSet *as;
 
-  // setOptions(argc, argv);
-  // getCPU(0, TIME_START, NULL);
-  // SetFPEtraps();
-
   /* --- Read input data and initialize --             -------------- */
 
-  // readInput();
   input.startJ = OLD_J;
   spectrum.updateJ = FALSE;
   input.limit_memory = FALSE;
-  // atmos.Nrlk = 0; // whether to read again or not the RLK lines
 
   /* --- Read input data for atmosphere --             -------------- */
 
-  // geometry.Ndep = Ndep;
-
   getCPU(1, TIME_START, NULL);
-  // MULTIatmos(&atmos, &geometry);
-
-  /* --- Read direction cosine for ray --              -------------- */
-
-  // if ((fp_ray = fopen(RAY_INPUT_FILE, "r")) == NULL) {
-  //   sprintf(messageStr, "Unable to open inputfile %s", RAY_INPUT_FILE);
-  //   Error(ERROR_LEVEL_2, argv[0], messageStr);
-  // }
   
-  // getLine(fp_ray, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
-  // Nread = sscanf(inputLine, "%lf", &muz);
-  // checkNread(Nread, Nrequired=1, argv[0], checkPoint=1);
-
-  // if (muz <= 0.0  ||  muz > 1.0) {
-  //   sprintf(messageStr,
-	 //    "Value of muz = %f does not lie in interval <0.0, 1.0]\n", muz);
-  //   Error(ERROR_LEVEL_2, argv[0], messageStr);
-  // }
-  
-  // if (atm_scale==0){
-  //   geometry.scale = TAU500;
-  //   for (k=0; k<Ndep; k++){ 
-  //     geometry.tau_ref[k] = POW10(rh_scale[k]);
-  //   }
-  // }
-  // if (atm_scale==1){
-  //   geometry.scale = COLUMN_MASS;
-  //   for (k=0; k<Ndep; k++){
-  //     geometry.cmass[k] = POW10(rh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
-  //   }
-  // }
-  // if (input.StokesMode == FIELD_FREE ||
-  //     input.StokesMode == POLARIZATION_FREE) {
-  //   input.StokesMode = FULL_STOKES;
-  // }
-  /* --- redefine geometry for just this one ray --    -------------- */
-
-  // atmos.T = rh_temp;
-  // atmos.ne = rh_ne;
-  // geometry.vel = rh_vz;
-  // atmos.vturb = rh_vmic;
-
-  // atmos.B = (double *) malloc(atmos.Nspace * sizeof(double));
-  // atmos.gamma_B = (double *) malloc(atmos.Nspace * sizeof(double));
-  // atmos.chi_B   = (double *) malloc(atmos.Nspace * sizeof(double));
-
-  // atmos.B = rh_mag;
-  // atmos.gamma_B = rh_gamma;
-  // atmos.chi_B = rh_chi;
-  // atmos.Stokes = TRUE;
-
   atmos.Nrays = geometry.Nrays = 1;
   geometry.muz[0] = muz;
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
@@ -160,39 +102,6 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   geometry.wmu[0] = 1.0;
   // this has to be reprojected for new muz (but from input B vector, not from already projected from rhf1d())
   if (atmos.Stokes) Bproject();
-  
-  // atmos.nH = matrix_double(atmos.NHydr, Ndep);
-  // atmos.nH = rh_nH;
-  // atmos.nHtot = (double *) calloc(Ndep, sizeof(double));
-
-  // for (k=0; k<Ndep; k++)
-  // {
-  //   for (n=0;  n<atmos.NHydr;  n++)
-  //   {
-  //     atmos.nH[n][k] /= CUBE(CM_TO_M);
-  //     atmos.nHtot[k] += atmos.nH[n][k];
-  //   }
-  //   geometry.vel[k] *= KM_TO_M;
-  //   atmos.vturb[k]  *= KM_TO_M;
-  //   atmos.ne[k]     /= CUBE(CM_TO_M);
-  // }
-  
-  // atmos.moving = FALSE;
-  // for (k=0; k<Ndep; k++)
-  // {
-  //   if (fabs(geometry.vel[k]) >= atmos.vmacro_tresh) {
-  //     atmos.moving = TRUE;
-  //     break;
-  //   }
-  // }
-
-  // this is how far I edited
-
-  // readAtomicModels();
-  // readMolecularModels();
-  // SortLambda();
-
-  // getBoundary(&geometry);
 
   /* --- Open file with background opacities --        -------------- */
   

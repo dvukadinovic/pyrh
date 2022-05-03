@@ -108,7 +108,7 @@ myPops hse(int argc, char *argv[])
 
   readAtomicModels();
   readMolecularModels();
-  SortLambda();
+  SortLambda(NULL, 0);
   getBoundary(&geometry);
 
   // convertScales(&atmos, &geometry);
