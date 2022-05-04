@@ -9,18 +9,22 @@ cimport numpy as cnp
 import cython
 from libc.stdlib cimport malloc, free
 
+from cpython cimport PyObject, Py_INCREF
+
+cnp.import_array()
+
 # cimport tools
 
 cdef convert_1d(double *arr, int n):
-	cdef int i
+	cdef Py_ssize_t i
 	cdef cnp.ndarray[cnp.float64_t, ndim=1] pyarr = np.empty(n)
 	for i in range(n):
 		pyarr[i] = arr[i]
 	return pyarr
 
 cdef convert_2d(double **arr, int nx, int ny):
-	cdef int i
-	cdef int j
+	cdef Py_ssize_t i
+	cdef Py_ssize_t j
 	cdef cnp.ndarray[cnp.float64_t, ndim=2] pyarr = np.empty((nx, ny))
 	for i in range(nx):
 		for j in range(ny):
@@ -44,8 +48,6 @@ class Spectrum(object):
 			self.stokes = False
 
 cdef class RH:
-	cdef rh.mySpectrum spec
-
 	cdef int Nrlk
 	cdef rh.myRLK_Line rlk_lines
 
@@ -66,7 +68,7 @@ cdef class RH:
 		self.argc = len(py_list)
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * self.argc)(*py_string)
-		cdef int i_
+		cdef Py_ssize_t i_
 		for i_ in range(self.argc):
 			self.argv[i_] = arr[i_]
 
@@ -76,11 +78,10 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wavetable):
-		cdef int i
+		cdef Py_ssize_t i
 		cdef double sigma_sq
 		cdef double fact
 		self.Nwave = wavetable.size
-		# self.wavetable = (double *)malloc(self.Nwave * cython.sizeof(double))
 		for i in range(self.Nwave):
 			if wavetable[i]>199.9352:
 				sigma_sq = (1.0e7/wavetable[i])*(1.0e7/wavetable[i])
@@ -102,25 +103,24 @@ cdef class RH:
 				cnp.ndarray[double, ndim=2, mode="c"] nH,
 				int atm_scale):
 		cdef int Ndep = scale.shape[0]
+		cdef rh.mySpectrum spec
 
-		self.spec = rh.rhf1d(self.argc, self.argv, Ndep,
+		spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale, &self.rlk_lines,
 				 self.wavetable_ptr, self.Nwave)
 
-		lam = convert_1d(self.spec.lam, self.spec.nlw)
-		sI = convert_1d(self.spec.sI, self.spec.nlw)
+		lam = convert_1d(spec.lam, spec.nlw)
+		sI = convert_1d(spec.sI, spec.nlw)
 		sQ, sU, sV = None, None, None
-		if self.spec.stokes:
-			sQ = convert_1d(self.spec.sQ, self.spec.nlw)
-			sU = convert_1d(self.spec.sU, self.spec.nlw)
-			sV = convert_1d(self.spec.sV, self.spec.nlw)
-		J = convert_2d(self.spec.J, self.spec.nlw, self.spec.Nrays)
+		if spec.stokes:
+			sQ = convert_1d(spec.sQ, spec.nlw)
+			sU = convert_1d(spec.sU, spec.nlw)
+			sV = convert_1d(spec.sV, spec.nlw)
+		J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-		#lam_ = np.ctypeslib.as_array(self.spec.lam, shape=(self.spec.nlw,))
-
-		return Spectrum(self.spec.nlw, lam, sI, sQ, sU, sV, J, None, self.spec.stokes)
+		return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 
 	cpdef read_RLK_lines(self):
 		self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
