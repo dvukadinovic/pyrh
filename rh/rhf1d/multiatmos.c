@@ -155,6 +155,7 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     	(height[k-1] - height[k]);
           // height[k] = height[k-1] + 1/as->chi_c[k] * (tau_ref[k] - tau_ref[k-1]);
           // cmass[k] = cmass[k-1] + rho[k]/as->chi_c[k] * (tau_ref[k] - tau_ref[k-1]);
+        // printf("%e | %f\n", as->chi_c[k], tau_ref[k]);
     }
     break;
   case GEOMETRIC:
@@ -178,6 +179,7 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     for (k = 0;  k < Ndep;  k++)
       {
         height[k] = height[k] - h_zero;
+        // printf("%e\n", height[k]/1e3);
       }
   }
 

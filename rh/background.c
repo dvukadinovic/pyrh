@@ -191,16 +191,16 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     return;
   }
 
-  if (input.old_background) {
-    if ((atmos.fd_background =
-	 open(input.background_File, O_RDONLY, 0)) == -1) {
-      sprintf(messageStr, "Unable to open input file %s",
-	      input.background_File);
-      Error(ERROR_LEVEL_2, routineName, messageStr);
-    }
-    readBRS();
-    return;
-  }
+  // if (input.old_background) {
+  //   if ((atmos.fd_background =
+	 // open(input.background_File, O_RDONLY, 0)) == -1) {
+  //     sprintf(messageStr, "Unable to open input file %s",
+	 //      input.background_File);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   readBRS();
+  //   return;
+  // }
     
   getCPU(3, TIME_START, NULL);
   if (strcmp(input.fudgeData, "none")) {
@@ -334,12 +334,13 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   /* --- Open output file for background opacity, emissivity,
          scattering --                                 -------------- */
 
-  if ((atmos.fd_background =
-       open(input.background_File, O_RDWR | O_CREAT, PERMISSIONS)) == -1) {
-    sprintf(messageStr, "Unable to open output file %s",
-	    input.background_File);
-    Error(ERROR_LEVEL_2, routineName, messageStr);
-  }
+  // if ((atmos.fd_background =
+  //      open(input.background_File, O_RDWR | O_CREAT, PERMISSIONS)) == -1) {
+  //   sprintf(messageStr, "Unable to open output file %s",
+	 //    input.background_File);
+  //   Error(ERROR_LEVEL_2, routineName, messageStr);
+  // }
+
   /* --- Go through the spectrum and add the different opacity and
          emissivity contributions. This is the main loop --  -------- */
 
@@ -627,7 +628,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     	  if ((mu == atmos.Nrays-1 && to_obs) ||
     	      (atmos.backgrflags[nspect].hasline && 
     	       (atmos.moving || atmos.backgrflags[nspect].ispolarized))) {
-    	    backgrrecno += writeBackground(nspect, mu, to_obs,
+          backgrrecno += writeBackground(nspect, mu, to_obs,
     					   chi_c, eta_c, sca_c, chip_c);
     	  }
 	}
@@ -679,22 +680,24 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       }
       /* --- Store results --                          -------------- */
 
+      // printf("%e  ", chi_c[0]);
       atmos.backgrrecno[nspect] = backgrrecno;
       backgrrecno += writeBackground(nspect, 0, 0,
 				     chi_c, eta_c, sca_c, NULL);
+      // printf("spectrum.as.chi_c = %e\n", spectrum.as[nspect].chi_c[0]);
     }
   }
 
-  if (write_analyze_output) {
+  // if (write_analyze_output) {
     /* --- Write background record structure --          ------------ */
     
-    writeBRS();
+    // writeBRS();
 
     /* --- Write out the metals and molecules --         ------------ */
 
-    writeMetals("metals.out");
-    writeMolecules(MOLECULAR_CONCENTRATION_FILE);
-  }
+    // writeMetals("metals.out");
+    // writeMolecules(MOLECULAR_CONCENTRATION_FILE);
+  // }
   /* --- Clean up but keep H, H2, and active atom and/or molecule
          if appropriate --                               ------------ */
 

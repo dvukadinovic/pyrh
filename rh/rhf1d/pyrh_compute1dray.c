@@ -184,6 +184,9 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
 
+  // mySpectrum dummy;
+  // return dummy;
+
   bool_t pyrh_io_flag = FALSE;
 
   getProfiles();
@@ -201,12 +204,19 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
 
+  // int nspect = 0;
+  // ActiveSet *as;
+  // as = &spectrum.as[nspect];
+
   adjustStokesMode();
   niter = 0;
   while (niter < input.NmaxScatter) {
     if (solveSpectrum(FALSE, FALSE) <= input.iterLimit) break;
     niter++;
   }
+  // printf("final --> %e\n", spectrum.I[0]);
+
+  // return dummy;
   /* --- Write output files --                         -------------- */
 
   if (atmos.hydrostatic) {

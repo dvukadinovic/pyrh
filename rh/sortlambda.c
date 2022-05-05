@@ -193,6 +193,25 @@ void SortLambda(double* wavetable, int Nwave)
 				       spectrum.Nspect*sizeof(double));
   spectrum.as = (ActiveSet *) malloc(spectrum.Nspect * sizeof(ActiveSet));
 
+  /* --- Allocate space for wavelength dependendent opacities and 
+  emissivities --- */
+
+  spectrum.chi_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.chi_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+  
+  spectrum.chip_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.chip_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+
+  spectrum.eta_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.eta_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+
+  spectrum.sca_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.sca_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+
   /* --- Go through each established wavelength and gather active
          transitions --                                -------------- */
 

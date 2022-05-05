@@ -160,10 +160,12 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 	  Opacity(nspect, mu, to_obs, initialize);
 
 	if (eval_operator) addtoCoupling(nspect);
-	for (k = 0;  k < Nspace;  k++) {
-	  chi[k] = as->chi[k] + as->chi_c[k];
+	
+  for (k = 0;  k < Nspace;  k++) {
+    chi[k] = as->chi[k] + as->chi_c[k];
 	  S[k]   = as->eta[k] + as->eta_c[k] + as->sca_c[k]*Jdag[k];
 	}
+
 	if (solveStokes) {
 	  for (k = Nspace;  k < 4*Nspace;  k++) Spol[0][k] = 0.0;
 

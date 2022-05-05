@@ -104,20 +104,20 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   if (atmos.Stokes) Bproject();
 
   /* --- Open file with background opacities --        -------------- */
-  
+
   if (atmos.moving || input.StokesMode) {
-    strcpy(input.background_File, input.background_ray_File);
+    // strcpy(input.background_File, input.background_ray_File);
     Background(analyze_output=FALSE, equilibria_only=FALSE);
   } else {
     Background(analyze_output=FALSE, equilibria_only=TRUE);
 
-    if ((atmos.fd_background =
-	 open(input.background_File, O_RDONLY, 0)) == -1) {
-      sprintf(messageStr, "Unable to open inputfile %s",
-	      input.background_File);
-      Error(ERROR_LEVEL_2, argv[0], messageStr);
-    }
-    readBRS();
+  //   if ((atmos.fd_background =
+	 // open(input.background_File, O_RDONLY, 0)) == -1) {
+  //     sprintf(messageStr, "Unable to open inputfile %s",
+	 //      input.background_File);
+  //     Error(ERROR_LEVEL_2, argv[0], messageStr);
+  //   }
+  //   readBRS();
   }
   // convertScales(&atmos, &geometry);
 

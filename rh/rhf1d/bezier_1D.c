@@ -228,8 +228,10 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     
     for(i = 0;  i < 4;  i++){
       for(j = 0;  j < 4;  j++){
-	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] +
-	  Mc[i][j] * S0[j];
+      	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] +
+      	  Mc[i][j] * S0[j];
+        // if (nspect==1) 
+        //   printf("%e | %e | %e | %e | %e | %e\n", Ma[i][k], I[j][k-dk], Mb[i][j], Su[j], Mc[i][j], S0[j]);
       }
       V0[i] += dt03 * (gamma * dS0[i] - theta * dSu[i]);
     }

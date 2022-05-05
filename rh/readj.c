@@ -237,36 +237,41 @@ void readBackground(int nspect, int mu, bool_t to_obs)
   } else
     NskipStokes = 1;
 
+  memcpy(as->chi_c, spectrum.chi_c_lam[nspect], NrecStokes*recordsize);
+
   /* --- Read background opacity --                    -------------- */
 
-  result &= (pread_rh(atmos.fd_background, as->chi_c,
-		      NrecStokes * recordsize,
-		      offset) == NrecStokes * recordsize);
+  // result &= (pread_rh(atmos.fd_background, as->chi_c,
+		//       NrecStokes * recordsize,
+		//       offset) == NrecStokes * recordsize);
   offset += NskipStokes * recordsize;
 
   /* --- Read off-diagonal elements propagation matrix K -- --------- */
 
   if (atmos.backgrflags[nspect].ispolarized && input.magneto_optical) {
     if (input.StokesMode == FULL_STOKES)
-      result &= (pread_rh(atmos.fd_background, as->chip_c, 3*recordsize,
-			  offset) == 3*recordsize);
+     //  result &= (pread_rh(atmos.fd_background, as->chip_c, 3*recordsize,
+			  // offset) == 3*recordsize);
+      memcpy(as->chip_c, spectrum.chip_c_lam[nspect], NrecStokes * recordsize);
     offset += 3 * recordsize;
   }
   /* --- Read background emissivity --                 -------------- */
 
-  result &= (pread_rh(atmos.fd_background, as->eta_c,
-                   NrecStokes * recordsize,
-                   offset) == NrecStokes * recordsize);
+  // result &= (pread_rh(atmos.fd_background, as->eta_c,
+  //                  NrecStokes * recordsize,
+  //                  offset) == NrecStokes * recordsize);
+  memcpy(as->eta_c, spectrum.eta_c_lam[nspect], NrecStokes * recordsize);
   offset += NskipStokes * recordsize;
 
   /* --- Read background scattering opacity --         -------------- */
 
-  result &= (pread_rh(atmos.fd_background,
-		      as->sca_c, recordsize, offset) == recordsize);
+  // result &= (pread_rh(atmos.fd_background,
+		//       as->sca_c, recordsize, offset) == recordsize);
+  memcpy(as->sca_c, spectrum.sca_c_lam[nspect], recordsize);
 
   /* --- Exit if reading is unsuccessful --            -------------- */
 
-  if (!result) Error(ERROR_LEVEL_2, routineName, "Error reading file");
+  // if (!result) Error(ERROR_LEVEL_2, routineName, "Error reading file");
 }
 /* ------- end ---------------------------- readBackground.c -------- */
 
@@ -304,36 +309,40 @@ int writeBackground(int nspect, int mu, bool_t to_obs,
 
   /* --- Write background opacity --                   -------------- */
 
-  result &= (pwrite_rh(atmos.fd_background, chi_c,
-		       NrecStokes * recordsize,
-		       offset) == NrecStokes * recordsize);
+  // result &= (pwrite_rh(atmos.fd_background, chi_c,
+		//        NrecStokes * recordsize,
+		//        offset) == NrecStokes * recordsize);
+  memcpy(spectrum.chi_c_lam[nspect], chi_c, NrecStokes * recordsize);
   Nwrite += NrecStokes;
   offset += NrecStokes * recordsize;
 
   /* --- Write off-diagonal elements of propagation matrix K -- ----- */
 
   if (atmos.backgrflags[nspect].ispolarized && input.magneto_optical) {
-    result &= (pwrite_rh(atmos.fd_background, chip_c, 3*recordsize,
-			 offset) == 3*recordsize);
+    // result &= (pwrite_rh(atmos.fd_background, chip_c, 3*recordsize,
+			 // offset) == 3*recordsize);
+    memcpy(spectrum.chip_c_lam[nspect], chip_c, NrecStokes * recordsize);
     Nwrite += 3;
     offset += 3 * recordsize;
   }
   /* --- Write background emissivity --                -------------- */
 
-  result &= (pwrite_rh(atmos.fd_background, eta_c, 
-		       NrecStokes * recordsize,
-		       offset) == NrecStokes * recordsize);
+  // result &= (pwrite_rh(atmos.fd_background, eta_c, 
+		//        NrecStokes * recordsize,
+		//        offset) == NrecStokes * recordsize);
+  memcpy(spectrum.eta_c_lam[nspect], eta_c, NrecStokes * recordsize);
   Nwrite += NrecStokes;
   offset += NrecStokes * recordsize;
 
   /* --- Write background scattering opacity --        -------------- */
 
-  result &= (pwrite_rh(atmos.fd_background, sca_c, recordsize,
-		       offset) == recordsize);
+  // result &= (pwrite_rh(atmos.fd_background, sca_c, recordsize,
+		//        offset) == recordsize);
+  memcpy(spectrum.sca_c_lam[nspect], sca_c, recordsize);
   Nwrite += 1;
 
-  if (!result)
-    Error(ERROR_LEVEL_2, routineName, "Error writing file");
+  // if (!result)
+  //   Error(ERROR_LEVEL_2, routineName, "Error writing file");
 
   /* --- Return the number of written records --       -------------- */
 

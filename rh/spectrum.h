@@ -42,6 +42,8 @@ typedef struct {
   int      Nspect, *PRDindex, fd_J, fd_J20, fd_Imu;
   double  *lambda, **J, **I, **Stokes_Q, **Stokes_U, **Stokes_V, **J20;
   ActiveSet *as;
+  // background opacities/emissivities per wavelength (D.Vukadinovic)
+  double  **chi_c_lam, **eta_c_lam, **sca_c_lam, **chip_c_lam;
 } Spectrum;
 
 

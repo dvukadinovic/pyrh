@@ -318,8 +318,6 @@ rh/rhf1d/dummy_1/ray.input
 rh/rhf1d/test_run/atm_0_0.atmos
 rh/rhf1d/test_run/atmos_combined_ss_v2.fits
 rh/rhf1d/test_run/atoms.input
-rh/rhf1d/test_run/background.dat
-rh/rhf1d/test_run/background.ray
 rh/rhf1d/test_run/keyword.input
 rh/rhf1d/test_run/kurucz.input
 rh/rhf1d/test_run/molecules.input

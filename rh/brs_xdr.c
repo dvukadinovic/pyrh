@@ -21,6 +21,7 @@
 #include "spectrum.h"
 #include "error.h"
 #include "xdr.h"
+#include "inputs.h"
 
 #define  BRS_DOT_OUT  "brs.out"
 
@@ -39,11 +40,11 @@ extern char messageStr[];
 
 void writeBRS(void)
 {
+  return;
   const char routineName[] = "writeBRS";
 
   FILE *fp_out;
   XDR   xdrs;
-
 
   if ((fp_out = fopen(BRS_DOT_OUT, "w")) == NULL) {
     sprintf(messageStr, "Unable to open output file %s", BRS_DOT_OUT);
@@ -66,6 +67,7 @@ void writeBRS(void)
 
 void readBRS(void)
 {
+  return;
   const char routineName[] = "readBRS";
 
   FILE *fp_in;
