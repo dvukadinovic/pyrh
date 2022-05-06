@@ -200,9 +200,11 @@ void SortLambda(double* wavetable, int Nwave)
   for (nspect=0; nspect < spectrum.Nspect; nspect++)
     spectrum.chi_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
   
-  spectrum.chip_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
-  for (nspect=0; nspect < spectrum.Nspect; nspect++)
-    spectrum.chip_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+  if (input.magneto_optical){
+    spectrum.chip_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+    for (nspect=0; nspect < spectrum.Nspect; nspect++)
+      spectrum.chip_c_lam[nspect] = (double *) malloc(3*atmos.Nspace * sizeof(double));
+  }
 
   spectrum.eta_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
   for (nspect=0; nspect < spectrum.Nspect; nspect++)

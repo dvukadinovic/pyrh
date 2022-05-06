@@ -237,7 +237,8 @@ void readBackground(int nspect, int mu, bool_t to_obs)
   } else
     NskipStokes = 1;
 
-  memcpy(as->chi_c, spectrum.chi_c_lam[nspect], NrecStokes*recordsize);
+  // memcpy(as->chi_c, spectrum.chi_c_lam[nspect], NrecStokes*recordsize);
+  as->chi_c = spectrum.chi_c_lam[nspect];
 
   /* --- Read background opacity --                    -------------- */
 
@@ -252,7 +253,8 @@ void readBackground(int nspect, int mu, bool_t to_obs)
     if (input.StokesMode == FULL_STOKES)
      //  result &= (pread_rh(atmos.fd_background, as->chip_c, 3*recordsize,
 			  // offset) == 3*recordsize);
-      memcpy(as->chip_c, spectrum.chip_c_lam[nspect], NrecStokes * recordsize);
+      // memcpy(as->chip_c, spectrum.chip_c_lam[nspect], NrecStokes * recordsize);
+      as->chip_c = spectrum.chip_c_lam[nspect];
     offset += 3 * recordsize;
   }
   /* --- Read background emissivity --                 -------------- */
@@ -260,14 +262,16 @@ void readBackground(int nspect, int mu, bool_t to_obs)
   // result &= (pread_rh(atmos.fd_background, as->eta_c,
   //                  NrecStokes * recordsize,
   //                  offset) == NrecStokes * recordsize);
-  memcpy(as->eta_c, spectrum.eta_c_lam[nspect], NrecStokes * recordsize);
+  // memcpy(as->eta_c, spectrum.eta_c_lam[nspect], NrecStokes * recordsize);
+  as->eta_c = spectrum.eta_c_lam[nspect];
   offset += NskipStokes * recordsize;
 
   /* --- Read background scattering opacity --         -------------- */
 
   // result &= (pread_rh(atmos.fd_background,
 		//       as->sca_c, recordsize, offset) == recordsize);
-  memcpy(as->sca_c, spectrum.sca_c_lam[nspect], recordsize);
+  // memcpy(as->sca_c, spectrum.sca_c_lam[nspect], recordsize);
+  as->sca_c = spectrum.sca_c_lam[nspect];
 
   /* --- Exit if reading is unsuccessful --            -------------- */
 

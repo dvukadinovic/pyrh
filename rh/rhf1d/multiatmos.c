@@ -127,8 +127,8 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
   Locate(spectrum.Nspect, spectrum.lambda, atmos->lambda_ref, &ref_index);
 
   as = &spectrum.as[ref_index];
-  alloc_as(ref_index, FALSE);
-  readBackground(ref_index, 0, 0);
+  // no need to allocate space, we just make it a pointer to the already saved memory location
+  as->chi_c = spectrum.chi_c_lam[ref_index];
 
   /* --- Convert to missing depth scales --              ------------ */
 
@@ -141,8 +141,6 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     	(rho[k-1] + rho[k]);
           tau_ref[k] = tau_ref[k-1] + 0.5*(as->chi_c[k-1] + as->chi_c[k]) *
     	(height[k-1] - height[k]);
-            // height[k] = height[k-1] + 1/rho[k] * (cmass[k] - cmass[k-1]);
-            // tau_ref[k] = tau_ref[k-1] + as->chi_c[k]/rho[k] * (cmass[k] - cmass[k-1]);
     }
     break;
   case TAU500:
@@ -153,9 +151,6 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     	(as->chi_c[k-1] + as->chi_c[k]);
           cmass[k]  = cmass[k-1]  + 0.5*(rho[k-1] + rho[k]) *
     	(height[k-1] - height[k]);
-          // height[k] = height[k-1] + 1/as->chi_c[k] * (tau_ref[k] - tau_ref[k-1]);
-          // cmass[k] = cmass[k-1] + rho[k]/as->chi_c[k] * (tau_ref[k] - tau_ref[k-1]);
-        // printf("%e | %f\n", as->chi_c[k], tau_ref[k]);
     }
     break;
   case GEOMETRIC:
@@ -171,7 +166,6 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     }
     break;
   }
-  free_as(ref_index, FALSE);
 
   if ((geometry->scale == COLUMN_MASS) || (geometry->scale == TAU500)) {
     unity = 1.0;
@@ -179,7 +173,6 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
     for (k = 0;  k < Ndep;  k++)
       {
         height[k] = height[k] - h_zero;
-        // printf("%e\n", height[k]/1e3);
       }
   }
 

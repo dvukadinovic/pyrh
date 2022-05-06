@@ -18,6 +18,8 @@
 
        --                                              -------------- */
 
+// #include <stdlib.h>
+// #include <stdio.h>
 #include <string.h>
 
 #include "rh.h"
@@ -157,7 +159,6 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   {
     for (int n=0;  n<atmos.NHydr;  n++)
     {
-      // atmos.nH[n][k] /= CUBE(CM_TO_M);
       atmos.nHtot[k] += atmos.nH[n][k];
     }
     geometry.vel[k] *= KM_TO_M;
@@ -184,9 +185,6 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
 
-  // mySpectrum dummy;
-  // return dummy;
-
   bool_t pyrh_io_flag = FALSE;
 
   getProfiles();
@@ -204,19 +202,12 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
 
-  // int nspect = 0;
-  // ActiveSet *as;
-  // as = &spectrum.as[nspect];
-
   adjustStokesMode();
   niter = 0;
   while (niter < input.NmaxScatter) {
     if (solveSpectrum(FALSE, FALSE) <= input.iterLimit) break;
     niter++;
   }
-  // printf("final --> %e\n", spectrum.I[0]);
-
-  // return dummy;
   /* --- Write output files --                         -------------- */
 
   if (atmos.hydrostatic) {
@@ -252,6 +243,32 @@ mySpectrum rhf1d(int argc, char *argv[], int pyrh_Ndep,
   // getCPU(1, TIME_POLL, "Write output");
 
   printTotalCPU();
+
+  /*--- Free from memory background opacity/emissivity  ---*/
+  
+  // int nspect;
+  
+  // for (nspect=0; nspect<spectrum.Nspect; nspect++) {
+  //   free(spectrum.chi_c_lam[nspect]);
+  // }
+  // free(spectrum.chi_c_lam);
+
+  // for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
+  //   free(spectrum.eta_c_lam[nspect]);
+  // }
+  // free(spectrum.eta_c_lam);
+
+  // for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
+  //   free(spectrum.sca_c_lam[nspect]);
+  // }
+  // free(spectrum.sca_c_lam);
+
+  // if (input.magneto_optical){
+  //   for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
+  //     free(spectrum.chip_c_lam[nspect]);
+  //   }
+  //   free(spectrum.chip_c_lam);
+  // }
 
   mySpectrum spec;
   _solveray(argv, 1.0, &spec, spectrum.J, spectrum.J20);

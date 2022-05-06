@@ -409,14 +409,14 @@ void alloc_as(int nspect, bool_t crosscoupling)
       input.StokesMode == FULL_STOKES) {
     NrecStokes = 4;
 
-    if (input.magneto_optical)
-      as->chip_c = (double *) malloc(3*atmos.Nspace * sizeof(double));
+    // if (input.magneto_optical)
+    //   as->chip_c = (double *) malloc(3*atmos.Nspace * sizeof(double));
   } else
     NrecStokes = 1;
 
-  as->chi_c = (double *) malloc(NrecStokes*atmos.Nspace * sizeof(double));
-  as->eta_c = (double *) malloc(NrecStokes*atmos.Nspace * sizeof(double));
-  as->sca_c = (double *) malloc(atmos.Nspace * sizeof(double));
+  // as->chi_c = (double *) malloc(NrecStokes*atmos.Nspace * sizeof(double));
+  // as->eta_c = (double *) malloc(NrecStokes*atmos.Nspace * sizeof(double));
+  // as->sca_c = (double *) malloc(atmos.Nspace * sizeof(double));
 
   /* --- Now for the active part --                    -------------- */
 
@@ -439,54 +439,55 @@ void alloc_as(int nspect, bool_t crosscoupling)
     atom = atmos.activeatoms[nact];
 
     if (as->Nactiveatomrt[nact] > 0) {
-      atom->rhth[nt].eta =
-	(double *) malloc(NrecStokes_as * atmos.Nspace * sizeof(double));
+		  atom->rhth[nt].eta =
+				(double *) malloc(NrecStokes_as * atmos.Nspace * sizeof(double));
 
-      atom->rhth[nt].Vij =
-	matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
-      atom->rhth[nt].gij =
-	matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
-      atom->rhth[nt].wla =
-	matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+			atom->rhth[nt].Vij =
+				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+		  atom->rhth[nt].gij =
+				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+		  atom->rhth[nt].wla =
+				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
 
       /* --- Allocate pointer space for cross-coupling coefficients - */
 
       if (crosscoupling) {
-	atom->rhth[nt].chi_down = 
-	  (double **) calloc(atom->Nlevel, sizeof(double *));
-	atom->rhth[nt].chi_up   =
-	  (double **) calloc(atom->Nlevel, sizeof(double *));
-	atom->rhth[nt].Uji_down =
-	  (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].chi_down = 
+				  (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].chi_up   =
+				  (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].Uji_down =
+				  (double **) calloc(atom->Nlevel, sizeof(double *));
 
-	for (m = 0;  m < as->Nlower[nact];  m++) {
-	  i = as->lower_levels[nact][m];
-	  atom->rhth[nt].chi_up[i] =
-	    (double *) malloc(atmos.Nspace * sizeof(double));
-	}
-	for (m = 0;  m < as->Nupper[nact];  m++) {
-	  j = as->upper_levels[nact][m];
-	  atom->rhth[nt].chi_down[j] =
-	    (double *) malloc(atmos.Nspace * sizeof(double));
-	  atom->rhth[nt].Uji_down[j] =
-	    (double *) malloc(atmos.Nspace * sizeof(double));
-	}
+				for (m = 0;  m < as->Nlower[nact];  m++) {
+				  i = as->lower_levels[nact][m];
+				  atom->rhth[nt].chi_up[i] =
+				    (double *) malloc(atmos.Nspace * sizeof(double));
+				}
+				for (m = 0;  m < as->Nupper[nact];  m++) {
+				  j = as->upper_levels[nact][m];
+				  atom->rhth[nt].chi_down[j] =
+				    (double *) malloc(atmos.Nspace * sizeof(double));
+				  atom->rhth[nt].Uji_down[j] =
+				    (double *) malloc(atmos.Nspace * sizeof(double));
+				}
       }
     }
   }
+
   for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
     molecule = atmos.activemols[nact];
 
     if (as->Nactivemolrt[nact] > 0) {
       molecule->rhth[nt].eta =
-	(double *) malloc(atmos.Nspace * sizeof(double));
+				(double *) malloc(atmos.Nspace * sizeof(double));
 
       molecule->rhth[nt].Vij = 
-	matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
       molecule->rhth[nt].gij =
-	matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
       molecule->rhth[nt].wla =
-	matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
     }
   }
 }
@@ -506,16 +507,16 @@ void free_as(int nspect, bool_t crosscoupling)
   as = &spectrum.as[nspect];
   nt = nspect % input.Nthreads;
 
-  free(as->chi_c);
-  free(as->eta_c);
-  free(as->sca_c);
+  // free(as->chi_c);
+  // free(as->eta_c);
+  // free(as->sca_c);
 
   free(as->chi);
   free(as->eta);
 
   if (input.StokesMode == FULL_STOKES && input.magneto_optical) {
-    if (atmos.backgrflags[nspect].ispolarized)
-      free(as->chip_c);
+    // if (atmos.backgrflags[nspect].ispolarized)
+    //   free(as->chip_c);
     if (containsPolarized(as))
       free(as->chip);
   }
@@ -531,26 +532,27 @@ void free_as(int nspect, bool_t crosscoupling)
       freeMatrix((void **) atom->rhth[nt].wla);
 
       if (crosscoupling) {
-	for (m = 0;  m < as->Nlower[nact];  m++) {
-	  i = as->lower_levels[nact][m];
-	  free(atom->rhth[nt].chi_up[i]);
-	  atom->rhth[nt].chi_up[i] = NULL;
-	}
-	free(atom->rhth[nt].chi_up);
+				for (m = 0;  m < as->Nlower[nact];  m++) {
+				  i = as->lower_levels[nact][m];
+				  free(atom->rhth[nt].chi_up[i]);
+				  atom->rhth[nt].chi_up[i] = NULL;
+				}
+				free(atom->rhth[nt].chi_up);
 
-	for (m = 0;  m < as->Nupper[nact];  m++) {
-	  j = as->upper_levels[nact][m];
-	  free(atom->rhth[nt].chi_down[j]);
-	  free(atom->rhth[nt].Uji_down[j]);
+				for (m = 0;  m < as->Nupper[nact];  m++) {
+				  j = as->upper_levels[nact][m];
+				  free(atom->rhth[nt].chi_down[j]);
+				  free(atom->rhth[nt].Uji_down[j]);
 
-	  atom->rhth[nt].chi_down[j] = NULL;
-	  atom->rhth[nt].Uji_down[j] = NULL;
-	}
-	free(atom->rhth[nt].chi_down);
-	free(atom->rhth[nt].Uji_down);
+				  atom->rhth[nt].chi_down[j] = NULL;
+				  atom->rhth[nt].Uji_down[j] = NULL;
+				}
+				free(atom->rhth[nt].chi_down);
+				free(atom->rhth[nt].Uji_down);
       }
     }
   }
+  
   for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
     molecule = atmos.activemols[nact];
     if (as->Nactivemolrt[nact] > 0) {

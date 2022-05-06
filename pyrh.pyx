@@ -108,23 +108,6 @@ cdef class RH:
 		cdef int Ndep = scale.shape[0]
 		cdef rh.mySpectrum spec
 
-		# print("to convert string")
-
-		# cdef Py_ssize_t n = len(brs_dot_out)
-		# cdef char* rh_brs_dot_out = <char*>malloc(n * sizeof(char))
-		# cdef Py_ssize_t i
-		# string = brs_dot_out.split("")
-		# py_string = [item.encode("utf-8") for item in string]
-		# arr = (ctypes.c_char_p * self.argc)(*py_string)
-		# for i in range(n):
-		# 	rh_brs_dot_out[i] = arr[i]
-
-		# string = brs_dot_out.encode("utf-8")
-		# rh_brs_dot_out = <char*> string
-		# # rh_brs_dot_out = (ctypes.c_char_p * 1)(*string)
-
-		# print(rh_brs_dot_out)
-
 		spec = rh.rhf1d(self.argc, self.argv, Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
@@ -142,9 +125,9 @@ cdef class RH:
 
 		return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
 
-	cpdef read_RLK_lines(self):
-		self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
-		self.Nrlk = self.rlk_lines.Nrlk
+	# cpdef read_RLK_lines(self):
+	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
+	# 	self.Nrlk = self.rlk_lines.Nrlk
 
 	def get_Nrlk(self):
 		return self.Nrlk
