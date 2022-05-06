@@ -219,6 +219,7 @@ void writeProfile(AtomicLine *line, int lamu, double *phi);
 void readAtom(Atom *atom, char *atomFileName, bool_t active);
 void readPopulations(Atom *atom);
 void SortLambda(double* wavetable, int Nwave);
+// void SortLambda();
 void Stark(AtomicLine *line, double *GStark);
 void StarkLinear(AtomicLine *line, double *GStark);
 void VanderWaals(AtomicLine *line, double *GvdW);

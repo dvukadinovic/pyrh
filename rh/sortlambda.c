@@ -40,6 +40,7 @@ extern char messageStr[];
 /* ------- begin -------------------------- SortLambda.c ------------ */
 
 void SortLambda(double* wavetable, int Nwave)
+// void SortLambda()
 {
   const char routineName[] = "SortLambda";
   register int kr, n, m, nspect, la, nact;
@@ -54,12 +55,38 @@ void SortLambda(double* wavetable, int Nwave)
   AtomicContinuum *continuum;
   MolecularLine *mrt;
   XDR    xdrs;
+  
+  // int Nwave;
+  // double* wavetable;
+  // FILE  *fp_wavetable;
 
   getCPU(2, TIME_START, NULL);
 
   /* --- First read the wavelength table if specified -- ------------ */
 
   result = TRUE;
+
+  // if (strcmp(input.wavetable_input, "none")) {
+  //   if ((fp_wavetable = fopen(input.wavetable_input, "r")) == NULL) {
+  //     sprintf(messageStr, "Unable to open input file %s",
+  //       input.wavetable_input);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   xdrstdio_create(&xdrs, fp_wavetable, XDR_DECODE);
+
+  //   result &= xdr_int(&xdrs, &Nwave);
+  //   wavetable = (double *) malloc(Nwave * sizeof(double));
+  //   result &= xdr_vector(&xdrs, (char *) wavetable, Nwave,
+  //      sizeof(double), (xdrproc_t) xdr_double);
+  //   if (!result) {
+  //     sprintf(messageStr, "Unable to read from input file %s",
+  //       input.wavetable_input);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   xdr_destroy(&xdrs);
+  //   fclose(fp_wavetable);
+  // } else
+  //   Nwave = 0;
 
   /* --- Add reference wavelength if necessary --      -------------- */
 

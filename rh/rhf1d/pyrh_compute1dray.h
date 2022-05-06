@@ -11,11 +11,11 @@ typedef struct{
 	int Nrlk;
 	RLK_Line *rlk_lines;
 } myRLK_Line;
-
-mySpectrum rhf1d(int argc, char *argv[], int Ndep,
+ 
+mySpectrum rhf1d(int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
               double *rh_mag, double *rh_gamma, double *rh_chi,
-              double *rh_nH, int atm_scale, myRLK_Line *pyrh_rlk_lines,
-              double *wavetable, int Nwave);
+              double *rh_nH, int atm_scale,
+              double *wavetable, int Nwave); // myRLK_Line *pyrh_rlk_lines,
 
 myRLK_Line get_RLK_lines(int argc, char *argv[]);

@@ -51,46 +51,49 @@ class Spectrum(object):
 # add OF table as input to rhf1d()
 
 cdef class RH:
-	cdef int Nrlk
-	cdef rh.myRLK_Line rlk_lines
+	# cdef int Nrlk
+	# cdef rh.myRLK_Line rlk_lines
 
-	cdef int argc
-	cdef char* argv[10]
+	# cdef int argc
+	# cdef char* argv[10]
 
 	cdef int Nwave
-	cdef double* wavetable_ptr
+	cdef double [::1] wavetable
 
-	def __init__(self, input="keyword.input", logfile=None, quiet=True):
-		py_argv = "rhf1d" + " -input " + input
-		if logfile is not None:
-			py_argv += " -logfile " + logfile
-		if quiet:
-			py_argv += " -quiet"
+	def __init__(self):
+		pass
 
-		py_list = py_argv.split(" ")
-		self.argc = len(py_list)
-		py_string = [item.encode("utf-8") for item in py_list]
-		arr = (ctypes.c_char_p * self.argc)(*py_string)
-		cdef Py_ssize_t i_
-		for i_ in range(self.argc):
-			self.argv[i_] = arr[i_]
+	# def __init__(self, input="keyword.input", logfile=None, quiet=True):
+	# 	py_argv = "rhf1d" + " -input " + input
+	# 	if logfile is not None:
+	# 		py_argv += " -logfile " + logfile
+	# 	if quiet:
+	# 		py_argv += " -quiet"
 
-		self.Nrlk = 0
-		self.Nwave = 0
+	# 	py_list = py_argv.split(" ")
+	# 	self.argc = len(py_list)
+	# 	py_string = [item.encode("utf-8") for item in py_list]
+	# 	arr = (ctypes.c_char_p * self.argc)(*py_string)
+	# 	cdef Py_ssize_t i_
+	# 	for i_ in range(self.argc):
+	# 		self.argv[i_] = arr[i_]
+
+		# self.Nrlk = 0
+		# self.Nwave = 0
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
-	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wavetable):
+	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
+		self.wavetable = wave
 		cdef Py_ssize_t i
 		cdef double sigma_sq
 		cdef double fact
-		self.Nwave = wavetable.size
+		self.Nwave = self.wavetable.size
 		for i in range(self.Nwave):
-			if wavetable[i]>199.9352:
-				sigma_sq = (1.0e7/wavetable[i])*(1.0e7/wavetable[i])
+			if self.wavetable[i]>199.9352:
+				sigma_sq = (1.0e7/self.wavetable[i])*(1.0e7/self.wavetable[i])
 				fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
-				wavetable[i] = wavetable[i] * fact
-		self.wavetable_ptr = &wavetable[0]
+				self.wavetable[i] = self.wavetable[i] * fact
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
@@ -108,11 +111,15 @@ cdef class RH:
 		cdef int Ndep = scale.shape[0]
 		cdef rh.mySpectrum spec
 
-		spec = rh.rhf1d(self.argc, self.argv, Ndep,
+		spec = rh.rhf1d(Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
-				 &nH[0,0], atm_scale, &self.rlk_lines,
-				 self.wavetable_ptr, self.Nwave)
+				 &nH[0,0], atm_scale, &self.wavetable[0], self.Nwave)
+
+		# spec = rh.rhf1d(self.argc, self.argv, Ndep,
+		# 		 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
+		# 		 &mag[0], &gamma[0], &chi[0],
+		# 		 &nH[0,0], atm_scale) #self.wavetable_ptr, self.Nwave)
 
 		lam = convert_1d(spec.lam, spec.nlw)
 		sI = convert_1d(spec.sI, spec.nlw)
@@ -129,5 +136,5 @@ cdef class RH:
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
 	# 	self.Nrlk = self.rlk_lines.Nrlk
 
-	def get_Nrlk(self):
-		return self.Nrlk
+	# def get_Nrlk(self):
+	# 	return self.Nrlk

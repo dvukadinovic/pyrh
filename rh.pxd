@@ -53,11 +53,12 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sV
 		double **J
 	
-	cdef mySpectrum rhf1d(int argc, char *argv[], int Ndep,
+	# int argc, char *argv[], 
+	cdef mySpectrum rhf1d(int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
-			double *rh_nH, int atm_scale, myRLK_Line *pyrh_rlk_lines,
-			double *wavetable, int Nwave)
+			double *rh_nH, int atm_scale, double *wavetable, int Nwave)
+	# myRLK_Line *pyrh_rlk_lines,
 
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
 	cdef void dummy(myRLK_Line *rlk_lines)
