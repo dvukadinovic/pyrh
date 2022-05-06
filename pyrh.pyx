@@ -3,14 +3,10 @@
 # distutils: include_dirs = rh/
 
 cimport rh
-import ctypes
 import numpy as np
 cimport numpy as cnp
 import cython
-from libc.stdlib cimport malloc, free
-from libc.string cimport strcpy, strlen
-
-from cpython cimport PyObject, Py_INCREF
+import ctypes
 
 cnp.import_array()
 
@@ -33,21 +29,24 @@ cdef convert_2d(double **arr, int nx, int ny):
 	return pyarr
 
 class Spectrum(object):
-	def __init__(self, nlw, lam, sI, sQ, sU, sV, J, Jrh, stokes):
+	def __init__(self, nlw=None, lam=None, sI=None, sQ=None, 
+				 sU=None, sV=None, J=None, Jrh=None, stokes=True):
 		self.nlw = nlw
 		self.lam = lam
 		self.I = sI
-		self.Q = sQ
-		self.U = sU
-		self.V = sV
+		self.Q = None
+		self.U = None
+		self.V = None
 		self.J = J
 		self.Jrh = Jrh
+		self.stokes = False
 
 		if stokes:
 			self.stokes = True
-		else:
-			self.stokes = False
-
+			self.Q = sQ
+			self.U = sU
+			self.V = sV
+		
 # add OF table as input to rhf1d()
 
 cdef class RH:
@@ -57,11 +56,15 @@ cdef class RH:
 	# cdef int argc
 	# cdef char* argv[10]
 
-	cdef int Nwave
-	cdef double [::1] wavetable
+	# cdef Py_ssize_t Nwave
+	# cdef array[double] wavetable
+	# cdef double[::1] wavetable
 
 	def __init__(self):
 		pass
+
+	# def __reduce__(self):
+	# 	return (self.__class__, (None, None))
 
 	# def __init__(self, input="keyword.input", logfile=None, quiet=True):
 	# 	py_argv = "rhf1d" + " -input " + input
@@ -81,19 +84,19 @@ cdef class RH:
 		# self.Nrlk = 0
 		# self.Nwave = 0
 
-	@cython.boundscheck(False)
-	@cython.wraparound(False)
-	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
-		self.wavetable = wave
-		cdef Py_ssize_t i
-		cdef double sigma_sq
-		cdef double fact
-		self.Nwave = self.wavetable.size
-		for i in range(self.Nwave):
-			if self.wavetable[i]>199.9352:
-				sigma_sq = (1.0e7/self.wavetable[i])*(1.0e7/self.wavetable[i])
-				fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
-				self.wavetable[i] = self.wavetable[i] * fact
+	# @cython.boundscheck(False)
+	# @cython.wraparound(False)
+	# cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
+	# 	self.wavetable = wave
+	# 	cdef Py_ssize_t i
+	# 	cdef double sigma_sq
+	# 	cdef double fact
+	# 	self.Nwave = self.wavetable.size
+	# 	for i in range(self.Nwave):
+	# 		if self.wavetable[i]>199.9352:
+	# 			sigma_sq = (1.0e7/self.wavetable[i])*(1.0e7/self.wavetable[i])
+	# 			fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
+	# 			self.wavetable[i] = self.wavetable[i] * fact
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
@@ -109,12 +112,11 @@ cdef class RH:
 				cnp.ndarray[double, ndim=2, mode="c"] nH,
 				int atm_scale):
 		cdef int Ndep = scale.shape[0]
-		cdef rh.mySpectrum spec
 
 		spec = rh.rhf1d(Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
-				 &nH[0,0], atm_scale, &self.wavetable[0], self.Nwave)
+				 &nH[0,0], atm_scale)# &self.wavetable[0], self.Nwave)
 
 		# spec = rh.rhf1d(self.argc, self.argv, Ndep,
 		# 		 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],

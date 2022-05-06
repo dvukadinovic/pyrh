@@ -3,6 +3,7 @@ import numpy as np
 import multiprocessing as mp
 import time
 import sys
+import pickle
 
 import globin
 import pyrh
@@ -14,12 +15,12 @@ start = time.time()
 
 aux = pyrh.RH()
 
-wave = np.linspace(401.5, 401.7, num=201)
-aux.set_wavetable(wave)
+# wave = np.linspace(401.5, 401.7, num=201)
+# aux.set_wavetable(wave)
 
 # def spec(args):
 idx, idy = 0, 0
-specRH = aux.compute1d(atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
+spec = aux.compute1d(atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
                    atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],
                    atmos.data[idx, idy, 5] / 1e4, atmos.data[idx, idy, 6], atmos.data[idx, idy, 7],
                    atmos.data[idx, idy, 8:], 0)
@@ -34,7 +35,7 @@ specRH = aux.compute1d(atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.d
 
 print(time.time() - start)
 
-plt.plot(specRH.I[:-1])
+plt.plot(spec.I[:-1])
 
 # spec = globin.Observation("obs.fits")
 # plt.plot(spec.spec[0,0,:,0])

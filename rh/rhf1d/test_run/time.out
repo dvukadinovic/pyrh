@@ -41,14 +41,14 @@
     ..........LTEpops NA:   0.000 [sec]
     ..........LTEpops MG:   0.000 [sec]
     Chemical equilibrium:   0.001 [sec]
-    ..Background Opacity:   0.138 [sec]
-   .....Total Background:   0.139 [sec]
+    ..Background Opacity:   0.134 [sec]
+   .....Total Background:   0.136 [sec]
 
    .............Profiles:   0.000 [sec]
 
    .....Initial solution:   0.000 [sec]
 
-  ......Total Initialize:   0.147 [sec]
+  ......Total Initialize:   0.144 [sec]
 
 
     .Spectrum & Operator:   0.011 [sec]
@@ -58,7 +58,7 @@
 
 
 
-Total_time____:    1.600 [sec]  (user: 41.9%, system: 58.1%)
+Total_time____:    1.540 [sec]  (user: 44.2%, system: 55.8%)
 
     ..........LTEpops H :   0.000 [sec]
     ..........LTEpops HE:   0.000 [sec]
@@ -72,14 +72,14 @@ Total_time____:    1.600 [sec]  (user: 41.9%, system: 58.1%)
     ..........LTEpops NA:   0.000 [sec]
     ..........LTEpops MG:   0.000 [sec]
     Chemical equilibrium:   0.001 [sec]
-    ..Background Opacity:   0.132 [sec]
+    ..Background Opacity:   0.133 [sec]
    .....Total Background:   0.134 [sec]
 
    .............Profiles:   0.000 [sec]
 
    .....Initial solution:   0.000 [sec]
 
-  ......Total initialize:   0.134 [sec]
+  ......Total initialize:   0.135 [sec]
 
 
     ......Solve Spectrum:   0.011 [sec]
