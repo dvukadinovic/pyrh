@@ -45,6 +45,8 @@ typedef struct {
   int     Ndim, *N, Nspace, Nrays, Nelem, Natom, Nmolecule,
          *backgrrecno, Npf, NHydr, fd_background, NPRDactive,
           Nactiveatom, Nactivemol;
+  int     fudge_num; // DV -- number of OF points
+  double *fudge_lam, **fudge; // DV -- pointer for OF wavelengths and values
   int     Nrlk;
   double *T, *ne, *vturb, totalAbund, avgMolWght, wght_per_H, gravity,
           vmicro_char, vmacro_tresh, lambda_ref, *wmu, *Tpf,

@@ -101,6 +101,7 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef compute1d(self,
+				int atm_scale,
 				cnp.ndarray[double, ndim=1, mode="c"] scale,
 				cnp.ndarray[double, ndim=1, mode="c"] temp,
 				cnp.ndarray[double, ndim=1, mode="c"] ne,
@@ -110,18 +111,18 @@ cdef class RH:
 				cnp.ndarray[double, ndim=1, mode="c"] gamma,
 				cnp.ndarray[double, ndim=1, mode="c"] chi,
 				cnp.ndarray[double, ndim=2, mode="c"] nH,
-				int atm_scale):
+				do_fudge,
+				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
+				cnp.ndarray[double, ndim=2, mode="c"] fudge):
 		cdef int Ndep = scale.shape[0]
+		cdef fudge_num = fudge_lam.shape[0]
 
 		spec = rh.rhf1d(Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
-				 &nH[0,0], atm_scale)# &self.wavetable[0], self.Nwave)
-
-		# spec = rh.rhf1d(self.argc, self.argv, Ndep,
-		# 		 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
-		# 		 &mag[0], &gamma[0], &chi[0],
-		# 		 &nH[0,0], atm_scale) #self.wavetable_ptr, self.Nwave)
+				 &nH[0,0], atm_scale,
+				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
+				 # &self.wavetable[0], self.Nwave)
 
 		lam = convert_1d(spec.lam, spec.nlw)
 		sI = convert_1d(spec.sI, spec.nlw)

@@ -134,20 +134,6 @@ extern Spectrum spectrum;
 extern InputData input;
 extern char messageStr[];
 
-// // D.Vukadinovic
-// double get_line_of(double lambda){
-//   double fudge=1.0;
-
-//   lambda *= 10; // transform from nm to Angstrom
-//   double lb_coeff = 2.1177*exp(-(lambda-2087.7)*(lambda-2087.7)/2.421E6) + 0.68738;
-//   if (lambda > 4300.0 || lambda < 1800.0)
-//     lb_coeff = 0.0;
-
-//   fudge *= (1.0+0.666667*lb_coeff);
-
-//   return fudge;
-// }
-
 /* ------- begin -------------------------- Background.c ------------ */
 
 void Background(bool_t write_analyze_output, bool_t equilibria_only)
@@ -190,47 +176,43 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     getCPU(2, TIME_POLL, "Total Background");
     return;
   }
-
-  // if (input.old_background) {
-  //   if ((atmos.fd_background =
-	 // open(input.background_File, O_RDONLY, 0)) == -1) {
-  //     sprintf(messageStr, "Unable to open input file %s",
-	 //      input.background_File);
-  //     Error(ERROR_LEVEL_2, routineName, messageStr);
-  //   }
-  //   readBRS();
-  //   return;
-  // }
     
   getCPU(3, TIME_START, NULL);
-  if (strcmp(input.fudgeData, "none")) {
-    do_fudge = TRUE;
+  // if (strcmp(input.fudgeData, "none")) {
+  //   do_fudge = TRUE;
 
-    /* --- Read wavelength-dependent fudge factors to compensate for
-           missing UV backround line haze --           -------------- */
+  //   /* --- Read wavelength-dependent fudge factors to compensate for
+  //          missing UV backround line haze --           -------------- */
 
-    if ((fp_fudge = fopen(input.fudgeData, "r")) == NULL) {
-      sprintf(messageStr, "Unable to open input file %s", input.fudgeData);
-      Error(ERROR_LEVEL_2, routineName, messageStr);
-    }
-    sprintf(messageStr,
-	    "\n-Fudging background opacities with file\n  %s\n\n",
-	    input.fudgeData);
-    Error(MESSAGE, routineName, messageStr);
+  //   if ((fp_fudge = fopen(input.fudgeData, "r")) == NULL) {
+  //     sprintf(messageStr, "Unable to open input file %s", input.fudgeData);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   sprintf(messageStr,
+	 //    "\n-Fudging background opacities with file\n  %s\n\n",
+	 //    input.fudgeData);
+  //   Error(MESSAGE, routineName, messageStr);
 
-    getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
-    sscanf(inputLine, "%d", &Nfudge);
-    lambda_fudge = (double *) malloc(Nfudge * sizeof(double));
-    fudge = matrix_double(3, Nfudge);
-    for (n = 0;  n < Nfudge;  n++) {
-      getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
-      sscanf(inputLine, "%lf %lf %lf %lf", &lambda_fudge[n],
-	     &fudge[0][n], &fudge[1][n], &fudge[2][n]);
-    }
-    for (n = 0;  n < 3*Nfudge;  n++) fudge[0][n] += 1.0;
-    fclose(fp_fudge);
-  } else
-    do_fudge = FALSE;
+  //   getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
+  //   sscanf(inputLine, "%d", &Nfudge);
+  //   lambda_fudge = (double *) malloc(Nfudge * sizeof(double));
+  //   fudge = matrix_double(3, Nfudge);
+  //   for (n = 0;  n < Nfudge;  n++) {
+  //     getLine(fp_fudge, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
+  //     sscanf(inputLine, "%lf %lf %lf %lf", &lambda_fudge[n],
+	 //     &fudge[0][n], &fudge[1][n], &fudge[2][n]);
+  //   }
+  //   for (n = 0;  n < 3*Nfudge;  n++) fudge[0][n] += 1.0;
+  //   fclose(fp_fudge);
+  // } else
+  //   do_fudge = FALSE;
+
+  do_fudge = input.do_fudge;
+  if (do_fudge){
+    Nfudge = atmos.fudge_num;
+    lambda_fudge = atmos.fudge_lam;
+    fudge = atmos.fudge;
+  }
 
   /* --- Allocate temporary storage space. The quantities are used
          for the following purposes:
@@ -750,14 +732,9 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     free(chip_c);
   }
 
-  if (do_fudge) {
-    free(lambda_fudge);
-    freeMatrix((void **) fudge);
-  }
-
-  // if (do_of_sasha) {
-  //   free(lambda_fudge_sasha);
-  //   free(fudge_sasha);
+  // if (do_fudge) {
+  //   free(lambda_fudge);
+  //   freeMatrix((void **) fudge);
   // }
 
   getCPU(2, TIME_POLL, "Total Background");

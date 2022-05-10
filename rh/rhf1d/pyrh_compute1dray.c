@@ -87,11 +87,12 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 mySpectrum rhf1d(int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double *pyrh_nH, int pyrh_atm_scale)
+              double *pyrh_nH, int pyrh_atm_scale, 
+              int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
               // double *wavetable, int Nwave) // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
-  int    niter, nact;
+  int    niter, nact, index;
 
   Molecule *molecule;
 
@@ -106,6 +107,23 @@ mySpectrum rhf1d(int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
+  
+  // set fudge factors
+  if (do_fudge==1){
+    input.do_fudge = TRUE;
+    atmos.fudge_num = fudge_num;
+    atmos.fudge_lam = fudge_lam;
+    atmos.fudge = matrix_double(3, atmos.fudge_num);
+    index = 0;
+    for (int n=0; n<3; n++)
+    {
+      for (int k=0; k<atmos.fudge_num; k++)
+      {
+        atmos.fudge[n][k] = fudge[index];
+        index++;
+      }
+    }
+  }
 
   // if (pyrh_rlk_lines->Nrlk!=0){
   //   atmos.Nrlk = pyrh_rlk_lines->Nrlk;
@@ -144,7 +162,7 @@ mySpectrum rhf1d(int pyrh_Ndep,
   atmos.Stokes = TRUE;
 
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  int index=0;
+  index=0;
   for (int n=0; n<atmos.NHydr; n++)
   {
     for (int k=0; k<geometry.Ndep; k++)

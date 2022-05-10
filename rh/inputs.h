@@ -79,13 +79,12 @@ typedef struct {
          dampingFile[MAX_VALUE_LENGTH],
          coolingFile[MAX_VALUE_LENGTH],
          Itop[MAX_VALUE_LENGTH],
-         of_sasha[MAX_VALUE_LENGTH], // D.Vukadinovic
          rfs_output[MAX_VALUE_LENGTH]; // D.Vukadinovic
   bool_t magneto_optical, PRD_angle_dep, XRD, Eddington,
          backgr_pol, limit_memory, allow_passive_bb, NonICE,
          rlkscatter, xdr_endian, old_background, accelerate_mols,
-         line_fudge, // D.Vukadinovic
-         rf_temp, rf_vz, rf_vmic, rf_mag, rf_gamma, rf_chi; // D.Vukadinovic
+         rf_temp, rf_vz, rf_vmic, rf_mag, rf_gamma, rf_chi, // D.Vukadinovic
+         do_fudge; // D.Vukadinovic
   enum   solution startJ;
   
   enum   StokesMode StokesMode;

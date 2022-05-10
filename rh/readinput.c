@@ -131,12 +131,12 @@ void readInput()
      setnesolution},
     {"OPACITY_FUDGE", "none", FALSE, KEYWORD_OPTIONAL, &input.fudgeData,
      setcharValue},
-    // D.Vukadinovic
-    // {"LINE_FUDGE", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.line_fudge,
-    //  setboolValue},
-    // D.Vukadinovic
-    // {"OF_SASHA", "none", FALSE, KEYWORD_OPTIONAL, &input.of_sasha,
-    //  setcharValue},
+   
+    // D.Vukadinovic (10.05.2022.) -- flag for doing fudge or not; 
+    //    data provided through call to rhf1d() function
+    {"DO_FUDGE", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.do_fudge,
+     setboolValue},
+
     {"METALLICITY", "0.0", FALSE, KEYWORD_DEFAULT, &input.metallicity,
      setdoubleValue},
     
