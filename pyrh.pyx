@@ -132,7 +132,7 @@ cdef class RH:
 			sV = convert_1d(spec.sV, spec.nlw)
 		J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-		return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, J, None, spec.stokes)
+		return Spectrum(spec.nlw-1, lam[:-1], sI[:-1], sQ[:-1], sU[:-1], sV[:-1], J, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
