@@ -116,13 +116,20 @@ cdef class RH:
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge,
 				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] loggf_values):
+				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
+				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
+				cnp.ndarray[double, ndim=1, mode="c"] lam_values):
 		cdef int Ndep = scale.shape[0]
 		cdef int fudge_num = fudge_lam.shape[0]
+		
 		cdef int Nloggf = loggf_ids.shape[0]
-		print(Nloggf)
 		if (Nloggf!=loggf_values.shape[0]):
-			print("\n  pyrh: Different number of loggf_ids and loggf_values")
+			print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
+			sys.exit()
+
+		cdef int Nlam = lam_ids.shape[0]
+		if (Nlam!=lam_values.shape[0]):
+			print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
 			sys.exit()
 
 		spec = rh.rhf1d(Ndep,
@@ -130,7 +137,8 @@ cdef class RH:
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale,
 				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
-				 Nloggf, &loggf_ids[0], &loggf_values[0])
+				 Nloggf, &loggf_ids[0], &loggf_values[0],
+				 Nlam, &lam_ids[0], &lam_values[0])
 				 # &self.wavetable[0], self.Nwave)
 
 		lam = convert_1d(spec.lam, spec.nlw)

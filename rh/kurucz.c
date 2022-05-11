@@ -207,6 +207,14 @@ void readKuruczLines(char *inputFile)
 	rlk->gi = 2*Ji + 1;
 	rlk->gj = 2*Jj + 1;
 
+  if (atmos.Nlam>0){
+    for (int idl=0; idl<atmos.Nlam; idl++){
+      if (atmos.lam_ids[idl]==line_index){
+        lambda_air += atmos.lam_values[idl];
+      }
+    }
+  }  
+
 	if (USE_TABULATED_WAVELENGTH) {
 	  /* --- In this case use tabulated wavelength and adjust 
 	         upper-level energy --                 -------------- */

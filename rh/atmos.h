@@ -47,8 +47,8 @@ typedef struct {
           Nactiveatom, Nactivemol;
   int     fudge_num; // DV -- number of OF points
   double *fudge_lam, **fudge; // DV -- pointer for OF wavelengths and values
-  double *loggf_values; // DV -- perturbation value for log(gf)
-  int    *loggf_ids, Nloggf; // DV -- line id for which we perturb log(gf)
+  double *loggf_values, *lam_values; // DV -- perturbation value for log(gf)
+  int    *loggf_ids, Nloggf, *lam_ids, Nlam; // DV -- line id for which we perturb log(gf)
   int     Nrlk;
   double *T, *ne, *vturb, totalAbund, avgMolWght, wght_per_H, gravity,
           vmicro_char, vmacro_tresh, lambda_ref, *wmu, *Tpf,

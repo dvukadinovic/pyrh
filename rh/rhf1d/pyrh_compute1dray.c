@@ -89,7 +89,8 @@ mySpectrum rhf1d(int pyrh_Ndep,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
-              int Nloggf, int *loggf_ids, double *loggf_values)
+              int Nloggf, int *loggf_ids, double *loggf_values,
+              int Nlam, int *lam_ids, double *lam_values)
               // double *wavetable, int Nwave) // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
@@ -132,6 +133,16 @@ mySpectrum rhf1d(int pyrh_Ndep,
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
     atmos.loggf_values = loggf_values;
+  }
+
+  // set lam0 indices and values if forwarded
+  atmos.Nlam = 0;
+  atmos.lam_ids = NULL;
+  atmos.lam_values = NULL;
+  if (Nlam>=1){
+    atmos.Nlam = Nlam;
+    atmos.lam_ids = lam_ids;
+    atmos.lam_values = lam_values;
   }
 
   // if (pyrh_rlk_lines->Nrlk!=0){
