@@ -7,6 +7,7 @@ import numpy as np
 cimport numpy as cnp
 import cython
 import ctypes
+import sys
 
 cnp.import_array()
 
@@ -113,15 +114,23 @@ cdef class RH:
 				cnp.ndarray[double, ndim=2, mode="c"] nH,
 				do_fudge,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
-				cnp.ndarray[double, ndim=2, mode="c"] fudge):
+				cnp.ndarray[double, ndim=2, mode="c"] fudge,
+				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
+				cnp.ndarray[double, ndim=1, mode="c"] loggf_values):
 		cdef int Ndep = scale.shape[0]
-		cdef fudge_num = fudge_lam.shape[0]
+		cdef int fudge_num = fudge_lam.shape[0]
+		cdef int Nloggf = loggf_ids.shape[0]
+		print(Nloggf)
+		if (Nloggf!=loggf_values.shape[0]):
+			print("\n  pyrh: Different number of loggf_ids and loggf_values")
+			sys.exit()
 
 		spec = rh.rhf1d(Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale,
-				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
+				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
+				 Nloggf, &loggf_ids[0], &loggf_values[0])
 				 # &self.wavetable[0], self.Nwave)
 
 		lam = convert_1d(spec.lam, spec.nlw)

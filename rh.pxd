@@ -58,7 +58,8 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
 			double *rh_nH, int atm_scale,
-			int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
+			int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
+			int Nloggf, int *loggf_id, double* loggf_perturb)
 			# double *wavetable, int Nwave)
 	# myRLK_Line *pyrh_rlk_lines,
 

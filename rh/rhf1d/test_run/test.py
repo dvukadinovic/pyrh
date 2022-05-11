@@ -19,12 +19,16 @@ fudge_num = 5
 fudge_lam = np.linspace(401.5, 401.7, num=fudge_num)
 fudge = np.ones((3, fudge_num))
 
+loggf_ids = np.array([0, 8], dtype=np.int32)
+loggf_values = np.array([-2.4, 0.2], dtype=np.float64)
+
 # def spec(args):
 idx, idy = 0, 0
 spec = aux.compute1d(0, atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
                    atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],
                    atmos.data[idx, idy, 5] / 1e4, atmos.data[idx, idy, 6], atmos.data[idx, idy, 7],
-                   atmos.data[idx, idy, 8:], 1, fudge_lam, fudge)
+                   atmos.data[idx, idy, 8:], 1, fudge_lam, fudge,
+                   loggf_ids, loggf_values)
 
 # pool = mp.Pool(4)
 #
@@ -35,11 +39,12 @@ spec = aux.compute1d(0, atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.
 # pool.map(spec, iterable=args)
 
 print(time.time() - start)
+obs = globin.Observation("obs.fits")
 
-plt.plot(spec.I[:-1])
+plt.plot(spec.I)
+plt.plot(obs.spec[0,0,:,0])
 
-spec = globin.Observation("obs.fits")
-plt.plot(spec.spec[0,0,:,0])
+# plt.plot(obs.spec[0,0,:,0] - spec.I)
 
 plt.show()
 sys.exit()

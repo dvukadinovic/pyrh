@@ -88,7 +88,8 @@ mySpectrum rhf1d(int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
-              int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
+              int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
+              int Nloggf, int *loggf_ids, double *loggf_values)
               // double *wavetable, int Nwave) // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
@@ -115,14 +116,22 @@ mySpectrum rhf1d(int pyrh_Ndep,
     atmos.fudge_lam = fudge_lam;
     atmos.fudge = matrix_double(3, atmos.fudge_num);
     index = 0;
-    for (int n=0; n<3; n++)
-    {
-      for (int k=0; k<atmos.fudge_num; k++)
-      {
+    for (int n=0; n<3; n++){
+      for (int k=0; k<atmos.fudge_num; k++){
         atmos.fudge[n][k] = fudge[index];
         index++;
       }
     }
+  }
+
+  // set log(gf) indices and values if forwarded
+  atmos.Nloggf = 0;
+  atmos.loggf_ids = NULL;
+  atmos.loggf_values = NULL;
+  if (Nloggf>=1){
+    atmos.Nloggf = Nloggf;
+    atmos.loggf_ids = loggf_ids;
+    atmos.loggf_values = loggf_values;
   }
 
   // if (pyrh_rlk_lines->Nrlk!=0){

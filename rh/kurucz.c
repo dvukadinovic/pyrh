@@ -117,14 +117,12 @@ void readKuruczLines(char *inputFile)
         *commentChar = COMMENT_CHAR;
   bool_t swap_levels, determined, useBarklem;
   int    Nline, Nread, Nrequired, checkPoint, hfs_i, hfs_j, gL_i, gL_j,
-         iso_dl;
+         iso_dl, line_index;
   double lambda0, Ji, Jj, Grad, GStark, GvdWaals, pti,
          Ei, Ej, gf, lambda_air;
   RLK_Line *rlk;
   Barklemstruct bs_SP, bs_PD, bs_DF;
   FILE  *fp_Kurucz, *fp_linelist;
-
-
 
   if (!strcmp(inputFile, "none")) return;
 
@@ -166,6 +164,7 @@ void readKuruczLines(char *inputFile)
     /* --- Read lines from file --                     -------------- */
 
     rlk = atmos.rlk_lines + atmos.Nrlk;
+    line_index = 0;
     while (fgets(inputLine, RLK_RECORD_LENGTH+1, fp_linelist) != NULL) {
       if (*inputLine != *commentChar) {
 
@@ -197,7 +196,7 @@ void readKuruczLines(char *inputFile)
 	} else {
 	  swap_levels = FALSE;
 	  rlk->Ei = Ei;
-          rlk->Ej = Ej;
+    rlk->Ej = Ej;
 	  strncpy(labeli, inputLine+41, RLK_LABEL_LENGTH);
 	  strncpy(labelj, inputLine+69, RLK_LABEL_LENGTH);
 	}
@@ -220,9 +219,19 @@ void readKuruczLines(char *inputFile)
 	  
 	  lambda0 = (HPLANCK * CLIGHT) / (rlk->Ej - rlk->Ei);
 	}
-	rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj;
+
+  rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj;  
+  if (atmos.Nloggf>=1){
+    for (int idl=0; idl<atmos.Nloggf; idl++){
+      if (atmos.loggf_ids[idl]==line_index){
+        rlk->Aji = C / SQ(lambda0) * POW10(atmos.loggf_values[idl]) / rlk->gj;
+      }
+    }
+  }
 	rlk->Bji = CUBE(lambda0) / (2.0 * HPLANCK * CLIGHT) * rlk->Aji;
 	rlk->Bij = (rlk->gj / rlk->gi) * rlk->Bji;
+
+  line_index++;
 
         /* --- Store in nm --                          -------------- */
 
