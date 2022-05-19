@@ -19,6 +19,18 @@ fudge_num = 5
 fudge_lam = np.linspace(401.5, 401.7, num=fudge_num)
 fudge = np.ones((3, fudge_num))
 
+idx, idy = 0, 0
+plt.plot(atmos.data[idx,idy,2])
+ne, nH = aux.hse(0, atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
+                   atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],
+                   atmos.data[idx, idy, 5] / 1e4, atmos.data[idx, idy, 6], atmos.data[idx, idy, 7],
+                   atmos.data[idx, idy, 8:], 0, fudge_lam, fudge)
+plt.plot(atmos.data[idx,idy,2])
+plt.yscale("log")
+plt.show()
+
+sys.exit()
+
 loggf_ids = np.array([], dtype=np.int32)
 loggf_values = np.array([], dtype=np.float64)
 
