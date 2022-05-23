@@ -1,6 +1,7 @@
 .gitignore
 .install
 README.md
+ToDo
 pyrh.c
 pyrh.html
 pyrh.pyx
@@ -308,6 +309,7 @@ rh/rhf1d/piecestokes_1D.c
 rh/rhf1d/piecewise_1D.c
 rh/rhf1d/project.c
 rh/rhf1d/pyrh_background.c
+rh/rhf1d/pyrh_background.h
 rh/rhf1d/pyrh_compute1dray.c
 rh/rhf1d/pyrh_compute1dray.h
 rh/rhf1d/pyrh_hse.c

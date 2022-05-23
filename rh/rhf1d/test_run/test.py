@@ -21,19 +21,19 @@ fudge_lam = np.linspace(401.5, 401.7, num=fudge_num, dtype=np.float64)
 fudge = np.ones((3, fudge_num), dtype=np.float64)
 
 idx, idy = 0, 0
-# plt.plot(atmos.data[idx,idy,2])
-# fig = plt.figure()
-old = copy.deepcopy(atmos.data[idx,idy,2])
 ne, nH = aux.hse(0, atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
                    atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],
                    atmos.data[idx, idy, 5] / 1e4, atmos.data[idx, idy, 6], atmos.data[idx, idy, 7],
                    atmos.data[idx, idy, 8:], 0, fudge_lam, fudge)
-# plt.plot(old*1e6)
-plt.plot(atmos.data[idx,idy,2])
-plt.yscale("log")
-plt.show()
+atmos.data[idx,idy,2] = ne/1e6
+atmos.data[idx,idy,8:] = nH/1e6
+# plt.plot(atmos.data[idx,idy,9])
+# plt.plot(nH[1]/1e6)
+# plt.yscale("log")
+# plt.show()
+# print(time.time() - start)
 
-sys.exit()
+# sys.exit()
 
 loggf_ids = np.array([], dtype=np.int32)
 loggf_values = np.array([], dtype=np.float64)
@@ -62,7 +62,7 @@ print(time.time() - start)
 obs = globin.Observation("obs.fits")
 
 plt.plot(spec.I)
-# plt.plot(obs.spec[0,0,:,0])
+plt.plot(obs.spec[0,0,:,0])
 
 # plt.plot(obs.spec[0,0,:,0] - spec.I)
 

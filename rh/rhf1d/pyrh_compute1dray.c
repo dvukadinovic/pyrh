@@ -171,13 +171,13 @@ mySpectrum rhf1d(int pyrh_Ndep,
     }
   }
 
-  atmos.T = pyrh_temp;
-  atmos.ne = pyrh_ne;
-  geometry.vel = pyrh_vz;
-  atmos.vturb = pyrh_vmic;
-  atmos.B = pyrh_mag;
-  atmos.gamma_B = pyrh_gamma;
-  atmos.chi_B = pyrh_chi;
+  memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
+  memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));
+  memcpy(geometry.vel, pyrh_vz, geometry.Ndep * sizeof(double));
+  memcpy(atmos.vturb, pyrh_vmic, geometry.Ndep * sizeof(double));
+  memcpy(atmos.B, pyrh_mag, geometry.Ndep * sizeof(double));
+  memcpy(atmos.gamma_B, pyrh_gamma, geometry.Ndep * sizeof(double));
+  memcpy(atmos.chi_B, pyrh_chi, geometry.Ndep * sizeof(double));
   atmos.Stokes = TRUE;
 
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);

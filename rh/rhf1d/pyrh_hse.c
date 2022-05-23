@@ -100,6 +100,7 @@ myPops hse(int pyrh_Ndep,
   // we want only to have reference wavelength
   // (but we will still have those from active atoms...)
   // input.wavetable_input = "none";
+  strcpy(input.wavetable_input, "none");
   // input.kurucz_list = "none";
 
   /* --- Read input data for atmosphere --             -------------- */
@@ -145,15 +146,13 @@ myPops hse(int pyrh_Ndep,
     }
   }
 
-  atmos.T = pyrh_temp;
-  // atmos.ne = pyrh_ne;
-  atmos.ne = (double *) malloc(geometry.Ndep * sizeof(double));
+  memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
   memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));
-  geometry.vel = pyrh_vz;
-  atmos.vturb = pyrh_vmic;
-  atmos.B = pyrh_mag;
-  atmos.gamma_B = pyrh_gamma;
-  atmos.chi_B = pyrh_chi;
+  memcpy(geometry.vel, pyrh_vz, geometry.Ndep * sizeof(double));
+  memcpy(atmos.vturb, pyrh_vmic, geometry.Ndep * sizeof(double));
+  memcpy(atmos.B, pyrh_mag, geometry.Ndep * sizeof(double));
+  memcpy(atmos.gamma_B, pyrh_gamma, geometry.Ndep * sizeof(double));
+  memcpy(atmos.chi_B, pyrh_chi, geometry.Ndep * sizeof(double));
   atmos.Stokes = TRUE;
 
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
