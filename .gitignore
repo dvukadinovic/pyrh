@@ -1,6 +1,6 @@
-build/*
-dist/*
-pyrh.egg-info/*
+build/
+dist/
+pyrh.egg-info/
 pyrh.c
 tools.c
 /*.html

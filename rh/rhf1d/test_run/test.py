@@ -16,10 +16,6 @@ aux = pyrh.RH()
 # aux.dummy()
 # sys.exit()
 
-fudge_num = 5
-fudge_lam = np.linspace(401.5, 401.7, num=fudge_num, dtype=np.float64)
-fudge = np.ones((3, fudge_num), dtype=np.float64)
-
 idx, idy = 0, 0
 ne, nH = aux.hse(0, atmos.data[idx, idy, 0], atmos.data[idx, idy, 1], atmos.data[idx, idy, 2],
                    atmos.data[idx, idy, 3], atmos.data[idx, idy, 4],

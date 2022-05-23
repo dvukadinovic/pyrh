@@ -115,7 +115,7 @@ cdef class RH:
 			  cnp.ndarray[double, ndim=1, mode="c"] gamma,
 			  cnp.ndarray[double, ndim=1, mode="c"] chi,
 			  cnp.ndarray[double, ndim=2, mode="c"] nH,
-			  do_fudge,
+			  int do_fudge,
 			  cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 			  cnp.ndarray[double, ndim=2, mode="c"] fudge):
 		cdef int Ndep = scale.shape[0]

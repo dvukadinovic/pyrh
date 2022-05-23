@@ -881,7 +881,7 @@ static PyObject *__pyx_pf_4pyrh_8Spectrum___init__(CYTHON_UNUSED PyObject *__pyx
 
 struct __pyx_vtabstruct_4pyrh_RH {
   PyObject *(*dummy)(struct __pyx_obj_4pyrh_RH *, int __pyx_skip_dispatch);
-  PyObject *(*hse)(struct __pyx_obj_4pyrh_RH *, int, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
+  PyObject *(*hse)(struct __pyx_obj_4pyrh_RH *, int, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, int, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
   PyObject *(*compute1d)(struct __pyx_obj_4pyrh_RH *, int, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_4pyrh_RH *__pyx_vtabptr_4pyrh_RH;
@@ -1067,9 +1067,9 @@ static PyObject *__pyx_pf_4pyrh_2RH_2dummy(struct __pyx_obj_4pyrh_RH *__pyx_v_se
 </pre><pre class="cython line score-0">&#xA0;<span class="">104</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">105</span>: 	<span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">106</span>: 	<span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
-<pre class="cython line score-343" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">107</span>: 	<span class="k">cpdef</span> <span class="nf">hse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span></pre>
-<pre class='cython code score-343 '>static PyObject *__pyx_pw_4pyrh_2RH_5hse(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_4pyrh_2RH_hse(CYTHON_UNUSED struct __pyx_obj_4pyrh_RH *__pyx_v_self, int __pyx_v_atm_scale, PyArrayObject *__pyx_v_scale, PyArrayObject *__pyx_v_temp, PyArrayObject *__pyx_v_ne, PyArrayObject *__pyx_v_vz, PyArrayObject *__pyx_v_vmic, PyArrayObject *__pyx_v_mag, PyArrayObject *__pyx_v_gamma, PyArrayObject *__pyx_v_chi, PyArrayObject *__pyx_v_nH, PyObject *__pyx_v_do_fudge, PyArrayObject *__pyx_v_fudge_lam, PyArrayObject *__pyx_v_fudge, int __pyx_skip_dispatch) {
+<pre class="cython line score-354" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">107</span>: 	<span class="k">cpdef</span> <span class="nf">hse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span></pre>
+<pre class='cython code score-354 '>static PyObject *__pyx_pw_4pyrh_2RH_5hse(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_4pyrh_2RH_hse(CYTHON_UNUSED struct __pyx_obj_4pyrh_RH *__pyx_v_self, int __pyx_v_atm_scale, PyArrayObject *__pyx_v_scale, PyArrayObject *__pyx_v_temp, PyArrayObject *__pyx_v_ne, PyArrayObject *__pyx_v_vz, PyArrayObject *__pyx_v_vmic, PyArrayObject *__pyx_v_mag, PyArrayObject *__pyx_v_gamma, PyArrayObject *__pyx_v_chi, PyArrayObject *__pyx_v_nH, int __pyx_v_do_fudge, PyArrayObject *__pyx_v_fudge_lam, PyArrayObject *__pyx_v_fudge, int __pyx_skip_dispatch) {
   int __pyx_v_Ndep;
   int __pyx_v_fudge_num;
   myPops __pyx_v_myPops;
@@ -1214,87 +1214,91 @@ static PyObject *__pyx_f_4pyrh_2RH_hse(CYTHON_UNUSED struct __pyx_obj_4pyrh_RH *
         <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
         __pyx_t_3 = <span class='pyx_c_api'>__Pyx_PyInt_From_int</span>(__pyx_v_atm_scale);<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
+        __pyx_t_4 = <span class='pyx_c_api'>__Pyx_PyInt_From_int</span>(__pyx_v_do_fudge);<span class='error_goto'> if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
+        <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_4);
         <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
-        __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
-        __pyx_t_6 = 0;
-        if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_4))) {
-          __pyx_t_5 = <span class='py_macro_api'>PyMethod_GET_SELF</span>(__pyx_t_4);
-          if (likely(__pyx_t_5)) {
-            PyObject* function = <span class='py_macro_api'>PyMethod_GET_FUNCTION</span>(__pyx_t_4);
-            <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_5);
+        __pyx_t_5 = __pyx_t_1; __pyx_t_6 = NULL;
+        __pyx_t_7 = 0;
+        if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_5))) {
+          __pyx_t_6 = <span class='py_macro_api'>PyMethod_GET_SELF</span>(__pyx_t_5);
+          if (likely(__pyx_t_6)) {
+            PyObject* function = <span class='py_macro_api'>PyMethod_GET_FUNCTION</span>(__pyx_t_5);
+            <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_6);
             <span class='pyx_macro_api'>__Pyx_INCREF</span>(function);
-            <span class='pyx_macro_api'>__Pyx_DECREF_SET</span>(__pyx_t_4, function);
-            __pyx_t_6 = 1;
+            <span class='pyx_macro_api'>__Pyx_DECREF_SET</span>(__pyx_t_5, function);
+            __pyx_t_7 = 1;
           }
         }
         #if CYTHON_FAST_PYCALL
-        if (<span class='py_c_api'>PyFunction_Check</span>(__pyx_t_4)) {
-          PyObject *__pyx_temp[14] = {__pyx_t_5, __pyx_t_3, ((PyObject *)__pyx_v_scale), ((PyObject *)__pyx_v_temp), ((PyObject *)__pyx_v_ne), ((PyObject *)__pyx_v_vz), ((PyObject *)__pyx_v_vmic), ((PyObject *)__pyx_v_mag), ((PyObject *)__pyx_v_gamma), ((PyObject *)__pyx_v_chi), ((PyObject *)__pyx_v_nH), __pyx_v_do_fudge, ((PyObject *)__pyx_v_fudge_lam), ((PyObject *)__pyx_v_fudge)};
-          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyFunction_FastCall</span>(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 13+__pyx_t_6);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
-          <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
+        if (<span class='py_c_api'>PyFunction_Check</span>(__pyx_t_5)) {
+          PyObject *__pyx_temp[14] = {__pyx_t_6, __pyx_t_3, ((PyObject *)__pyx_v_scale), ((PyObject *)__pyx_v_temp), ((PyObject *)__pyx_v_ne), ((PyObject *)__pyx_v_vz), ((PyObject *)__pyx_v_vmic), ((PyObject *)__pyx_v_mag), ((PyObject *)__pyx_v_gamma), ((PyObject *)__pyx_v_chi), ((PyObject *)__pyx_v_nH), __pyx_t_4, ((PyObject *)__pyx_v_fudge_lam), ((PyObject *)__pyx_v_fudge)};
+          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyFunction_FastCall</span>(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 13+__pyx_t_7);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
+          <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_6); __pyx_t_6 = 0;
           <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
           <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
+          <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
         } else
         #endif
         #if CYTHON_FAST_PYCCALL
-        if (<span class='pyx_c_api'>__Pyx_PyFastCFunction_Check</span>(__pyx_t_4)) {
-          PyObject *__pyx_temp[14] = {__pyx_t_5, __pyx_t_3, ((PyObject *)__pyx_v_scale), ((PyObject *)__pyx_v_temp), ((PyObject *)__pyx_v_ne), ((PyObject *)__pyx_v_vz), ((PyObject *)__pyx_v_vmic), ((PyObject *)__pyx_v_mag), ((PyObject *)__pyx_v_gamma), ((PyObject *)__pyx_v_chi), ((PyObject *)__pyx_v_nH), __pyx_v_do_fudge, ((PyObject *)__pyx_v_fudge_lam), ((PyObject *)__pyx_v_fudge)};
-          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyCFunction_FastCall</span>(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 13+__pyx_t_6);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
-          <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
+        if (<span class='pyx_c_api'>__Pyx_PyFastCFunction_Check</span>(__pyx_t_5)) {
+          PyObject *__pyx_temp[14] = {__pyx_t_6, __pyx_t_3, ((PyObject *)__pyx_v_scale), ((PyObject *)__pyx_v_temp), ((PyObject *)__pyx_v_ne), ((PyObject *)__pyx_v_vz), ((PyObject *)__pyx_v_vmic), ((PyObject *)__pyx_v_mag), ((PyObject *)__pyx_v_gamma), ((PyObject *)__pyx_v_chi), ((PyObject *)__pyx_v_nH), __pyx_t_4, ((PyObject *)__pyx_v_fudge_lam), ((PyObject *)__pyx_v_fudge)};
+          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyCFunction_FastCall</span>(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 13+__pyx_t_7);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
+          <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_6); __pyx_t_6 = 0;
           <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
           <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
+          <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
         } else
         #endif
         {
-          __pyx_t_7 = <span class='py_c_api'>PyTuple_New</span>(13+__pyx_t_6);<span class='error_goto'> if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
-          <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_7);
-          if (__pyx_t_5) {
-            <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_5); <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
+          __pyx_t_8 = <span class='py_c_api'>PyTuple_New</span>(13+__pyx_t_7);<span class='error_goto'> if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
+          <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_8);
+          if (__pyx_t_6) {
+            <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_6); <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
           }
           <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_3);
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 0+__pyx_t_6, __pyx_t_3);
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 0+__pyx_t_7, __pyx_t_3);
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_scale));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_scale));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 1+__pyx_t_6, ((PyObject *)__pyx_v_scale));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 1+__pyx_t_7, ((PyObject *)__pyx_v_scale));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_temp));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_temp));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 2+__pyx_t_6, ((PyObject *)__pyx_v_temp));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 2+__pyx_t_7, ((PyObject *)__pyx_v_temp));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_ne));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_ne));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 3+__pyx_t_6, ((PyObject *)__pyx_v_ne));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 3+__pyx_t_7, ((PyObject *)__pyx_v_ne));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_vz));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_vz));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 4+__pyx_t_6, ((PyObject *)__pyx_v_vz));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 4+__pyx_t_7, ((PyObject *)__pyx_v_vz));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_vmic));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_vmic));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 5+__pyx_t_6, ((PyObject *)__pyx_v_vmic));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 5+__pyx_t_7, ((PyObject *)__pyx_v_vmic));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_mag));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_mag));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 6+__pyx_t_6, ((PyObject *)__pyx_v_mag));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 6+__pyx_t_7, ((PyObject *)__pyx_v_mag));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_gamma));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_gamma));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 7+__pyx_t_6, ((PyObject *)__pyx_v_gamma));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 7+__pyx_t_7, ((PyObject *)__pyx_v_gamma));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_chi));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_chi));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 8+__pyx_t_6, ((PyObject *)__pyx_v_chi));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 8+__pyx_t_7, ((PyObject *)__pyx_v_chi));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_nH));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_nH));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 9+__pyx_t_6, ((PyObject *)__pyx_v_nH));
-          <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_v_do_fudge);
-          <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_v_do_fudge);
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 10+__pyx_t_6, __pyx_v_do_fudge);
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 9+__pyx_t_7, ((PyObject *)__pyx_v_nH));
+          <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_t_4);
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 10+__pyx_t_7, __pyx_t_4);
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_fudge_lam));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_fudge_lam));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 11+__pyx_t_6, ((PyObject *)__pyx_v_fudge_lam));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 11+__pyx_t_7, ((PyObject *)__pyx_v_fudge_lam));
           <span class='pyx_macro_api'>__Pyx_INCREF</span>(((PyObject *)__pyx_v_fudge));
           <span class='refnanny'>__Pyx_GIVEREF</span>(((PyObject *)__pyx_v_fudge));
-          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_7, 12+__pyx_t_6, ((PyObject *)__pyx_v_fudge));
+          <span class='py_macro_api'>PyTuple_SET_ITEM</span>(__pyx_t_8, 12+__pyx_t_7, ((PyObject *)__pyx_v_fudge));
           __pyx_t_3 = 0;
-          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_4, __pyx_t_7, NULL);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
+          __pyx_t_4 = 0;
+          __pyx_t_2 = <span class='pyx_c_api'>__Pyx_PyObject_Call</span>(__pyx_t_5, __pyx_t_8, NULL);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)</span>
           <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
-          <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_7); __pyx_t_7 = 0;
+          <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_8); __pyx_t_8 = 0;
         }
-        <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_4); __pyx_t_4 = 0;
+        <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
         __pyx_r = __pyx_t_2;
         __pyx_t_2 = 0;
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
@@ -1320,7 +1324,8 @@ static PyObject *__pyx_f_4pyrh_2RH_hse(CYTHON_UNUSED struct __pyx_obj_4pyrh_RH *
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_5);
-  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_7);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_6);
+  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_8);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
@@ -1373,7 +1378,7 @@ static PyObject *__pyx_pw_4pyrh_2RH_5hse(PyObject *__pyx_v_self, PyObject *__pyx
   PyArrayObject *__pyx_v_gamma = 0;
   PyArrayObject *__pyx_v_chi = 0;
   PyArrayObject *__pyx_v_nH = 0;
-  PyObject *__pyx_v_do_fudge = 0;
+  int __pyx_v_do_fudge;
   PyArrayObject *__pyx_v_fudge_lam = 0;
   PyArrayObject *__pyx_v_fudge = 0;
   PyObject *__pyx_r = 0;
@@ -1523,7 +1528,7 @@ static PyObject *__pyx_pw_4pyrh_2RH_5hse(PyObject *__pyx_v_self, PyObject *__pyx
     __pyx_v_gamma = ((PyArrayObject *)values[7]);
     __pyx_v_chi = ((PyArrayObject *)values[8]);
     __pyx_v_nH = ((PyArrayObject *)values[9]);
-    __pyx_v_do_fudge = values[10];
+    __pyx_v_do_fudge = <span class='pyx_c_api'>__Pyx_PyInt_As_int</span>(values[10]); if (unlikely((__pyx_v_do_fudge == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 118, __pyx_L3_error)</span>
     __pyx_v_fudge_lam = ((PyArrayObject *)values[11]);
     __pyx_v_fudge = ((PyArrayObject *)values[12]);
   }
@@ -1560,7 +1565,7 @@ static PyObject *__pyx_pw_4pyrh_2RH_5hse(PyObject *__pyx_v_self, PyObject *__pyx
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4pyrh_2RH_4hse(struct __pyx_obj_4pyrh_RH *__pyx_v_self, int __pyx_v_atm_scale, PyArrayObject *__pyx_v_scale, PyArrayObject *__pyx_v_temp, PyArrayObject *__pyx_v_ne, PyArrayObject *__pyx_v_vz, PyArrayObject *__pyx_v_vmic, PyArrayObject *__pyx_v_mag, PyArrayObject *__pyx_v_gamma, PyArrayObject *__pyx_v_chi, PyArrayObject *__pyx_v_nH, PyObject *__pyx_v_do_fudge, PyArrayObject *__pyx_v_fudge_lam, PyArrayObject *__pyx_v_fudge) {
+static PyObject *__pyx_pf_4pyrh_2RH_4hse(struct __pyx_obj_4pyrh_RH *__pyx_v_self, int __pyx_v_atm_scale, PyArrayObject *__pyx_v_scale, PyArrayObject *__pyx_v_temp, PyArrayObject *__pyx_v_ne, PyArrayObject *__pyx_v_vz, PyArrayObject *__pyx_v_vmic, PyArrayObject *__pyx_v_mag, PyArrayObject *__pyx_v_gamma, PyArrayObject *__pyx_v_chi, PyArrayObject *__pyx_v_nH, int __pyx_v_do_fudge, PyArrayObject *__pyx_v_fudge_lam, PyArrayObject *__pyx_v_fudge) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_chi;
   __Pyx_Buffer __pyx_pybuffer_chi;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_fudge;
@@ -1741,7 +1746,7 @@ static PyObject *__pyx_pf_4pyrh_2RH_4hse(struct __pyx_obj_4pyrh_RH *__pyx_v_self
 <pre class="cython line score-0">&#xA0;<span class="">115</span>: 			  <span class="n">cnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">double</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">gamma</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">116</span>: 			  <span class="n">cnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">double</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">chi</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">117</span>: 			  <span class="n">cnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">double</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">nH</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">118</span>: 			  <span class="n">do_fudge</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">118</span>: 			  <span class="nb">int</span> <span class="n">do_fudge</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">119</span>: 			  <span class="n">cnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">double</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">fudge_lam</span><span class="p">,</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">120</span>: 			  <span class="n">cnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">double</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">fudge</span><span class="p">):</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">121</span>: 		<span class="k">cdef</span> <span class="kt">int</span> <span class="nf">Ndep</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span></pre>
@@ -1750,74 +1755,73 @@ static PyObject *__pyx_pf_4pyrh_2RH_4hse(struct __pyx_obj_4pyrh_RH *__pyx_v_self
 <pre class='cython code score-0 '>  __pyx_v_fudge_num = (__pyx_v_fudge_lam-&gt;dimensions[0]);
 </pre><pre class="cython line score-0">&#xA0;<span class="">123</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">124</span>: 		<span class="n">myPops</span> <span class="o">=</span> <span class="n">rh</span><span class="o">.</span><span class="n">hse</span><span class="p">(</span><span class="n">Ndep</span><span class="p">,</span></pre>
-<pre class='cython code score-0 '>  __pyx_v_myPops = hse(__pyx_v_Ndep, (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_scale.rcbuffer-&gt;pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_scale.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_temp.rcbuffer-&gt;pybuffer.buf, __pyx_t_9, __pyx_pybuffernd_temp.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_ne.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_vz.rcbuffer-&gt;pybuffer.buf, __pyx_t_11, __pyx_pybuffernd_vz.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_vmic.rcbuffer-&gt;pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_vmic.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_mag.rcbuffer-&gt;pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_mag.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_gamma.rcbuffer-&gt;pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_gamma.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_chi.rcbuffer-&gt;pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_chi.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_nH.diminfo[0].strides, __pyx_t_17, __pyx_pybuffernd_nH.diminfo[1].strides))), __pyx_v_atm_scale, __pyx_t_6, __pyx_v_fudge_num, (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_fudge_lam.rcbuffer-&gt;pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_fudge_lam.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_fudge.rcbuffer-&gt;pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_fudge.diminfo[0].strides, __pyx_t_20, __pyx_pybuffernd_fudge.diminfo[1].strides))));
+<pre class='cython code score-0 '>  __pyx_v_myPops = hse(__pyx_v_Ndep, (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_scale.rcbuffer-&gt;pybuffer.buf, __pyx_t_9, __pyx_pybuffernd_scale.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_temp.rcbuffer-&gt;pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_temp.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer.buf, __pyx_t_11, __pyx_pybuffernd_ne.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_vz.rcbuffer-&gt;pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_vz.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_vmic.rcbuffer-&gt;pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_vmic.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_mag.rcbuffer-&gt;pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_mag.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_gamma.rcbuffer-&gt;pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_gamma.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_chi.rcbuffer-&gt;pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_chi.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_nH.diminfo[0].strides, __pyx_t_18, __pyx_pybuffernd_nH.diminfo[1].strides))), __pyx_v_atm_scale, __pyx_v_do_fudge, __pyx_v_fudge_num, (&amp;(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_fudge_lam.rcbuffer-&gt;pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_fudge_lam.diminfo[0].strides))), (&amp;(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_fudge.rcbuffer-&gt;pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_fudge.diminfo[0].strides, __pyx_t_21, __pyx_pybuffernd_fudge.diminfo[1].strides))));
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">125</span>: 					 <span class="o">&amp;</span><span class="n">scale</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">temp</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">ne</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">vz</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">vmic</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span></pre>
-<pre class='cython code score-0 '>  __pyx_t_8 = 0;
-  __pyx_t_9 = 0;
+<pre class='cython code score-0 '>  __pyx_t_9 = 0;
   __pyx_t_10 = 0;
   __pyx_t_11 = 0;
   __pyx_t_12 = 0;
+  __pyx_t_13 = 0;
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">126</span>: 					 <span class="o">&amp;</span><span class="n">mag</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">gamma</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">chi</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span></pre>
-<pre class='cython code score-0 '>  __pyx_t_13 = 0;
-  __pyx_t_14 = 0;
+<pre class='cython code score-0 '>  __pyx_t_14 = 0;
   __pyx_t_15 = 0;
+  __pyx_t_16 = 0;
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">127</span>: 					 <span class="o">&amp;</span><span class="n">nH</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">],</span> <span class="n">atm_scale</span><span class="p">,</span></pre>
-<pre class='cython code score-0 '>  __pyx_t_16 = 0;
-  __pyx_t_17 = 0;
-</pre><pre class="cython line score-7" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">128</span>: 					 <span class="n">do_fudge</span><span class="p">,</span> <span class="n">fudge_num</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fudge_lam</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">fudge</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">])</span></pre>
-<pre class='cython code score-7 '>  __pyx_t_6 = <span class='pyx_c_api'>__Pyx_PyInt_As_int</span>(__pyx_v_do_fudge); if (unlikely((__pyx_t_6 == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 128, __pyx_L1_error)</span>
+<pre class='cython code score-0 '>  __pyx_t_17 = 0;
   __pyx_t_18 = 0;
-  __pyx_t_19 = 0;
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">128</span>: 					 <span class="n">do_fudge</span><span class="p">,</span> <span class="n">fudge_num</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fudge_lam</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">fudge</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">])</span></pre>
+<pre class='cython code score-0 '>  __pyx_t_19 = 0;
   __pyx_t_20 = 0;
+  __pyx_t_21 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">129</span>: </pre>
 <pre class="cython line score-21" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">130</span>: 		<span class="n">ne</span> <span class="o">=</span> <span class="n">convert_1d</span><span class="p">(</span><span class="n">myPops</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span> <span class="n">Ndep</span><span class="p">)</span></pre>
 <pre class='cython code score-21 '>  __pyx_t_1 = __pyx_f_4pyrh_convert_1d(__pyx_v_myPops.ne, __pyx_v_Ndep);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   if (!(likely(((__pyx_t_1) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 130, __pyx_L1_error)</span>
-  __pyx_t_21 = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_22 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer);
-    __pyx_t_6 = <span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_21, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack);
-    if (unlikely(__pyx_t_6 &lt; 0)) {
-      <span class='py_c_api'>PyErr_Fetch</span>(&amp;__pyx_t_22, &amp;__pyx_t_23, &amp;__pyx_t_24);
+    __pyx_t_7 = <span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_22, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack);
+    if (unlikely(__pyx_t_7 &lt; 0)) {
+      <span class='py_c_api'>PyErr_Fetch</span>(&amp;__pyx_t_23, &amp;__pyx_t_24, &amp;__pyx_t_25);
       if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_ne, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 1, 0, __pyx_stack) == -1)) {
-        Py_XDECREF(__pyx_t_22); Py_XDECREF(__pyx_t_23); Py_XDECREF(__pyx_t_24);
+        Py_XDECREF(__pyx_t_23); Py_XDECREF(__pyx_t_24); Py_XDECREF(__pyx_t_25);
         <span class='pyx_c_api'>__Pyx_RaiseBufferFallbackError</span>();
       } else {
-        <span class='py_c_api'>PyErr_Restore</span>(__pyx_t_22, __pyx_t_23, __pyx_t_24);
+        <span class='py_c_api'>PyErr_Restore</span>(__pyx_t_23, __pyx_t_24, __pyx_t_25);
       }
-      __pyx_t_22 = __pyx_t_23 = __pyx_t_24 = 0;
+      __pyx_t_23 = __pyx_t_24 = __pyx_t_25 = 0;
     }
     __pyx_pybuffernd_ne.diminfo[0].strides = __pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_ne.diminfo[0].shape = __pyx_pybuffernd_ne.rcbuffer-&gt;pybuffer.shape[0];
-    if (unlikely(__pyx_t_6 &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 130, __pyx_L1_error)</span>
+    if (unlikely(__pyx_t_7 &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 130, __pyx_L1_error)</span>
   }
-  __pyx_t_21 = 0;
+  __pyx_t_22 = 0;
   <span class='pyx_macro_api'>__Pyx_DECREF_SET</span>(__pyx_v_ne, ((PyArrayObject *)__pyx_t_1));
   __pyx_t_1 = 0;
 </pre><pre class="cython line score-21" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">131</span>: 		<span class="n">nH</span> <span class="o">=</span> <span class="n">convert_2d</span><span class="p">(</span><span class="n">myPops</span><span class="o">.</span><span class="n">nH</span><span class="p">,</span> <span class="mf">6</span><span class="p">,</span> <span class="n">Ndep</span><span class="p">)</span></pre>
 <pre class='cython code score-21 '>  __pyx_t_1 = __pyx_f_4pyrh_convert_2d(__pyx_v_myPops.nH, 6, __pyx_v_Ndep);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   if (!(likely(((__pyx_t_1) == Py_None) || likely(<span class='pyx_c_api'>__Pyx_TypeTest</span>(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) <span class='error_goto'>__PYX_ERR(0, 131, __pyx_L1_error)</span>
-  __pyx_t_25 = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_26 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     <span class='pyx_c_api'>__Pyx_SafeReleaseBuffer</span>(&amp;__pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer);
-    __pyx_t_6 = <span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_25, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 2, 0, __pyx_stack);
-    if (unlikely(__pyx_t_6 &lt; 0)) {
-      <span class='py_c_api'>PyErr_Fetch</span>(&amp;__pyx_t_24, &amp;__pyx_t_23, &amp;__pyx_t_22);
+    __pyx_t_7 = <span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_t_26, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 2, 0, __pyx_stack);
+    if (unlikely(__pyx_t_7 &lt; 0)) {
+      <span class='py_c_api'>PyErr_Fetch</span>(&amp;__pyx_t_25, &amp;__pyx_t_24, &amp;__pyx_t_23);
       if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_nH, &amp;__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_C_CONTIGUOUS, 2, 0, __pyx_stack) == -1)) {
-        Py_XDECREF(__pyx_t_24); Py_XDECREF(__pyx_t_23); Py_XDECREF(__pyx_t_22);
+        Py_XDECREF(__pyx_t_25); Py_XDECREF(__pyx_t_24); Py_XDECREF(__pyx_t_23);
         <span class='pyx_c_api'>__Pyx_RaiseBufferFallbackError</span>();
       } else {
-        <span class='py_c_api'>PyErr_Restore</span>(__pyx_t_24, __pyx_t_23, __pyx_t_22);
+        <span class='py_c_api'>PyErr_Restore</span>(__pyx_t_25, __pyx_t_24, __pyx_t_23);
       }
-      __pyx_t_24 = __pyx_t_23 = __pyx_t_22 = 0;
+      __pyx_t_25 = __pyx_t_24 = __pyx_t_23 = 0;
     }
     __pyx_pybuffernd_nH.diminfo[0].strides = __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_nH.diminfo[0].shape = __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_nH.diminfo[1].strides = __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_nH.diminfo[1].shape = __pyx_pybuffernd_nH.rcbuffer-&gt;pybuffer.shape[1];
-    if (unlikely(__pyx_t_6 &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 131, __pyx_L1_error)</span>
+    if (unlikely(__pyx_t_7 &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 131, __pyx_L1_error)</span>
   }
-  __pyx_t_25 = 0;
+  __pyx_t_26 = 0;
   <span class='pyx_macro_api'>__Pyx_DECREF_SET</span>(__pyx_v_nH, ((PyArrayObject *)__pyx_t_1));
   __pyx_t_1 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">132</span>: </pre>
