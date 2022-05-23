@@ -1,0 +1,7 @@
+ToDo
+--------
+
+[x] ltepops.c/LTEpops() change to per atmospheric layer
+[ ] collision.c/CollisionRate() reads always Atom file and 
+    allocates collisional coefficients
+[ ] 

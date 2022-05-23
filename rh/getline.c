@@ -61,7 +61,7 @@ int getLine(FILE *inputFile, char *commentChar, char *line,
 void checkNread(int Nread, int Nrequired, const char *routineName,
 		int checkPoint)
 {
-  /* --- Check whether Nread igreater or equal to Nrequired and issue 
+  /* --- Check whether Nread is greater or equal to Nrequired and issue 
          error otherwise --                           --------------- */
 
   if (Nread < Nrequired) {

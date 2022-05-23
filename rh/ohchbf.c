@@ -353,6 +353,26 @@ bool_t OH_bf_opac(double lambda, double *chi, double *eta)
   hc_kla     = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M * lambda);
   twohnu3_c2 = (2.0 * HPLANCK * CLIGHT) / CUBE(NM_TO_M * lambda);
 
+  if (atmos.active_layer!=-1){
+    k = atmos.active_layer;
+    if (atmos.T[k] < TOH[0]  ||  atmos.T[k] > TOH[NTOH - 1]) {
+      chi[0] = 0.0;
+      eta[0] = 0.0;
+    } else {
+
+      Hunt(NTOH, TOH, atmos.T[k], &index2);
+      t_index = (double) index2 +
+        (atmos.T[k] - TOH[index2]) / (TOH[index2+1] - TOH[index2]);
+
+      kappa    = exp(LG10 * bilinear(NTOH, NEOH, OH_cross[0],
+             t_index, e_index)) * SQ(CM_TO_M);
+      stimEmis = exp(-hc_kla/atmos.T[k]);
+      chi[0]   = atmos.OH->n[k] * (1.0 - stimEmis) * kappa;
+      eta[0]   = atmos.OH->n[k] * twohnu3_c2 * stimEmis * kappa;
+    }
+    return TRUE;
+  }
+
   for (k = 0;  k < atmos.Nspace;  k++) {
     if (atmos.T[k] < TOH[0]  ||  atmos.T[k] > TOH[NTOH - 1]) {
       chi[k] = 0.0;
@@ -631,21 +651,39 @@ bool_t CH_bf_opac(double lambda, double *chi, double *eta)
   hc_kla     = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M * lambda);
   twohnu3_c2 = (2.0 * HPLANCK * CLIGHT) / CUBE(NM_TO_M * lambda);
 
-  for (k = 0;  k < atmos.Nspace;  k++) {
+  if (atmos.active_layer!=-1){
+    k = atmos.active_layer;
     if (atmos.T[k] < TCH[0]  ||  atmos.T[k] > TCH[NTCH - 1]) {
-      chi[k] = 0.0;
-      eta[k] = 0.0;
+      chi[0] = 0.0;
+      eta[0] = 0.0;
     } else {
-
       Hunt(NTCH, TCH, atmos.T[k], &index2);
       t_index = (double) index2 +
-	(atmos.T[k] - TCH[index2]) / (TCH[index2+1] - TCH[index2]);
+        (atmos.T[k] - TCH[index2]) / (TCH[index2+1] - TCH[index2]);
 
       kappa    = exp(LG10 * bilinear(NTCH, NECH, CH_cross[0],
-				     t_index, e_index)) * SQ(CM_TO_M);
+             t_index, e_index)) * SQ(CM_TO_M);
       stimEmis = exp(-hc_kla/atmos.T[k]);
-      chi[k]   = atmos.CH->n[k] * (1.0 - stimEmis) * kappa;
-      eta[k]   = atmos.CH->n[k] * twohnu3_c2 * stimEmis * kappa;
+      chi[0]   = atmos.CH->n[k] * (1.0 - stimEmis) * kappa;
+      eta[0]   = atmos.CH->n[k] * twohnu3_c2 * stimEmis * kappa;
+    }
+  } else{
+    for (k = 0;  k < atmos.Nspace;  k++) {
+      if (atmos.T[k] < TCH[0]  ||  atmos.T[k] > TCH[NTCH - 1]) {
+        chi[k] = 0.0;
+        eta[k] = 0.0;
+      } else {
+
+        Hunt(NTCH, TCH, atmos.T[k], &index2);
+        t_index = (double) index2 +
+  	      (atmos.T[k] - TCH[index2]) / (TCH[index2+1] - TCH[index2]);
+
+        kappa    = exp(LG10 * bilinear(NTCH, NECH, CH_cross[0],
+  				     t_index, e_index)) * SQ(CM_TO_M);
+        stimEmis = exp(-hc_kla/atmos.T[k]);
+        chi[k]   = atmos.CH->n[k] * (1.0 - stimEmis) * kappa;
+        eta[k]   = atmos.CH->n[k] * twohnu3_c2 * stimEmis * kappa;
+      }
     }
   }
   return TRUE;

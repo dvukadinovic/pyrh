@@ -13,14 +13,14 @@ cnp.import_array()
 
 # cimport tools
 
-cdef convert_1d(double *arr, int n):
+cdef convert_1d(double *arr, Py_ssize_t n):
 	cdef Py_ssize_t i
 	cdef cnp.ndarray[cnp.float64_t, ndim=1] pyarr = np.empty(n)
 	for i in range(n):
 		pyarr[i] = arr[i]
 	return pyarr
 
-cdef convert_2d(double **arr, int nx, int ny):
+cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 	cdef Py_ssize_t i
 	cdef Py_ssize_t j
 	cdef cnp.ndarray[cnp.float64_t, ndim=2] pyarr = np.empty((nx, ny))
@@ -99,6 +99,39 @@ cdef class RH:
 	# 			fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
 	# 			self.wavetable[i] = self.wavetable[i] * fact
 
+	cpdef dummy(self):
+		rh.dummy()
+
+	@cython.boundscheck(False)
+	@cython.wraparound(False)
+	cpdef hse(self,
+			  int atm_scale,
+			  cnp.ndarray[double, ndim=1, mode="c"] scale,
+			  cnp.ndarray[double, ndim=1, mode="c"] temp,
+			  cnp.ndarray[double, ndim=1, mode="c"] ne,
+			  cnp.ndarray[double, ndim=1, mode="c"] vz,
+			  cnp.ndarray[double, ndim=1, mode="c"] vmic,
+			  cnp.ndarray[double, ndim=1, mode="c"] mag,
+			  cnp.ndarray[double, ndim=1, mode="c"] gamma,
+			  cnp.ndarray[double, ndim=1, mode="c"] chi,
+			  cnp.ndarray[double, ndim=2, mode="c"] nH,
+			  do_fudge,
+			  cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
+			  cnp.ndarray[double, ndim=2, mode="c"] fudge):
+		cdef int Ndep = scale.shape[0]
+		cdef int fudge_num = fudge_lam.shape[0]
+
+		myPops = rh.hse(Ndep,
+					 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
+					 &mag[0], &gamma[0], &chi[0],
+					 &nH[0,0], atm_scale,
+					 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
+
+		ne = convert_1d(myPops.ne, Ndep)
+		nH = convert_2d(myPops.nH, 6, Ndep)
+
+		return ne, nH
+
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef compute1d(self,
@@ -129,7 +162,7 @@ cdef class RH:
 
 		cdef int Nlam = lam_ids.shape[0]
 		if (Nlam!=lam_values.shape[0]):
-			print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
+			print("\n  pyrh: Different number of lam_ids and lam_values.\n")
 			sys.exit()
 
 		spec = rh.rhf1d(Ndep,
@@ -150,7 +183,8 @@ cdef class RH:
 			sV = convert_1d(spec.sV, spec.nlw)
 		J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-		return Spectrum(spec.nlw-1, lam[:-1], sI[:-1], sQ[:-1], sU[:-1], sV[:-1], J, None, spec.stokes)
+		Nlam = len(lam)
+		return Spectrum(spec.nlw-1, lam[:Nlam-1], sI[:Nlam-1], sQ[:Nlam-1], sU[:Nlam-1], sV[:Nlam-1], J, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)

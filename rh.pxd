@@ -66,3 +66,16 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
 	cdef void dummy(myRLK_Line *rlk_lines)
+
+cdef extern from "rh/rhf1d/pyrh_hse.h":
+	ctypedef struct myPops:
+		double *ne
+		double **nH
+
+	cdef myPops hse(int Ndep,
+					double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
+					double *rh_mag, double *rh_gamma, double *rh_chi,
+					double *rh_nH, int atm_scale,
+					int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
+
+	cdef void dummy()

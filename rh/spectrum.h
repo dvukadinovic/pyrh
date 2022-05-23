@@ -73,7 +73,7 @@ void alloc_as(int nspect, bool_t crosscoupling);
 void free_as(int nspect, bool_t crosscoupling);
 void initSpectrum(void);
 void Opacity(int nspect, int mu, bool_t top_to_bottom, bool_t activate);
-void Planck(int Nspace, double *T, double lambda0, double *Bnu);
+void Planck(int Nspace, double *T, double lambda0, double *Bnu, int active_layer);
 
 void readJlambda(int nspect, double *J);
 void writeJlambda(int nspect, double *J);

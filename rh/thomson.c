@@ -39,6 +39,11 @@ void Thomson(double *chi)
   double sigma = 8.0*PI/3.0 * pow(Q_ELECTRON/(sqrt(4.0*PI*EPSILON_0) *
 					      (sqrt(M_ELECTRON)*CLIGHT)), 4);
 
+  if (atmos.active_layer!=-1){
+    chi[0] = atmos.ne[atmos.active_layer] * sigma;
+    return;
+  }
+
   for (k = 0;  k < atmos.Nspace;  k++)
     chi[k] = atmos.ne[k] * sigma;
 }

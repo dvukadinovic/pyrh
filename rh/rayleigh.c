@@ -87,9 +87,13 @@ bool_t Rayleigh(double lambda, Atom *atom, double *scatt)
     }
     sigma_Rayleigh = sigma_e * fomega;
 
-    for (k = 0;  k < atmos.Nspace;  k++)
-      scatt[k] = sigma_Rayleigh * atom->n[0][k];
-
+    if (atmos.active_layer!=-1)
+    {
+      scatt[0] = sigma_Rayleigh * atom->n[0][atmos.active_layer];
+    } else{
+      for (k = 0;  k < atmos.Nspace;  k++)
+        scatt[k] = sigma_Rayleigh * atom->n[0][k];
+    }
     return TRUE;
   } else
     return FALSE;

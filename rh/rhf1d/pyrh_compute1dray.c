@@ -153,12 +153,11 @@ mySpectrum rhf1d(int pyrh_Ndep,
   // }
   atmos.Nrlk = 0;
 
-  Atom *atom;
-
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry);
+  atmos.active_layer = -1;
   
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
@@ -260,59 +259,7 @@ mySpectrum rhf1d(int pyrh_Ndep,
   }
 
   getCPU(1, TIME_START, NULL);
-
-  // writeInput();
-  // writeAtmos(&atmos);
-  // writeGeometry(&geometry);
-  // writeSpectrum(&spectrum);
-  // writeFlux(FLUX_DOT_OUT);
-
-  // for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
-  //   atom = atmos.activeatoms[nact];
-
-  //   writeAtom(atom);
-  //   writePopulations(atom);
-  //   writeRadRate(atom);
-  //   writeCollisionRate(atom);
-  //   writeDamping(atom);
-  // }
-
-  // for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
-  //   molecule = atmos.activemols[nact];
-  //   writeMolPops(molecule);
-  // }
-
-  // writeOpacity();
-  
-  // getCPU(1, TIME_POLL, "Write output");
-
   printTotalCPU();
-
-  /*--- Free from memory background opacity/emissivity  ---*/
-  
-  // int nspect;
-  
-  // for (nspect=0; nspect<spectrum.Nspect; nspect++) {
-  //   free(spectrum.chi_c_lam[nspect]);
-  // }
-  // free(spectrum.chi_c_lam);
-
-  // for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
-  //   free(spectrum.eta_c_lam[nspect]);
-  // }
-  // free(spectrum.eta_c_lam);
-
-  // for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
-  //   free(spectrum.sca_c_lam[nspect]);
-  // }
-  // free(spectrum.sca_c_lam);
-
-  // if (input.magneto_optical){
-  //   for (int nspect=0; nspect<spectrum.Nspect; ++nspect) {
-  //     free(spectrum.chip_c_lam[nspect]);
-  //   }
-  //   free(spectrum.chip_c_lam);
-  // }
 
   mySpectrum spec;
   _solveray(argv, 1.0, &spec, spectrum.J, spectrum.J20);

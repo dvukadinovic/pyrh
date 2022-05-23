@@ -82,9 +82,18 @@ bool_t Metal_bf(double lambda, int Nmetal, struct Atom *metals,
 
   twohc  = (2.0 * HPLANCK * CLIGHT) / CUBE(NM_TO_M);
   hc_k   = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M);
-  for (k = 0;  k < atmos.Nspace;  k++) {
-    chi[k] = 0.0;
-    eta[k] = 0.0;
+  
+  double _expla;
+  int layer = atmos.active_layer;
+
+  if (layer!=-1){
+    chi[k] = 0;
+    eta[k] = 0;
+  } else {
+    for (k = 0;  k < atmos.Nspace;  k++) {
+      chi[k] = 0.0;
+      eta[k] = 0.0;
+    }
   }
 
   /* --- Go through the bound-free transitions of the metals and add
@@ -100,47 +109,58 @@ bool_t Metal_bf(double lambda, int Nmetal, struct Atom *metals,
       n = (metal->n != metal->nstar) ? metal->n : metal->nstar;
 
       for (kr = 0;  kr < metal->Ncont;  kr++) {
-	continuum = metal->continuum + kr;
-	i = continuum->i;
-	j = continuum->j;
-	lambdaEdge = continuum->lambda0;
+      	continuum = metal->continuum + kr;
+      	i = continuum->i;
+      	j = continuum->j;
+      	lambdaEdge = continuum->lambda0;
 
-	if (lambda <= lambdaEdge  &&  lambda >= continuum->lambda[0]) {
-	  hc_kla     = hc_k / lambda;
-	  twohnu3_c2 = twohc / CUBE(lambda);
+      	if (lambda <= lambdaEdge  &&  lambda >= continuum->lambda[0]) {
+      	  hc_kla     = hc_k / lambda;
+      	  twohnu3_c2 = twohc / CUBE(lambda);
 
-	  /* --- Evaluate the exponential only once at wavelength lambda,
-	     not for each transition seperately -- ------------ */
+      	  /* --- Evaluate the exponential only once at wavelength lambda,
+      	     not for each transition seperately -- ------------ */
 
-	  if (expla == NULL) {
-	    expla = (double *) malloc(atmos.Nspace * sizeof(double));
-	    for (k = 0;  k < atmos.Nspace;  k++)
-	      expla[k] = exp(-hc_kla/atmos.T[k]);
-	  }
+      	  if (expla == NULL) {
+      	    expla = (double *) malloc(atmos.Nspace * sizeof(double));
+        	  if (layer!=-1){
+              _expla = exp(-hc_kla/atmos.T[layer]);
+            } else {
+              for (k = 0;  k < atmos.Nspace;  k++)
+        	      expla[k] = exp(-hc_kla/atmos.T[k]);
+            }
+      	  }
 
-	  if (continuum->hydrogenic) {
-	    Z = metal->stage[continuum->j];
-	    n_eff = Z*sqrt(E_RYDBERG / (metal->E[continuum->j] -
-					metal->E[continuum->i]));
-	    gbf_0 = Gaunt_bf(continuum->lambda0, n_eff, Z);
+      	  if (continuum->hydrogenic) {
+      	    Z = metal->stage[continuum->j];
+      	    n_eff = Z*sqrt(E_RYDBERG / (metal->E[continuum->j] -
+      					metal->E[continuum->i]));
+      	    gbf_0 = Gaunt_bf(continuum->lambda0, n_eff, Z);
 
-	    alpha_la = continuum->alpha0 * CUBE(lambda/continuum->lambda0) *
-	      Gaunt_bf(lambda, n_eff, Z) / gbf_0;
-	  } else {
-	    splineCoef(continuum->Nlambda, continuum->lambda,
-		       continuum->alpha);
-	    splineEval(1, &lambda, &alpha_la, hunt=FALSE);
-	  }
+      	    alpha_la = continuum->alpha0 * CUBE(lambda/continuum->lambda0) *
+      	      Gaunt_bf(lambda, n_eff, Z) / gbf_0;
+      	  } else {
+      	    splineCoef(continuum->Nlambda, continuum->lambda,
+      		       continuum->alpha);
+      	    splineEval(1, &lambda, &alpha_la, hunt=FALSE);
+      	  }
 
-	  for (k = 0;  k < atmos.Nspace;  k++) {
-	    gijk    = metal->nstar[i][k]/metal->nstar[j][k] * expla[k];
-	    chi[k] += alpha_la * (1.0 - expla[k]) * n[i][k];
-	    eta[k] += twohnu3_c2 * gijk * alpha_la * n[j][k];
-	  }
-	}
+          if (layer!=-1){
+            gijk    = metal->nstar[i][layer]/metal->nstar[j][layer] * _expla;
+            chi[0] += alpha_la * (1.0 - _expla) * n[i][layer];
+            eta[0] += twohnu3_c2 * gijk * alpha_la * n[j][layer];
+          } else {
+        	  for (k = 0;  k < atmos.Nspace;  k++) {
+        	    gijk    = metal->nstar[i][k]/metal->nstar[j][k] * expla[k];
+        	    chi[k] += alpha_la * (1.0 - expla[k]) * n[i][k];
+        	    eta[k] += twohnu3_c2 * gijk * alpha_la * n[j][k];
+        	  }
+          }
+	      }
       }
     }
   }
+  
   if (expla != NULL) {
     free(expla);
     return TRUE;

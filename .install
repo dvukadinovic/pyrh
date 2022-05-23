@@ -34,3 +34,4 @@ running install_lib
 running build_ext
 building 'pyrh' extension
 x86_64-linux-gnu-gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -flto -fuse-linker-plugin -ffat-lto-objects -fPIC -Irh/ -I. -I/home/dusan/Documents/snake/lib/python3.6/site-packages/numpy/core/include -I/home/dusan/Documents/snake/include/python3.6m -c pyrh.c -o build/temp.linux-x86_64-3.6/pyrh.o
+running install

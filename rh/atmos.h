@@ -45,6 +45,7 @@ typedef struct {
   int     Ndim, *N, Nspace, Nrays, Nelem, Natom, Nmolecule,
          *backgrrecno, Npf, NHydr, fd_background, NPRDactive,
           Nactiveatom, Nactivemol;
+  int     active_layer; // DV -- layer for which we compute HSE (opacities and equilibrium)
   int     fudge_num; // DV -- number of OF points
   double *fudge_lam, **fudge; // DV -- pointer for OF wavelengths and values
   double *loggf_values, *lam_values; // DV -- perturbation value for log(gf)

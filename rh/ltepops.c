@@ -73,7 +73,13 @@ void LTEpops(Atom *atom, bool_t Debeye)
   }
   /* --- Solve Saha-Boltzmann equilibrium equations --  ------------- */
 
-  for (k = 0;  k < Nspace;  k++) {
+  int start=0, end=atmos.Nspace;
+  if (atmos.active_layer!=-1){
+    start = atmos.active_layer;
+    end = start + 1;
+  }
+
+  for (k = start;  k < end;  k++) {
     if (Debeye) dEion = c2 * sqrt(atmos.ne[k] / atmos.T[k]);
     cNe_T = 0.5*atmos.ne[k] * pow(c1/atmos.T[k], 1.5);
     sum   = 1.0;
@@ -99,16 +105,8 @@ void LTEpops(Atom *atom, bool_t Debeye)
       atom->nstar[i][k] *= atom->nstar[0][k];
   }
 
-  // if (atom->ID=="H "){
-  //   printf("n[0][25] = %f\n", atmos.H->n[0][25]);
-  //   printf("n[1][25] = %f\n", atmos.H->n[1][25]);
-  //   printf("n[2][25] = %f\n", atmos.H->n[2][25]);
-  //   printf("n[3][25] = %f\n", atmos.H->n[3][25]);
-  // }
-
   if (Debeye) free(nDebeye);
 
-  sprintf(labelStr, "LTEpops %2s", atom->ID);
   getCPU(3, TIME_POLL, labelStr);
 }
 /* ------- end ---------------------------- LTEpops.c --------------- */

@@ -162,11 +162,20 @@ bool_t Hydrogen_bf(double lambda, double *chi, double *eta)
     hc_k, hc_kla, *npstar, expla, n_eff, *np;
   AtomicContinuum *continuum;
 
+  int layer = atmos.active_layer;
+
   opaque = FALSE;
-  for (k = 0;  k < atmos.Nspace;  k++) {
-    chi[k] = 0.0;
-    eta[k] = 0.0;
+  if (layer!=-1)
+  {
+    chi[0] = 0.0;
+    eta[0] = 0.0;
+  } else{
+    for (k = 0;  k < atmos.Nspace;  k++) {
+      chi[k] = 0.0;
+      eta[k] = 0.0;
+    }
   }
+  
   if (atmos.H->active) return opaque;
 
   twohc  = (2.0 * HPLANCK * CLIGHT) / CUBE(NM_TO_M);
@@ -193,13 +202,22 @@ bool_t Hydrogen_bf(double lambda, double *chi, double *eta)
       sigma = sigma0 * n_eff * g_bf * CUBE(lambda/lambdaEdge);
       hc_kla     = hc_k / lambda;
       twohnu3_c2 = twohc / CUBE(lambda);
-      
+
       np = atmos.H->n[atmos.H->Nlevel-1];
-      for (k = 0;  k < atmos.Nspace;  k++) {
-	expla   = exp(-hc_kla/atmos.T[k]);
-	gijk    = atmos.H->nstar[i][k]/npstar[k] * expla;
-	chi[k] += sigma * (1.0 - expla) * atmos.H->n[i][k];
-	eta[k] += twohnu3_c2 * gijk * sigma * np[k];
+      if (layer=-1)
+      {
+        k = atmos.active_layer;
+        expla   = exp(-hc_kla/atmos.T[k]);
+        gijk    = atmos.H->nstar[i][k]/npstar[k] * expla;
+        chi[0] += sigma * (1.0 - expla) * atmos.H->n[i][k];
+        eta[0] += twohnu3_c2 * gijk * sigma * np[k];
+      } else{
+        for (k = 0;  k < atmos.Nspace;  k++) {
+        	expla   = exp(-hc_kla/atmos.T[k]);
+        	gijk    = atmos.H->nstar[i][k]/npstar[k] * expla;
+        	chi[k] += sigma * (1.0 - expla) * atmos.H->n[i][k];
+        	eta[k] += twohnu3_c2 * gijk * sigma * np[k];
+        }
       }
     }
   }
@@ -228,6 +246,15 @@ void Hydrogen_ff(double lambda, double *chi)
   hc_kla = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M * lambda);
 
   np = atmos.H->n[atmos.H->Nlevel-1];
+  if (atmos.active_layer!=-1){
+    k = atmos.active_layer;
+    stim   = 1.0 - exp(-hc_kla/atmos.T[k]);
+    g_ff   = Gaunt_ff(lambda, 1, atmos.T[k]);
+    chi[0] = sigma / sqrt(atmos.T[k]) * nu3 * atmos.ne[k] *
+      np[k] * stim * g_ff;
+    return;
+  }
+
   for (k = 0;  k < Nspace;  k++) {
     stim   = 1.0 - exp(-hc_kla/atmos.T[k]);
     g_ff   = Gaunt_ff(lambda, 1, atmos.T[k]);
@@ -314,6 +341,14 @@ bool_t Hminus_bf(double lambda, double *chi, double *eta)
   hc_kla     = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M * lambda);
   twohnu3_c2 = (2.0 * HPLANCK * CLIGHT) / CUBE(NM_TO_M * lambda);
 
+  if (atmos.active_layer!=-1){
+    k = atmos.active_layer;
+    stimEmis = exp(-hc_kla/atmos.T[k]);
+    chi[0]   = atmos.nHmin[k] * (1.0 - stimEmis) * alpha_bf;
+    eta[0]   = atmos.nHmin[k] * twohnu3_c2 * stimEmis * alpha_bf;
+    return TRUE;
+  }
+
   for (k = 0;  k < Nspace;  k++) {
     stimEmis = exp(-hc_kla/atmos.T[k]);
     chi[k]   = atmos.nHmin[k] * (1.0 - stimEmis) * alpha_bf;
@@ -336,6 +371,8 @@ bool_t Hminus_ff(double lambda, double *chi)
   static bool_t  initialize=TRUE;
   static int     index;
   static double *theta_index;
+  double _theta_index;
+  int layer = atmos.active_layer;
 
   /* --- H-minus Free-Free coefficients (in units of 1.0E-29 m^5/J)
 
@@ -446,33 +483,63 @@ bool_t Hminus_ff(double lambda, double *chi)
   /* --- Use long-wavelength expansion if wavelength beyond 9113 nm - */
 
   if (lambda >= lambdaFF[NFF-1])
+    printf("Get Hminus_ff_long\n");
     return Hminus_ff_long(lambda, chi);
 
+  printf(" Initialize\n");
   if (initialize) {
 
     /* --- Store the fractional indices of temperature only the
            first time around --                        -------------- */
 
-    theta_index = (double *) malloc(Nspace * sizeof(double));
-    for (k = 0;  k < Nspace;  k++) {
-      theta = THETA0 / atmos.T[k];
+    if (layer!=-1){
+      printf("  Single layer\n");
+      theta = THETA0 / atmos.T[layer];
       if (theta <= thetaFF[0])
-        theta_index[k] = 0;
+        _theta_index = 0;
       else if (theta >= thetaFF[NTHETA-1])
-	theta_index[k] = NTHETA - 1;
+        _theta_index = NTHETA - 1;
       else {
-	Hunt(NTHETA, thetaFF, theta, &index);
-	theta_index[k] = (double) index +
-	  (theta - thetaFF[index]) / (thetaFF[index+1] - thetaFF[index]);
+        Hunt(NTHETA, thetaFF, theta, &index);
+        _theta_index = (double) index +
+          (theta - thetaFF[index]) / (thetaFF[index+1] - thetaFF[index]);
+      }
+    } else {
+      printf("  Multi layer\n");
+      theta_index = (double *) malloc(Nspace * sizeof(double));
+      for (k = 0;  k < Nspace;  k++) {
+        theta = THETA0 / atmos.T[k];
+        if (theta <= thetaFF[0])
+          theta_index[k] = 0;
+        else if (theta >= thetaFF[NTHETA-1])
+  	      theta_index[k] = NTHETA - 1;
+        else {
+        	Hunt(NTHETA, thetaFF, theta, &index);
+        	theta_index[k] = (double) index +
+        	  (theta - thetaFF[index]) / (thetaFF[index+1] - thetaFF[index]);
+        }
       }
     }
+
     initialize = FALSE;
   }
 
+  printf(" Hunt()\n");
   Hunt(NFF, lambdaFF, lambda, &index);
   lambda_index = (double) index +
     (lambda - lambdaFF[index]) / (lambdaFF[index+1] - lambdaFF[index]);
 
+  if (layer!=-1){
+    printf("  Set for single layer\n");
+    k = layer;
+    pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
+    kappa  = bilinear(NTHETA, NFF, kappaFF,
+          _theta_index, lambda_index);
+    chi[0] = (atmos.H->n[0][k] * 1.0E-29) * pe * kappa;
+    return TRUE;
+  }
+
+  printf("  Set for multi layer\n");
   for (k = 0;  k < Nspace;  k++) {
     pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
     kappa  = bilinear(NTHETA, NFF, kappaFF,
@@ -547,7 +614,10 @@ bool_t H2minus_ff(double lambda, double *chi) {
 
   static  bool_t initialize=TRUE;
   static   int   index;
+  
+  int layer = atmos.active_layer;
   static double *theta_index;
+  static double _theta_index;
 
   /* --- H2-minus Free-Free absorption coefficients (in units of
          10E-29 m^5/J). Stimulated emission is included.
@@ -647,17 +717,31 @@ bool_t H2minus_ff(double lambda, double *chi) {
     return FALSE;
 
   if (initialize) {
-    theta_index = (double *) malloc(Nspace * sizeof(double));
-    for (k = 0;  k < Nspace;  k++) {
-      theta = THETA0 / atmos.T[k];
-      if (theta <= thetaFF[0])
-        theta_index[k] = 0;
-      else if (theta >= thetaFF[NTHETA_H2-1])
-	theta_index[k] = NTHETA_H2-1;
-      else {
-	Hunt(NTHETA_H2, thetaFF, theta, &index);
-	theta_index[k] = index + (theta - thetaFF[index]) /
-	  (thetaFF[index+1] - thetaFF[index]);
+     if (layer!=-1)
+     {
+       theta = THETA0 / atmos.T[layer];
+        if (theta <= thetaFF[0])
+          _theta_index = 0;
+        else if (theta >= thetaFF[NTHETA_H2-1])
+          _theta_index = NTHETA_H2-1;
+        else {
+          Hunt(NTHETA_H2, thetaFF, theta, &index);
+          _theta_index = index + (theta - thetaFF[index]) /
+            (thetaFF[index+1] - thetaFF[index]);
+        }
+     } else {
+      theta_index = (double *) malloc(Nspace * sizeof(double));
+      for (k = 0;  k < Nspace;  k++) {
+        theta = THETA0 / atmos.T[k];
+        if (theta <= thetaFF[0])
+          theta_index[k] = 0;
+        else if (theta >= thetaFF[NTHETA_H2-1])
+  	      theta_index[k] = NTHETA_H2-1;
+        else {
+        	Hunt(NTHETA_H2, thetaFF, theta, &index);
+        	theta_index[k] = index + (theta - thetaFF[index]) /
+        	  (thetaFF[index+1] - thetaFF[index]);
+        }
       }
     }
     initialize = FALSE;
@@ -668,6 +752,19 @@ bool_t H2minus_ff(double lambda, double *chi) {
     (lambdaFF[index+1] - lambdaFF[index]);
 
   nH2 = atmos.H2->n;
+
+  if (layer!=-1) {
+    chi[0] = 0.0;
+    k = layer;
+    if (nH2[k] > 0.0) {
+      pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
+      kappa  = bilinear(NTHETA_H2, NFF_H2, kappaFF,
+      _theta_index, lambda_index);
+      chi[0] = (nH2[k] * 1.0E-29) * pe * kappa;
+    }
+    return TRUE;
+  }
+
   for (k = 0;  k < Nspace;  k++) {
     if (nH2[k] > 0.0) {
       pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
@@ -755,6 +852,9 @@ bool_t H2plus_ff(double lambda, double *chi)
   int     Nspace = atmos.Nspace;
   double  T, lambda_index, kappa, *np;
 
+  double _temp_index;
+  int layer = atmos.active_layer;
+
   if (lambda == 0.0) {
 
     /* --- When called with zero wavelength free memory for fractional
@@ -768,17 +868,30 @@ bool_t H2plus_ff(double lambda, double *chi)
     return FALSE;
 
   if (initialize) {
-    temp_index = (double *) malloc(Nspace * sizeof(double));
-    for (k = 0;  k < Nspace;  k++) {
-      T = atmos.T[k];
+    if (layer!=-1){
+      T = atmos.T[layer];
       if (T <= tempFF[0])
-        temp_index[k] = 0;
+        _temp_index = 0;
       else if (T >= tempFF[NTEMP_H2P-1])
-	temp_index[k] = NTEMP_H2P-1;
+        _temp_index = NTEMP_H2P-1;
       else {
-	Hunt(NTEMP_H2P, tempFF, T, &index);
-	temp_index[k] = index + (T - tempFF[index]) /
-	  (tempFF[index+1] - tempFF[index]);
+        Hunt(NTEMP_H2P, tempFF, T, &index);
+        _temp_index = index + (T - tempFF[index]) /
+          (tempFF[index+1] - tempFF[index]);
+      }
+    } else {
+      temp_index = (double *) malloc(Nspace * sizeof(double));
+      for (k = 0;  k < Nspace;  k++) {
+        T = atmos.T[k];
+        if (T <= tempFF[0])
+          temp_index[k] = 0;
+        else if (T >= tempFF[NTEMP_H2P-1])
+  	      temp_index[k] = NTEMP_H2P-1;
+        else {
+        	Hunt(NTEMP_H2P, tempFF, T, &index);
+        	temp_index[k] = index + (T - tempFF[index]) /
+        	  (tempFF[index+1] - tempFF[index]);
+        }
       }
     }
     initialize = FALSE;
@@ -789,6 +902,14 @@ bool_t H2plus_ff(double lambda, double *chi)
     (lambdaFF[index+1] - lambdaFF[index]);
 
   np = atmos.H->n[atmos.H->Nlevel-1];    
+  if (layer!=-1) {
+    k = layer;
+    kappa  = bilinear(NTEMP_H2P, NFF_H2P, kappaFF,
+            _temp_index, lambda_index);
+    chi[0] = (atmos.H->n[0][k] * 1.0E-29) * (np[k] * 1.0E-20) * kappa;
+    return TRUE;
+  }
+  
   for (k = 0;  k < Nspace;  k++) {
     kappa  = bilinear(NTEMP_H2P, NFF_H2P, kappaFF,
 		      temp_index[k], lambda_index);
@@ -844,6 +965,11 @@ bool_t Rayleigh_H2(double lambda, double *scatt)
       sigma_RH2 = (a[0] + (a[1] + a[2]*lambda2) * lambda2) * SQ(lambda2);
     }
     sigma_RH2 *= MEGABARN_TO_M2;
+
+    if (atmos.active_layer!=-1){
+      scatt[0] = sigma_RH2 * nH2[atmos.active_layer];
+      return TRUE;
+    }
 
     for (k = 0;  k < atmos.Nspace;  k++)
       scatt[k] = sigma_RH2 * nH2[k];

@@ -86,6 +86,12 @@ void FixedRate(Atom *atom)
   }
   /* --- Go through the fixed transitions --           -------------- */
 
+  int start=0, end=atmos.Nspace;
+  if (atmos.active_layer!=-1){
+    start = atmos.active_layer;
+    end = start + 1;
+  }
+
   for (kf = 0;  kf < atom->Nfixed;  kf++) {
     ft = atom->ft + kf;
 
@@ -105,42 +111,42 @@ void FixedRate(Atom *atom)
       C0 = 8.0*PI * ft->strength * CLIGHT / CUBE(NM_TO_M * ft->lambda0);
     }
 
-    for (k = 0;  k < atmos.Nspace;  k++) {
+    for (k = start;  k < end;  k++) {
       Te = atmos.T[k];
       if (k >= Nrepeat * (Ndepth - 1))
-	deltaT = -1.0;
+      	deltaT = -1.0;
       else
-	deltaT = Te - atmos.T[k + Nrepeat];
+	      deltaT = Te - atmos.T[k + Nrepeat];
       
       /* --- Determine radiation temperature --      -------------- */
       
       Trad = Te;
       switch (ft->option) {
       case TRAD_ATMOSPHERIC:
-	break;
+	      break;
       case TRAD_PHOTOSPHERIC:
-	if (deltaT >= 0.0  ||  (deltaT < 0.0 && ft->Trad > Te))
-	  Trad = ft->Trad;
-	break;
+	      if (deltaT >= 0.0  ||  (deltaT < 0.0 && ft->Trad > Te))
+	        Trad = ft->Trad;
+	      break;
       case TRAD_CHROMOSPHERIC:
-	if (deltaT >= 0.0  &&  ft->Trad < Te)
-	  Trad = ft->Trad;
-	break;
+	      if (deltaT >= 0.0  &&  ft->Trad < Te)
+	        Trad = ft->Trad;
+	      break;
       }
       /* --- Evaluate the rates and store in collisional matrix -- -- */      
       
       xrad = hc_kla / Trad;
       switch (ft->type) {
       case FIXED_LINE:
-	exp_hckTla = exp(-xrad);
-	atom->C[ji][k] += C0 * exp_hckTla / (1.0 - exp_hckTla);
-	atom->C[ij][k] += gij * C0 / (1.0 - exp_hckTla);
-	break;
+      	exp_hckTla = exp(-xrad);
+      	atom->C[ji][k] += C0 * exp_hckTla / (1.0 - exp_hckTla);
+      	atom->C[ij][k] += gij * C0 / (1.0 - exp_hckTla);
+      	break;
       case FIXED_CONTINUUM:
-	xe = hc_kla / Te;
-	atom->C[ji][k] += C0 * sumE1(xrad);
-	atom->C[ij][k] += atom->nstar[i][k] / atom->nstar[j][k] * C0 * 
-	  sumE1_xe(xe, xrad);
+      	xe = hc_kla / Te;
+      	atom->C[ji][k] += C0 * sumE1(xrad);
+      	atom->C[ij][k] += atom->nstar[i][k] / atom->nstar[j][k] * C0 * 
+      	  sumE1_xe(xe, xrad);
         break;
       }
     }

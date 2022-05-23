@@ -31,7 +31,7 @@
 
 ##  Table of additional wavelengths  KEYWORD_OPTIONAL
 
-# WAVETABLE = spinor_window.wave
+ WAVETABLE = spinor_window.wave
 
 # Maximum number of iterations to initialize scattering radiation
 # field in the background (KEYWORD_OPTIONAL). In LTE case it needs

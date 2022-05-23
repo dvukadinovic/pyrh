@@ -76,7 +76,7 @@ void Piecewise_Linear_1D(int nspect, int mu, bool_t to_obs,
       I_uw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
       I_uw = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau_uw;
       break;
     case IRRADIATED:
@@ -93,7 +93,7 @@ void Piecewise_Linear_1D(int nspect, int mu, bool_t to_obs,
       I_uw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu, -1);
       I_uw = Bnu[0] - (Bnu[1] - Bnu[0]) / dtau_uw;
       break;
     case IRRADIATED:
@@ -167,7 +167,7 @@ void Piecewise_1D(int nspect, int mu, bool_t to_obs,
       I_uw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
       I_uw = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau_uw;
       break;
     case IRRADIATED:
@@ -184,7 +184,7 @@ void Piecewise_1D(int nspect, int mu, bool_t to_obs,
       I_uw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu, -1);
       I_uw = Bnu[0] - (Bnu[1] - Bnu[0]) / dtau_uw;
       break;
     case IRRADIATED:

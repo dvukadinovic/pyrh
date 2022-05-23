@@ -154,11 +154,11 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
   for (j = 0;  j < Nnuclei;  j++) {
     if (nuclei[j]->model != NULL) {
       if (nuclei[j]->model->stage[0] > 0) {
-	sprintf(messageStr,
-		"Model for element %s does not have a neutral stage\n"
-		" needed for molecular formation\n",
-		nuclei[j]->ID);
-	Error(ERROR_LEVEL_2, routineName, messageStr);
+      	sprintf(messageStr,
+      		"Model for element %s does not have a neutral stage\n"
+      		" needed for molecular formation\n",
+      		nuclei[j]->ID);
+      	Error(ERROR_LEVEL_2, routineName, messageStr);
       }
     } else
       Nmaxstage = MAX(Nmaxstage, nuclei[j]->Nstage);
@@ -177,13 +177,14 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
     nucl_index[i] = (int *) malloc(molecule->Nelement * sizeof(int));
     for (j = 0;  j < molecule->Nelement;  j++) {
       for (nu = 0;  nu < Nnuclei;  nu++) {
-	if (nuclei[nu] == &atmos.elements[molecule->pt_index[j]]) {
-	  nucl_index[i][j] = nu;
-	  break;
-	}
+      	if (nuclei[nu] == &atmos.elements[molecule->pt_index[j]]) {
+      	  nucl_index[i][j] = nu;
+      	  break;
+      	}
       }
     }
   }
+
   /* --- Number of equations --                        -------------- */
 
   Nequation = Nnuclei + atmos.Nmolecule;
@@ -209,34 +210,37 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
 
   /* --- Go through spatial grid and solve (local) equations -- ----- */
 
-  for (k = 0;  k < atmos.Nspace;  k++) {
+  int layer = atmos.active_layer;
+  int start=0, end=atmos.Nspace;
+  if (layer!=-1){
+    start = layer;
+    end = start + 1;
+  }
+
+  for (k = start;  k < end;  k++) {
 
     /* --- Collect for each atom the population fraction of
            the neutral stage --                        -------------- */
 
     for (i = 0;  i < Nnuclei;  i++) {
       if ((atom = nuclei[i]->model) == NULL) {
-
-	/* --- If no atomic model is present for this nucleus -- ---- */
-
-	getfjk(nuclei[i], atmos.ne[k], k, fjk, dfjk);
-	fn0[i] = fjk[0];
-	a[i]   = nuclei[i]->abund * atmos.nHtot[k];
+	      /* --- If no atomic model is present for this nucleus -- ---- */
+      	getfjk(nuclei[i], atmos.ne[k], k, fjk, dfjk);
+      	fn0[i] = fjk[0];
+      	a[i]   = nuclei[i]->abund * atmos.nHtot[k];
       } else {
-
-	/* --- Atomic model has been read for this nucleus -- ------- */
-
-	fn0[i] = 0.0;
-	for (j = 0;  j < atom->Nlevel;  j++) {
-	  if (atom->stage[j] > 0) break;
-	  if (atom->active &&
-	      atom->initial_solution != OLD_POPULATIONS)
-	    fn0[i] += atom->nstar[j][k];
-	  else 
-	    fn0[i] += atom->n[j][k];
-	}
-	fn0[i] /= atom->ntotal[k];
-	a[i]    = atom->abundance * atmos.nHtot[k];
+	      /* --- Atomic model has been read for this nucleus -- ------- */
+      	fn0[i] = 0.0;
+      	for (j = 0;  j < atom->Nlevel;  j++) {
+      	  if (atom->stage[j] > 0) break;
+      	  if (atom->active &&
+      	      atom->initial_solution != OLD_POPULATIONS)
+      	    fn0[i] += atom->nstar[j][k];
+      	  else 
+      	    fn0[i] += atom->n[j][k];
+      	}
+      	fn0[i] /= atom->ntotal[k];
+      	a[i]    = atom->abundance * atmos.nHtot[k];
       }
     }
     
@@ -265,9 +269,9 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
     niter = 1;
     while (niter <= NmaxIter) {
       for (i = 0;  i < Nequation;  i++) {
-	f[i] = n[i] - a[i];
-	for (j = 0;  j < Nequation;  j++) df[i][j] = 0.0;
-        df[i][i] = 1.0;
+      	f[i] = n[i] - a[i];
+      	for (j = 0;  j < Nequation;  j++) df[i][j] = 0.0;
+              df[i][i] = 1.0;
       }
       /* --- Add nHminus to the H number conservation equation -- --- */ 
 
@@ -280,16 +284,16 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
       for (i = 0;  i < atmos.Nmolecule;  i++) {
         molecule = &atmos.molecules[i];
         saha = Phi[i];
-	for (j = 0;  j < molecule->Nelement;  j++) {
-	  nu = nucl_index[i][j];
-          saha *= pow(fn0[nu] * n[nu], molecule->pt_count[j]);
+      	for (j = 0;  j < molecule->Nelement;  j++) {
+      	  nu = nucl_index[i][j];
+                saha *= pow(fn0[nu] * n[nu], molecule->pt_count[j]);
 
-	  /* --- Contributions to equation of conservation for the
-                 nuclei in this molecule --            -------------- */
+        	  /* --- Contributions to equation of conservation for the
+                         nuclei in this molecule --            -------------- */
 
-	  f[nu] += molecule->pt_count[j] * n[Nnuclei + i];
-	}
-	/* --- Saha equation for this molecule --      -------------- */
+        	  f[nu] += molecule->pt_count[j] * n[Nnuclei + i];
+	      }
+	      /* --- Saha equation for this molecule --      -------------- */
 
         saha /= pow(atmos.ne[k], molecule->charge);
         f[Nnuclei + i] -= saha;
@@ -297,10 +301,10 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
         /* --- Fill the derivatives matrix --          -------------- */
 
         for (j = 0;  j < molecule->Nelement;  j++) {
-	  nu = nucl_index[i][j];
-          df[nu][Nnuclei + i] += molecule->pt_count[j];
-	  df[Nnuclei + i][nu] = -saha * (molecule->pt_count[j]/n[nu]);
-	}
+      	  nu = nucl_index[i][j];
+                df[nu][Nnuclei + i] += molecule->pt_count[j];
+      	  df[Nnuclei + i][nu] = -saha * (molecule->pt_count[j]/n[nu]);
+	      }
       }
       /* --- Solve linearized equations --             -------------- */
 
@@ -315,10 +319,10 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
 	      (niter == 1) ? "\n" : "", k, niter);
 
       if ((dnmax = MaxChange(Ngn, messageStr, quiet=TRUE)) <= iterLimit)
-	break;
+	      break;
       niter++;
     }
-    if (dnmax > iterLimit) {
+    if (dnmax > iterLimit && atmos.active_layer==-1) {
       sprintf(messageStr, "Iteration not converged:\n"
               " temperature: %6.1f [K], \n"
 	      " density: %9.3E [m^-3],\n dnmax: %9.3E\n",
@@ -329,13 +333,13 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
 
     for (i = 0;  i < Nnuclei;  i++) {
       if ((atom = nuclei[i]->model) != NULL) {
-	fraction = n[i] / atom->ntotal[k];
+	      fraction = n[i] / atom->ntotal[k];
 
-	for (j = 0;  j < atom->Nlevel;  j++) {
-	  atom->nstar[j][k] *= fraction;
-	  if (atom->n != atom->nstar) atom->n[j][k] *= fraction;
-	}
-	atom->ntotal[k] = n[i];
+      	for (j = 0;  j < atom->Nlevel;  j++) {
+      	  atom->nstar[j][k] *= fraction;
+      	  if (atom->n != atom->nstar) atom->n[j][k] *= fraction;
+  	    }
+        atom->ntotal[k] = n[i];
       }
     }
     /* --- Store Hmin density --                       -------------- */

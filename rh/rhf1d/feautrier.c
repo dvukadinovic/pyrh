@@ -88,7 +88,7 @@ double Feautrier(int nspect, int mu, double *chi, double *S,
     break;
   case THERMALIZED:
     r0 = 0.0;
-    Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu);
+    Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu, -1);
     h0 = Bnu[0] - (Bnu[1] - Bnu[0]) / dtau[0];
     break;
   case IRRADIATED:
@@ -115,7 +115,7 @@ double Feautrier(int nspect, int mu, double *chi, double *S,
     break;
   case THERMALIZED:
     rN = 0.0;
-    Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu);
+    Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
     hN = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau[Ndep-2];
     break;
   case IRRADIATED:

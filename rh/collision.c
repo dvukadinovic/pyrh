@@ -498,7 +498,7 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       T = (double *) realloc(T, Nitem*sizeof(double));
       for (n = 0, nitem = 0;  n < Nitem;  n++) {
         if ((pointer = strtok(NULL, " ")) == NULL) break;
-	nitem += sscanf(pointer, "%lf", T+n);
+	      nitem += sscanf(pointer, "%lf", T+n);
       }
     } else if (!strcmp(keyword, "OMEGA") || !strcmp(keyword, "CE") ||
 	       !strcmp(keyword, "CI")    || !strcmp(keyword, "CP") ||
@@ -513,7 +513,7 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
 
       for (n = 0, nitem = 0;  n < Nitem;  n++) {
         if ((pointer = strtok(NULL, " ")) == NULL) break;
-	nitem += sscanf(pointer, "%lf", coeff+n);
+	      nitem += sscanf(pointer, "%lf", coeff+n);
       }
       /* --- Transitions i -> j are stored at index ji, transitions
 	     j -> i are stored under ij. --            -------------- */
@@ -533,7 +533,7 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       
       for (n = 0, nitem = 0;  n < Nitem;  n++) {
         if ((pointer = strtok(NULL, " ")) == NULL) break;
-	nitem += sscanf(pointer, "%lf", coeff+n);
+	      nitem += sscanf(pointer, "%lf", coeff+n);
       }
 
       i  = MIN(i1, i2);
@@ -567,7 +567,7 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       
       for (n = 0, nitem = 0;  n < Nitem;  n++) {
         if ((pointer = strtok(NULL, " ")) == NULL) break;
-	nitem += sscanf(pointer, "%lf", coeff+n);
+	      nitem += sscanf(pointer, "%lf", coeff+n);
       }
       
       i  = MIN(i1, i2);
@@ -590,15 +590,15 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       badi  = matrix_double(Nrow, Ncoef);
 
       for (m = 0, nitem = 0;  m < Nrow;  m++) {
-	status = getLine(fp_atom, COMMENT_CHAR, inputLine,
-			 exit_on_EOF=FALSE);
+      	status = getLine(fp_atom, COMMENT_CHAR, inputLine,
+      			 exit_on_EOF=FALSE);
 
-        badi[m][0] = atof(strtok(inputLine, " "));
-        nitem++;
-	for (n = 1;  n < Ncoef;  n++) {
-	  if ((pointer = strtok(NULL, " ")) == NULL) break;
-	  nitem += sscanf(pointer, "%lf", badi[m]+n);
-	}
+              badi[m][0] = atof(strtok(inputLine, " "));
+              nitem++;
+      	for (n = 1;  n < Ncoef;  n++) {
+      	  if ((pointer = strtok(NULL, " ")) == NULL) break;
+      	  nitem += sscanf(pointer, "%lf", badi[m]+n);
+      	}
       }
 
       i  = MIN(i1, i2);
@@ -627,23 +627,23 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       Nrow = atoi(strtok(NULL, " "));
       
       if (Nrow > MSHELL) {
-	sprintf(messageStr, "Nrow: %i greater than mshell %i",
-		Nrow, MSHELL);
-	Error(ERROR_LEVEL_2, routineName, messageStr);
+      	sprintf(messageStr, "Nrow: %i greater than mshell %i",
+      		Nrow, MSHELL);
+      	Error(ERROR_LEVEL_2, routineName, messageStr);
       }
 
       Nitem = Nrow * MSHELL;
       cdi = matrix_double(Nrow, MSHELL);
       
       for (m = 0, nitem = 0;  m < Nrow;  m++) {
-	status = getLine(fp_atom, COMMENT_CHAR, inputLine, exit_on_EOF=FALSE);
-	
-        cdi[m][0] = atof(strtok(inputLine, " "));
-        nitem++;
-	for (n = 1;  n < MSHELL;  n++) {
-	  if ((pointer = strtok(NULL, " ")) == NULL) break;
-	  nitem += sscanf(pointer, "%lf", cdi[m]+n);
-	}
+      	status = getLine(fp_atom, COMMENT_CHAR, inputLine, exit_on_EOF=FALSE);
+      	
+              cdi[m][0] = atof(strtok(inputLine, " "));
+              nitem++;
+      	for (n = 1;  n < MSHELL;  n++) {
+      	  if ((pointer = strtok(NULL, " ")) == NULL) break;
+      	  nitem += sscanf(pointer, "%lf", cdi[m]+n);
+      	}
       }
 
       i  = MIN(i1, i2);
@@ -669,15 +669,15 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
            locations. Linear if only 2 interpolation points given - - */
 
     if (!strcmp(keyword, "OMEGA") || !strcmp(keyword, "CE") ||
-	!strcmp(keyword, "CI")    || !strcmp(keyword, "CP") ||
-	!strcmp(keyword, "CH0")   || !strcmp(keyword, "CH+")||
-	!strcmp(keyword, "CH") ) {
+      	!strcmp(keyword, "CI")    || !strcmp(keyword, "CP") ||
+      	!strcmp(keyword, "CH0")   || !strcmp(keyword, "CH+")||
+      	!strcmp(keyword, "CH") ) {
 
       if (Nitem > 2) {
-	splineCoef(Nitem, T, coeff);
-	splineEval(Nspace, atmos.T, C, hunt=TRUE);
+      	splineCoef(Nitem, T, coeff);
+      	splineEval(Nspace, atmos.T, C, hunt=TRUE);
       } else
-	Linear(Nitem, T, coeff, Nspace, atmos.T, C, hunt=TRUE);
+	       Linear(Nitem, T, coeff, Nspace, atmos.T, C, hunt=TRUE);
     }
 
     if (!strcmp(keyword, "OMEGA")) {
@@ -687,8 +687,8 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       for (k = 0;  k < Nspace;  k++) {
         Cdown = C0 * atmos.ne[k] * C[k] /
                                  (atom->g[j] * sqrt(atmos.T[k]));
-	atom->C[ij][k] += Cdown;
-	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
+      	atom->C[ij][k] += Cdown;
+      	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
       }
     } else if (!strcmp(keyword, "CE")) {      
 
@@ -697,8 +697,8 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       gij = atom->g[i] / atom->g[j];
       for (k = 0;  k < Nspace;  k++) {
         Cdown = C[k] * atmos.ne[k] * gij * sqrt(atmos.T[k]);
-	atom->C[ij][k] += Cdown;
-	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
+      	atom->C[ij][k] += Cdown;
+      	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
       }
     } else if (!strcmp(keyword, "CI")) {      
 
@@ -707,9 +707,9 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       dE = atom->E[j] - atom->E[i];
       for (k = 0;  k < Nspace;  k++) {
         Cup = C[k] * atmos.ne[k] *
-	  exp(-dE/(KBOLTZMANN*atmos.T[k])) * sqrt(atmos.T[k]);
-	atom->C[ji][k] += Cup;
-	atom->C[ij][k] += Cup * atom->nstar[i][k]/atom->nstar[j][k];
+      	  exp(-dE/(KBOLTZMANN*atmos.T[k])) * sqrt(atmos.T[k]);
+      	atom->C[ji][k] += Cup;
+      	atom->C[ij][k] += Cup * atom->nstar[i][k]/atom->nstar[j][k];
       }
     } else if (!strcmp(keyword, "CP")) {
 
@@ -718,8 +718,8 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       np = atmos.H->n[atmos.H->Nlevel-1];
       for (k = 0;  k < Nspace;  k++) {
         Cdown = np[k] * C[k];
-	atom->C[ij][k] += Cdown;
-	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
+      	atom->C[ij][k] += Cdown;
+      	atom->C[ji][k] += Cdown * atom->nstar[j][k]/atom->nstar[i][k];
       }
     } else if (!strcmp(keyword, "CH")) {
 
@@ -727,15 +727,15 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
 
       for (k = 0;  k < Nspace;  k++) {
         Cup = atmos.H->n[0][k] * C[k];
-	atom->C[ji][k] += Cup;
-	atom->C[ij][k] += Cup * atom->nstar[i][k]/atom->nstar[j][k];
+      	atom->C[ji][k] += Cup;
+      	atom->C[ij][k] += Cup * atom->nstar[i][k]/atom->nstar[j][k];
       }
     } else if (!strcmp(keyword, "CH0")) {
 
       /* --- Charge exchange with neutral hydrogen --  -------------- */
 
       for (k = 0;  k < Nspace;  k++)
-	atom->C[ij][k] += atmos.H->n[0][k] * C[k];
+	      atom->C[ij][k] += atmos.H->n[0][k] * C[k];
 
     } else if (!strcmp(keyword, "CH+")) {
 
@@ -743,7 +743,7 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
 
       np = atmos.H->n[atmos.H->Nlevel-1];
       for (k = 0;  k < Nspace;  k++)
-	atom->C[ji][k] += np[k] * C[k];
+	      atom->C[ji][k] += np[k] * C[k];
 
     } else if (!strcmp(keyword, "SHULL82")) {
       
@@ -757,29 +757,28 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       t1sh   = coeff[7];
       
       for (k = 0;  k < Nspace;  k++) {
+      	summrs = sumscl * summers(i, j, atmos.ne[k], atom) +
+      	  (1.0 - sumscl);
+      	tg = atmos.T[k];
+      	
+      	cdn = aradsh * pow(tg/1.E4, -xradsh) +
+      	  summrs * adish /tg/sqrt(tg) * exp(-t0sh/tg) * 
+      	  (1.0 + bdish * (exp(-t1sh/tg)));
+      	
+      	cup = acolsh * sqrt(tg) * exp( -tcolsh / tg) / 
+      	  (1.0 + 0.1 * tg / tcolsh);
+      	
+      	/* --- Convert coefficient from cm^3 s^-1 to m^3 s^-1 -- ---- */
 
-	summrs = sumscl * summers(i, j, atmos.ne[k], atom) +
-	  (1.0 - sumscl);
-	tg = atmos.T[k];
-	
-	cdn = aradsh * pow(tg/1.E4, -xradsh) +
-	  summrs * adish /tg/sqrt(tg) * exp(-t0sh/tg) * 
-	  (1.0 + bdish * (exp(-t1sh/tg)));
-	
-	cup = acolsh * sqrt(tg) * exp( -tcolsh / tg) / 
-	  (1.0 + 0.1 * tg / tcolsh);
-	
-	/* --- Convert coefficient from cm^3 s^-1 to m^3 s^-1 -- ---- */
+      	cdn *= atmos.ne[k] * CUBE(CM_TO_M);
+      	cup *= atmos.ne[k] * CUBE(CM_TO_M);
 
-	cdn *= atmos.ne[k] * CUBE(CM_TO_M);
-	cup *= atmos.ne[k] * CUBE(CM_TO_M);
+      	/* --- 3-body recombination (high density limit) -- -------- */
 
-	/* --- 3-body recombination (high density limit) -- -------- */
-
-	cdn += cup * atom->nstar[i][k] / atom->nstar[j][k];
-	
-	atom->C[ij][k] += cdn;
-	atom->C[ji][k] += cup;
+      	cdn += cup * atom->nstar[i][k] / atom->nstar[j][k];
+      	
+      	atom->C[ij][k] += cdn;
+      	atom->C[ji][k] += cup;
       }
     } else if (!strcmp(keyword, "BADNELL")) {
 
@@ -792,26 +791,26 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
              --                                        -------------- */
 
       for (k = 0;  k < Nspace;  k++) {
-	summrs = sumscl*summers(i, j, atmos.ne[k], atom) + (1.0-sumscl);
-	tg = atmos.T[k];
+      	summrs = sumscl*summers(i, j, atmos.ne[k], atom) + (1.0-sumscl);
+      	tg = atmos.T[k];
 
-      	cdn = 0.0;
-	for (ii=0;  ii < Ncoef;  ii++) {
-	  cdn += badi[1][ii] * exp(-badi[0][ii] / tg);
-	}
-	cdn *= pow(tg, -1.5) ;
+            	cdn = 0.0;
+      	for (ii=0;  ii < Ncoef;  ii++) {
+      	  cdn += badi[1][ii] * exp(-badi[0][ii] / tg);
+      	}
+      	cdn *= pow(tg, -1.5) ;
 
-	/* --- Convert coefficient from cm^3 s^-1 to m^3 s^-1 -- ---- */
+      	/* --- Convert coefficient from cm^3 s^-1 to m^3 s^-1 -- ---- */
 
-	cdn *= atmos.ne[k] * summrs * CUBE(CM_TO_M);
-	cup  = cdn * atom->nstar[j][k]/atom->nstar[i][k];
+      	cdn *= atmos.ne[k] * summrs * CUBE(CM_TO_M);
+      	cup  = cdn * atom->nstar[j][k]/atom->nstar[i][k];
 
-	/* --- 3-body recombination (high density limit) -- --------- */
+      	/* --- 3-body recombination (high density limit) -- --------- */
 
-	cdn += cup * atom->nstar[i][k] / atom->nstar[j][k];
-	
-	atom->C[ij][k] += cdn;
-	atom->C[ji][k] += cup;
+      	cdn += cup * atom->nstar[i][k] / atom->nstar[j][k];
+      	
+      	atom->C[ij][k] += cdn;
+      	atom->C[ji][k] += cup;
       }
       freeMatrix((void **) badi);
 
@@ -820,29 +819,28 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       /* --- Direct collionisional ionization --       -------------- */
 
       for (k = 0;  k < Nspace;  k++) {	
-	cup = 0.0;
-	tg  = atmos.T[k];
-	
-	for (m = 0;  m < Nrow;  m++) {
-	  
-	  xj  = cdi[m][0] * EV / (KBOLTZMANN * tg);
-	  fac = exp(-xj) * sqrt(xj);
-	  
-	  fxj = cdi[m][1] + cdi[m][2] * (1.0+xj) + 
-	    (cdi[m][3] -xj*(cdi[m][1]+cdi[m][2]*(2.0+xj)))*fone(xj) + 
-	    cdi[m][4]*xj*ftwo(xj);
-	  
-	  fxj = fxj * fac;
-	  fac = 6.69E-7 / pow(cdi[m][0], 1.5);
-	  cup += fac * fxj * CUBE(CM_TO_M);
-	}
-	if (cup < 0) cup = 0.0;
+      	cup = 0.0;
+      	tg  = atmos.T[k];
+      	
+      	for (m = 0;  m < Nrow;  m++) {
+      	  xj  = cdi[m][0] * EV / (KBOLTZMANN * tg);
+      	  fac = exp(-xj) * sqrt(xj);
+      	  
+      	  fxj = cdi[m][1] + cdi[m][2] * (1.0+xj) + 
+      	    (cdi[m][3] -xj*(cdi[m][1]+cdi[m][2]*(2.0+xj)))*fone(xj) + 
+      	    cdi[m][4]*xj*ftwo(xj);
+      	  
+      	  fxj = fxj * fac;
+      	  fac = 6.69E-7 / pow(cdi[m][0], 1.5);
+      	  cup += fac * fxj * CUBE(CM_TO_M);
+      	}
+      	if (cup < 0) cup = 0.0;
 
-	cup *= atmos.ne[k];
-	cdn = cup * atom->nstar[i][k]/atom->nstar[j][k];	  
-	
-	atom->C[ij][k] += cdn;
-	atom->C[ji][k] += cup;
+      	cup *= atmos.ne[k];
+      	cdn = cup * atom->nstar[i][k]/atom->nstar[j][k];	  
+      	
+      	atom->C[ij][k] += cdn;
+      	atom->C[ji][k] += cup;
       }
       freeMatrix((void **) cdi);
 
@@ -851,9 +849,9 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       /* --- Autoionization --                         -------------- */
 
       for (k = 0;  k < Nspace;  k++) {
-	fac = ar85cea(i, j, k, atom);
-	cup = coeff[0]*fac*atmos.ne[k];
-	atom->C[ji][k] += cup;
+      	fac = ar85cea(i, j, k, atom);
+      	cup = coeff[0]*fac*atmos.ne[k];
+      	atom->C[ji][k] += cup;
       }	  
       
     } else if (!strcmp(keyword, "AR85-CHP")) {
@@ -868,14 +866,14 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       ar85d  = coeff[5];
       
       for (k = 0;  k < Nspace;  k++) {
-	if (atmos.T[k] >= ar85t1  &&  atmos.T[k] <= ar85t2) {
+      	if (atmos.T[k] >= ar85t1  &&  atmos.T[k] <= ar85t2) {
 
-	  t4 = atmos.T[k] / 1.0E4;
-	  cup = ar85a * 1e-9 * pow(t4,ar85b) * exp(-ar85c*t4) *
-	    exp(-ar85d*EV/KBOLTZMANN/atmos.T[k])*atmos.H->n[5][k] *
-	    CUBE(CM_TO_M);
-	  atom->C[ji][k] += cup;
-	}
+      	  t4 = atmos.T[k] / 1.0E4;
+      	  cup = ar85a * 1e-9 * pow(t4,ar85b) * exp(-ar85c*t4) *
+      	    exp(-ar85d*EV/KBOLTZMANN/atmos.T[k])*atmos.H->n[5][k] *
+      	    CUBE(CM_TO_M);
+      	  atom->C[ji][k] += cup;
+      	}
       }
   } else if (!strcmp(keyword, "AR85-CHH")) {
       
@@ -889,15 +887,15 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       ar85d  = coeff[5];
       
       for (k = 0;  k < Nspace;  k++) {	
-	if (atmos.T[k] >= ar85t1  &&  atmos.T[k] <= ar85t2) {
+      	if (atmos.T[k] >= ar85t1  &&  atmos.T[k] <= ar85t2) {
 
-	  t4  = atmos.T[k] / 1.0E4;
-	  cdn = ar85a * 1E-9 * pow(t4, ar85b) * 
-	    (1.0 + ar85c*exp(ar85d * t4)) * 
-	    atmos.H->n[0][k] * CUBE(CM_TO_M);
+      	  t4  = atmos.T[k] / 1.0E4;
+      	  cdn = ar85a * 1E-9 * pow(t4, ar85b) * 
+      	    (1.0 + ar85c*exp(ar85d * t4)) * 
+      	    atmos.H->n[0][k] * CUBE(CM_TO_M);
 
-	  atom->C[ij][k] += cdn;
-	}
+      	  atom->C[ij][k] += cdn;
+      	}
       }
     } else if (!strcmp(keyword, "BURGESS")) {
       
@@ -911,21 +909,21 @@ void CollisionRate(struct Atom *atom, FILE *fp_atom)
       cbar = 2.3;
       
       for (k = 0;  k < Nspace;  k++) {
-	dekt  = de * EV / (KBOLTZMANN * atmos.T[k]);
-	dekt  = MIN(500, dekt);
-	dekti = 1.0 / dekt;
-        wlog  = log(1.0 + dekti);
-	wb    = pow(wlog, betab / (1.0 + dekti));
-	cup   = 2.1715E-8 * cbar * pow(13.6/de, 1.5) * sqrt(dekt) *
-          E1(dekt) * wb * atmos.ne[k] * CUBE(CM_TO_M);
-	
-        /* --- Add fudge factor --                     -------------- */
+      	dekt  = de * EV / (KBOLTZMANN * atmos.T[k]);
+      	dekt  = MIN(500, dekt);
+      	dekti = 1.0 / dekt;
+              wlog  = log(1.0 + dekti);
+      	wb    = pow(wlog, betab / (1.0 + dekti));
+      	cup   = 2.1715E-8 * cbar * pow(13.6/de, 1.5) * sqrt(dekt) *
+                E1(dekt) * wb * atmos.ne[k] * CUBE(CM_TO_M);
+      	
+              /* --- Add fudge factor --                     -------------- */
 
-	cup *= coeff[0];
-	cdn = cup * atom->nstar[i][k]/atom->nstar[j][k];
-	
-	atom->C[ji][k] += cup;
-	atom->C[ij][k] += cdn;
+      	cup *= coeff[0];
+      	cdn = cup * atom->nstar[i][k]/atom->nstar[j][k];
+      	
+      	atom->C[ji][k] += cup;
+      	atom->C[ij][k] += cdn;
       }
     }
   }

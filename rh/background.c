@@ -331,7 +331,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
 
     /* --- The Planck function at this wavelength --   -------------- */
 
-    Planck(atmos.Nspace, atmos.T, wavelength, Bnu);
+    Planck(atmos.Nspace, atmos.T, wavelength, Bnu, -1);
 
     /* --- Initialize the flags for this wavelength -- -------------- */
 

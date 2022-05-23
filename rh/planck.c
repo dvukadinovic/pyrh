@@ -21,6 +21,7 @@
 
 #include "rh.h"
 #include "atom.h"
+#include "atmos.h"
 #include "spectrum.h"
 #include "constant.h"
 
@@ -32,10 +33,9 @@
 
 /* --- Global variables --                             -------------- */
 
-
 /* ------- begin -------------------------- Planck.c ---------------- */
 
-void Planck(int Nspace, double *T, double lambda, double *Bnu)
+void Planck(int Nspace, double *T, double lambda, double *Bnu, int active_layer)
 {
   register int k;
 
@@ -43,6 +43,15 @@ void Planck(int Nspace, double *T, double lambda, double *Bnu)
 
   hc_kla     = (HPLANCK * CLIGHT) / (KBOLTZMANN * NM_TO_M * lambda);
   twohnu3_c2 = (2.0*HPLANCK*CLIGHT) / CUBE(NM_TO_M * lambda);
+
+  if (active_layer!=-1){
+    hc_Tkla = hc_kla/T[active_layer];
+    if (hc_Tkla <= MAX_EXPONENT)
+      Bnu[0] = twohnu3_c2 / (exp(hc_Tkla) - 1.0);
+    else
+      Bnu[0] = 0.0;
+    return;
+  }
 
   for (k = 0;  k < Nspace;  k++) {
     hc_Tkla = hc_kla/T[k];

@@ -93,7 +93,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       for (n = 0;  n < 4;  n++) I_upw[n] = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
       I_upw[0] = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau_uw;
       for (n = 1;  n < 4;  n++) I_upw[n] = 0.0;
       break;
@@ -348,7 +348,7 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       I_upw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
       I_upw = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau_uw;
       break;
     case IRRADIATED:
@@ -365,7 +365,7 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       I_upw = 0.0;
       break;
     case THERMALIZED:
-      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu);
+      Planck(2, &atmos.T[0], spectrum.lambda[nspect], Bnu, -1);
       I_upw = Bnu[0] - (Bnu[1] - Bnu[0]) / dtau_uw;
       break;
     case IRRADIATED:
