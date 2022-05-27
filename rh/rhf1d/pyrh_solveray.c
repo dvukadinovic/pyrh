@@ -136,24 +136,30 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
 
   solveSpectrum(FALSE, FALSE);
   
-  spec->nlw = spectrum.Nspect;
-  spec->Nrays = atmos.Nrays;
-  spec->lam = spectrum.lambda;
-  spec->sI = spectrum.I[0];
-
-  if (atmos.Stokes)
-  {
-    spec->sQ = spectrum.Stokes_Q[0];
-    spec->sU = spectrum.Stokes_U[0];
-    spec->sV = spectrum.Stokes_V[0];
-    spec->stokes = 1;
+  spec->sQ = NULL;
+  spec->sU = NULL;
+  spec->sV = NULL;
+  spec->J = NULL;
+  spec->J20 = NULL;
+  
+  spec->stokes = 0;
+  spec->lam = (double *) malloc(spec->nlw * sizeof(double));
+  spec->sI = (double *) malloc(spec->nlw * sizeof(double));
+  spec->sQ = (double *) malloc(spec->nlw * sizeof(double));
+  spec->sU = (double *) malloc(spec->nlw * sizeof(double));
+  spec->sV = (double *) malloc(spec->nlw * sizeof(double));
+  int index;
+  
+  for (int idl=0; idl<spec->nlw; idl++){
+    index = spectrum.wave_inds[idl];
+    spec->lam[idl] = spectrum.lambda[index];
+    spec->sI[idl] = spectrum.I[index][0];
+    if (atmos.Stokes){
+      spec->sQ[idl] = spectrum.Stokes_Q[index][0];
+      spec->sU[idl] = spectrum.Stokes_U[index][0];
+      spec->sV[idl] = spectrum.Stokes_V[index][0];
+      spec->stokes = 1;
+    }
   }
-  else
-  {
-    spec->sQ = NULL;
-    spec->sU = NULL;
-    spec->sV = NULL;
-    spec->stokes = 0;
-  }
-  spec->J = spectrum.J;
+  // spec->J = spectrum.J;
 }

@@ -39,8 +39,8 @@ extern char messageStr[];
 
 /* ------- begin -------------------------- SortLambda.c ------------ */
 
-// void SortLambda(double* wavetable, int Nwave)
-void SortLambda()
+void SortLambda(double* wavetable, int Nwave)
+// void SortLambda()
 {
   const char routineName[] = "SortLambda";
   register int kr, n, m, nspect, la, nact;
@@ -56,9 +56,9 @@ void SortLambda()
   MolecularLine *mrt;
   XDR    xdrs;
   
-  int Nwave;
-  double* wavetable;
-  FILE  *fp_wavetable;
+  // int Nwave;
+  // double* wavetable;
+  // FILE  *fp_wavetable;
 
   getCPU(2, TIME_START, NULL);
 
@@ -66,27 +66,27 @@ void SortLambda()
 
   result = TRUE;
 
-  if (strcmp(input.wavetable_input, "none")) {
-    if ((fp_wavetable = fopen(input.wavetable_input, "r")) == NULL) {
-      sprintf(messageStr, "Unable to open input file %s",
-        input.wavetable_input);
-      Error(ERROR_LEVEL_2, routineName, messageStr);
-    }
-    xdrstdio_create(&xdrs, fp_wavetable, XDR_DECODE);
+  // if (strcmp(input.wavetable_input, "none")) {
+  //   if ((fp_wavetable = fopen(input.wavetable_input, "r")) == NULL) {
+  //     sprintf(messageStr, "Unable to open input file %s",
+  //       input.wavetable_input);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   xdrstdio_create(&xdrs, fp_wavetable, XDR_DECODE);
 
-    result &= xdr_int(&xdrs, &Nwave);
-    wavetable = (double *) malloc(Nwave * sizeof(double));
-    result &= xdr_vector(&xdrs, (char *) wavetable, Nwave,
-       sizeof(double), (xdrproc_t) xdr_double);
-    if (!result) {
-      sprintf(messageStr, "Unable to read from input file %s",
-        input.wavetable_input);
-      Error(ERROR_LEVEL_2, routineName, messageStr);
-    }
-    xdr_destroy(&xdrs);
-    fclose(fp_wavetable);
-  } else
-    Nwave = 0;
+  //   result &= xdr_int(&xdrs, &Nwave);
+  //   wavetable = (double *) malloc(Nwave * sizeof(double));
+  //   result &= xdr_vector(&xdrs, (char *) wavetable, Nwave,
+  //      sizeof(double), (xdrproc_t) xdr_double);
+  //   if (!result) {
+  //     sprintf(messageStr, "Unable to read from input file %s",
+  //       input.wavetable_input);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   xdr_destroy(&xdrs);
+  //   fclose(fp_wavetable);
+  // } else
+  //   Nwave = 0;
 
   /* --- Add reference wavelength if necessary --      -------------- */
 
@@ -100,9 +100,9 @@ void SortLambda()
     atom = &atmos.atoms[n];
     if (atom->active) {
       for (kr = 0;  kr < atom->Ncont;  kr++)
-	Nspectrum += atom->continuum[kr].Nlambda;
+	      Nspectrum += atom->continuum[kr].Nlambda;
       for (kr = 0;  kr < atom->Nline;  kr++)
-	Nspectrum += atom->line[kr].Nlambda;
+	      Nspectrum += atom->line[kr].Nlambda;
 
       atom->activeindex = atmos.Nactiveatom;
       atmos.Nactiveatom++;
@@ -117,7 +117,7 @@ void SortLambda()
     for (n = 0;  n < atmos.Natom;  n++) {
       atom = &atmos.atoms[n];
       if (atom->active)
-	atmos.activeatoms[atom->activeindex] = atom;
+	      atmos.activeatoms[atom->activeindex] = atom;
     }
   } else
     atmos.activeatoms = NULL;
@@ -129,7 +129,7 @@ void SortLambda()
     molecule = &atmos.molecules[n];
     if (molecule->active) {
       for (kr = 0;  kr < molecule->Nrt;  kr++)
-      Nspectrum += molecule->mrt[kr].Nlambda;
+        Nspectrum += molecule->mrt[kr].Nlambda;
 
       molecule->activeindex = atmos.Nactivemol;
       atmos.Nactivemol++;
@@ -144,7 +144,7 @@ void SortLambda()
     for (n = 0;  n < atmos.Nmolecule;  n++) {
       molecule = &atmos.molecules[n];
       if (molecule->active)
-	atmos.activemols[molecule->activeindex] = molecule;
+	      atmos.activemols[molecule->activeindex] = molecule;
     }
   } else
     atmos.activemols = NULL;
@@ -173,12 +173,12 @@ void SortLambda()
     for (kr = 0;  kr < atom->Ncont;  kr++) {
       continuum = &atom->continuum[kr];
       for (la = 0;  la < continuum->Nlambda;  la++)
-	spectrum.lambda[nspect++] = continuum->lambda[la];
+	      spectrum.lambda[nspect++] = continuum->lambda[la];
     }
     for (kr = 0;  kr < atom->Nline;  kr++) {
       line = &atom->line[kr];
       for (la = 0;  la < line->Nlambda;  la++)
-	spectrum.lambda[nspect++] = line->lambda[la];
+        spectrum.lambda[nspect++] = line->lambda[la];
       
       if (line->PRD) atmos.NPRDactive++;
     }
@@ -190,7 +190,7 @@ void SortLambda()
     for (kr = 0;  kr < molecule->Nrt;  kr++) {
       mrt = &molecule->mrt[kr];
       for (la = 0;  la < mrt->Nlambda;  la++)
-	spectrum.lambda[nspect++] = mrt->lambda[la];
+        spectrum.lambda[nspect++] = mrt->lambda[la];
     }
   }
   /* --- Sort the wavelengths in ascending order --    -------------- */
@@ -241,6 +241,21 @@ void SortLambda()
   for (nspect=0; nspect < spectrum.Nspect; nspect++)
     spectrum.sca_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
 
+
+  /* --- Get the input wavelengts indices after sorting --- */
+  spectrum.wave_inds = (int *) malloc(Nwave * sizeof(int));
+  int last_index = 0;
+
+  for (int idl=0; idl < Nwave; idl++) {
+    for (nspect=last_index; nspect < spectrum.Nspect; nspect++) {
+      if (spectrum.lambda[nspect]==wavetable[idl]) {
+        spectrum.wave_inds[idl] = nspect;
+        last_index = nspect;
+        break;
+      }
+    }
+  }
+
   /* --- Go through each established wavelength and gather active
          transitions --                                -------------- */
 
@@ -253,14 +268,14 @@ void SortLambda()
  
     if (atmos.Nactiveatom > 0) {
       as->Nactiveatomrt =
-	(int *) malloc(atmos.Nactiveatom * sizeof(int));
+	      (int *) malloc(atmos.Nactiveatom * sizeof(int));
       as->art = (AtomicTransition **)
-	malloc(atmos.Nactiveatom * sizeof(AtomicTransition *));
+	      malloc(atmos.Nactiveatom * sizeof(AtomicTransition *));
 
       for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
-	as->Nactiveatomrt[nact] = 0;
-	as->art[nact] = (AtomicTransition *)
-	  malloc(N_MAX_OVERLAP * sizeof(AtomicTransition));
+      	as->Nactiveatomrt[nact] = 0;
+      	as->art[nact] = (AtomicTransition *)
+      	  malloc(N_MAX_OVERLAP * sizeof(AtomicTransition));
       }
     } else {
       as->Nactiveatomrt = NULL;

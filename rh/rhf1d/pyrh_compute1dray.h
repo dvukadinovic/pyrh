@@ -3,7 +3,7 @@
 
 typedef struct{
 	int nlw, Nrays, stokes;
-	double *lam, **sI, **sQ, **sU, **sV;
+	double *lam, *sI, *sQ, *sU, *sV;
 	double **J, **J20;
 } mySpectrum;
 
@@ -16,6 +16,7 @@ mySpectrum rhf1d(int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
               double *rh_mag, double *rh_gamma, double *rh_chi,
               double *rh_nH, int atm_scale, 
+              int Nwave, double *lam,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values);

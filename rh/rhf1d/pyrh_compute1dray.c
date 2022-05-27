@@ -88,6 +88,7 @@ mySpectrum rhf1d(int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
+              int Nwave, double *lam,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values)
@@ -220,8 +221,8 @@ mySpectrum rhf1d(int pyrh_Ndep,
   
   readAtomicModels();
   readMolecularModels();
-  // SortLambda(wavetable, Nwave);
-  SortLambda();
+  SortLambda(lam, Nwave);
+  // SortLambda();
 
   getBoundary(&geometry);
   
@@ -262,6 +263,8 @@ mySpectrum rhf1d(int pyrh_Ndep,
   printTotalCPU();
 
   mySpectrum spec;
+  spec.nlw = Nwave;
+  spec.Nrays = atmos.Nrays;
   _solveray(argv, 1.0, &spec, spectrum.J, spectrum.J20);
 
   return spec;

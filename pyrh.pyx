@@ -85,19 +85,20 @@ cdef class RH:
 		# self.Nrlk = 0
 		# self.Nwave = 0
 
-	# @cython.boundscheck(False)
-	# @cython.wraparound(False)
-	# cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
-	# 	self.wavetable = wave
-	# 	cdef Py_ssize_t i
-	# 	cdef double sigma_sq
-	# 	cdef double fact
-	# 	self.Nwave = self.wavetable.size
-	# 	for i in range(self.Nwave):
-	# 		if self.wavetable[i]>199.9352:
-	# 			sigma_sq = (1.0e7/self.wavetable[i])*(1.0e7/self.wavetable[i])
-	# 			fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
-	# 			self.wavetable[i] = self.wavetable[i] * fact
+	@cython.boundscheck(False)
+	@cython.wraparound(False)
+	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
+		cdef Py_ssize_t i
+		cdef double sigma_sq
+		cdef double fact
+		cdef Py_ssize_t Nwave = wave.size
+		for i in range(Nwave):
+			if wave[i]>199.9352:
+				sigma_sq = (1.0e7/wave[i])*(1.0e7/wave[i])
+				fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
+				wave[i] = wave[i] * fact
+
+		return wave
 
 	cpdef dummy(self):
 		rh.dummy()
@@ -145,6 +146,7 @@ cdef class RH:
 				cnp.ndarray[double, ndim=1, mode="c"] gamma,
 				cnp.ndarray[double, ndim=1, mode="c"] chi,
 				cnp.ndarray[double, ndim=2, mode="c"] nH,
+				cnp.ndarray[double, ndim=1, mode="c"] wave,
 				do_fudge,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge,
@@ -154,6 +156,7 @@ cdef class RH:
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values):
 		cdef int Ndep = scale.shape[0]
 		cdef int fudge_num = fudge_lam.shape[0]
+		cdef int Nwave = wave.shape[0]
 		
 		cdef int Nloggf = loggf_ids.shape[0]
 		if (Nloggf!=loggf_values.shape[0]):
@@ -169,6 +172,7 @@ cdef class RH:
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale,
+				 Nwave, &wave[0],
 				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
 				 Nloggf, &loggf_ids[0], &loggf_values[0],
 				 Nlam, &lam_ids[0], &lam_values[0])
@@ -181,10 +185,11 @@ cdef class RH:
 			sQ = convert_1d(spec.sQ, spec.nlw)
 			sU = convert_1d(spec.sU, spec.nlw)
 			sV = convert_1d(spec.sV, spec.nlw)
-		J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-		Nlam = len(lam)
-		return Spectrum(spec.nlw-1, lam[:Nlam-1], sI[:Nlam-1], sQ[:Nlam-1], sU[:Nlam-1], sV[:Nlam-1], J, None, spec.stokes)
+		# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
+
+		# Nlam = len(lam)
+		return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, None, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)

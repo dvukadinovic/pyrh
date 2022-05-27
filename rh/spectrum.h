@@ -44,6 +44,7 @@ typedef struct {
   ActiveSet *as;
   // background opacities/emissivities per wavelength (D.Vukadinovic)
   double  **chi_c_lam, **eta_c_lam, **sca_c_lam, **chip_c_lam;
+  int *wave_inds;
 } Spectrum;
 
 
