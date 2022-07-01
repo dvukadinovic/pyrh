@@ -100,7 +100,7 @@ myPops hse(int pyrh_Ndep,
   // we want only to have reference wavelength
   // (but we will still have those from active atoms...)
   // input.wavetable_input = "none";
-  strcpy(input.wavetable_input, "none");
+  // strcpy(input.wavetable_input, "none");
   // input.kurucz_list = "none";
 
   /* --- Read input data for atmosphere --             -------------- */
@@ -200,7 +200,10 @@ myPops hse(int pyrh_Ndep,
 
   readAtomicModels();
   readMolecularModels();
-  SortLambda();
+  double* wavetable = (double *) malloc(1 * sizeof(double));
+  wavetable[0] = 500.00;
+  int Nwav = 1;
+  SortLambda(wavetable, Nwav);
   getBoundary(&geometry);
 
   myPops pops;
