@@ -5,3 +5,4 @@ pyrh.c
 tools.c
 /*.html
 *.o
+pyrh.html

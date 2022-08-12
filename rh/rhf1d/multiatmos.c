@@ -154,11 +154,13 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
   case TAU500:
     height[0] = 0.0;
     cmass[0]  = (tau_ref[0] / as->chi_c[0]) * rho[0];
+    // printf("%e | %e | %e\n", as->chi_c[0], height[0], cmass[0]);
     for (k = 1;  k < Ndep;  k++) {
           height[k] = height[k-1] - 2.0 * (tau_ref[k] - tau_ref[k-1]) / 
     	(as->chi_c[k-1] + as->chi_c[k]);
           cmass[k]  = cmass[k-1]  + 0.5*(rho[k-1] + rho[k]) *
     	(height[k-1] - height[k]);
+          // printf("%e | %e | %e\n", as->chi_c[k], height[k], cmass[k]);
     }
     break;
   case GEOMETRIC:

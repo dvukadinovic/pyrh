@@ -70,12 +70,14 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 cdef extern from "rh/rhf1d/pyrh_hse.h":
 	ctypedef struct myPops:
 		double *ne
+		double *nHtot
 		double **nH
+		double *rho
 
 	cdef myPops hse(int Ndep,
 					double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 					double *rh_mag, double *rh_gamma, double *rh_chi,
-					double *rh_nH, int atm_scale,
+					double *rh_nH, double *rh_nHtot, int atm_scale,
 					int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
 
 	cdef void dummy()

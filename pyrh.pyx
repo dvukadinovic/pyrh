@@ -116,6 +116,7 @@ cdef class RH:
 			  cnp.ndarray[double, ndim=1, mode="c"] gamma,
 			  cnp.ndarray[double, ndim=1, mode="c"] chi,
 			  cnp.ndarray[double, ndim=2, mode="c"] nH,
+			  cnp.ndarray[double, ndim=1, mode="c"] nHtot,
 			  int do_fudge,
 			  cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 			  cnp.ndarray[double, ndim=2, mode="c"] fudge):
@@ -125,13 +126,15 @@ cdef class RH:
 		myPops = rh.hse(Ndep,
 					 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 					 &mag[0], &gamma[0], &chi[0],
-					 &nH[0,0], atm_scale,
+					 &nH[0,0], &nHtot[0], atm_scale,
 					 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
 
 		ne = convert_1d(myPops.ne, Ndep)
+		nHtot = convert_1d(myPops.nHtot, Ndep)
 		nH = convert_2d(myPops.nH, 6, Ndep)
+		rho = convert_1d(myPops.rho, Ndep)
 
-		return ne, nH
+		return ne, nH, nHtot, rho
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)

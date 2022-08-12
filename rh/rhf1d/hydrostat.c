@@ -116,14 +116,14 @@ void Hydrostatic(int NmaxIter, double iterLimit)
     while (niter <= NmaxIter) {
 
       for (n = 0;  n < Nhse;  n++) {
-	f[n] = 0.0;
-	for (m = 0;  m < Nhse;  m++) dfdn[n][m] = 0.0;
+      	f[n] = 0.0;
+      	for (m = 0;  m < Nhse;  m++) dfdn[n][m] = 0.0;
       }
       /* --- Row for mass conservation --              -------------- */
 
       for (m = 0;  m < Nhse-1;  m++) {
-	f[0] += n_k[m];
-	dfdn[0][m] = 1.0;
+      	f[0] += n_k[m];
+      	dfdn[0][m] = 1.0;
       }
       f[0] += beta * n_k[Nhse-1];
       dfdn[0][Nhse-1] = beta;
@@ -145,11 +145,11 @@ void Hydrostatic(int NmaxIter, double iterLimit)
         f[2] += n_k[3];
         dfdn[2][3] = 1.0;
 
-	/* --- Row for H2 equilibrium --               -------------- */
+      	/* --- Row for H2 equilibrium --               -------------- */
 
-	f[3] = -SQ(n_k[0]) * Phi_H2 + n_k[3];
-	dfdn[3][0] = -2.0*n_k[0] * Phi_H2;
-	dfdn[3][3] = 1.0;
+      	f[3] = -SQ(n_k[0]) * Phi_H2 + n_k[3];
+      	dfdn[3][0] = -2.0*n_k[0] * Phi_H2;
+      	dfdn[3][3] = 1.0;
       }
 
       /* --- Row for hydrogen ionization --            -------------- */

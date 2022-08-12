@@ -176,8 +176,7 @@ void readAbundance(Atmosphere *atmos)
 
       /* --- Apply metallicity factor to elements other than hydrogen */
 
-      if (metallicity != 1.0  &&  !strstr(element->ID, "H "))
-	element->abund *= metallicity;
+      if (metallicity != 1.0  &&  !strstr(element->ID, "H ")) element->abund *= metallicity;
 
       totalAbund += element->abund;
       avgWeight  += element->abund * element->weight;

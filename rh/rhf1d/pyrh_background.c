@@ -155,11 +155,11 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
   /* --- Set equilibrium state -------------------------------------- */
 
   // printf("Getting equilibrium state\n");
-  fromscratch = TRUE; // because SOLVE_NE == ONCE always for HSE!
-  if (debug) printf("Solve_ne()\n");
-  _Solve_ne(fromscratch);
-  if (debug) printf("Set LTE\n");
-  SetLTEQuantities();
+  // fromscratch = TRUE; // because SOLVE_NE == ONCE always for HSE!
+  // if (debug) printf("Solve_ne()\n");
+  // _Solve_ne(fromscratch);
+  // if (debug) printf("Set LTE\n");
+  // SetLTEQuantities();
   
   // printf("Setting ChemicalEquilibrium\n");
   if (input.NonICE)
@@ -241,7 +241,7 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
   /* --- Read background files from Kurucz data file -- ------------- */
 
   // We do not read Kurucz lines (we used pyrh_Background() to set 
-  // atmosphere in HSE only; no need for lines there).
+  // atmosphere in HSE only; no need for lines here).
   // if (atmos.Nrlk == 0){
   //   readKuruczLines(input.KuruczData);
   // }
@@ -307,12 +307,11 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
       total_opacity[layer] += chi[k];
     }
 
-    // if (Hminus_ff(wavelength, chi)) {
-    //   printf("Get Hminus_ff opacity\n");
-    //   chi_ai[k] += chi[k];
-    //   eta_ai[k] += chi[k] * Bnu[k];
-    //   total_opacity[layer] += chi[k];
-    // }
+    if (Hminus_ff(wavelength, chi)) {
+      chi_ai[k] += chi[k];
+      eta_ai[k] += chi[k] * Bnu[k];
+      total_opacity[layer] += chi[k];
+    }
 
     /* --- Opacity fudge factors, applied to Hminus opacity -- ------ */
 
@@ -426,9 +425,9 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
 
   // Hminus_ff(0.0, NULL);
   // printf("Cleaning!\n");
-  H2minus_ff(0.0, NULL);
+  // H2minus_ff(0.0, NULL);
   // printf("Cleaning!\n");
-  H2plus_ff(0.0, NULL);
+  // H2plus_ff(0.0, NULL);
 
   // printf("Cleaning!\n");
   free(chi);
@@ -449,9 +448,8 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
   getCPU(2, TIME_POLL, "Total Background");
 }
 
-void _Solve_ne(bool_t fromscratch)
-{
-  const char routineName[] = "Solvene";
+void get_ne(bool_t fromscratch){
+  const char routineName[] = "get_ne";
   register int k, n, j;
 
   int     Nmaxstage, niter;
@@ -473,22 +471,27 @@ void _Solve_ne(bool_t fromscratch)
 
   int layer = atmos.active_layer;
 
-  np = atmos.H->n[atmos.H->Nlevel-1];
-  if (fromscratch) {
-    /* --- Get the initial solution from ionization of H only -- -- */
-    if (atmos.H_LTE) {
-      Uk = getKuruczpf(&atmos.elements[0], 0, layer);
-      PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
-         exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
-      ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
-    } else
-       ne_old = np[layer];
-       /* --- Copy into ne as well to calculate first fij and dfij - - */
-       atmos.ne[layer] = ne_old;
-  } else {
-    /* --- Use original electron density as starting guess -- ----- */
-    ne_old = atmos.ne[layer];
-  }
+  Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+  PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
+     exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
+  ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
+  ne_old *= 1.1; // source: Lightwaever 
+  // np = atmos.H->n[atmos.H->Nlevel-1];
+  // if (fromscratch) {
+  //   /* --- Get the initial solution from ionization of H only -- -- */
+  //   if (atmos.H_LTE) {
+  //     Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+  //     PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
+  //        exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
+  //     ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
+  //   } else
+  //      ne_old = np[layer];
+  //      /* --- Copy into ne as well to calculate first fij and dfij - - */
+  //      atmos.ne[layer] = ne_old;
+  // } else {
+  //   /* --- Use original electron density as starting guess -- ----- */
+  //   ne_old = atmos.ne[layer];
+  // }
 
   niter = 0;
   while (niter < N_MAX_ELECTRON_ITERATIONS) {
@@ -519,15 +522,23 @@ void _Solve_ne(bool_t fromscratch)
     niter++;
   }
 
-    // if (dne > MAX_ELECTRON_ERROR) {
-    //   sprintf(messageStr, "Electron density iteration not converged:\n"
-    //     " spatial location: %d, temperature: %6.1f [K], \n"
-    //     " density: %9.3E [m^-3],\n dnemax: %9.3E\n",
-    //     k, atmos.T[k], atmos.nHtot[k], dne);
-    //   Error(WARNING, routineName, messageStr);
-    // }
+  if (dne > MAX_ELECTRON_ERROR) {
+    sprintf(messageStr, "Electron density iteration not converged:\n"
+      " spatial location: %d, temperature: %6.1f [K], \n"
+      " density: %9.3E [m^-3],\n dnemax: %9.3E\n",
+      k, atmos.T[k], atmos.nHtot[k], dne);
+    Error(WARNING, routineName, messageStr);
+  }
 
   free(fjk);  free(dfjk);
 
   getCPU(3, TIME_POLL, "Electron density");
+}
+
+void get_Nm_total(double* Nm, int k){
+  // total number of molecular density in atmosphere at k-th depth
+  Nm[k] = 0;
+  for (int n=0;  n<atmos.Nmolecule; n++){
+    Nm[k] += atmos.molecules[n].n[k];
+  }
 }

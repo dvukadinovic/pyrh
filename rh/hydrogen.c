@@ -483,17 +483,14 @@ bool_t Hminus_ff(double lambda, double *chi)
   /* --- Use long-wavelength expansion if wavelength beyond 9113 nm - */
 
   if (lambda >= lambdaFF[NFF-1])
-    printf("Get Hminus_ff_long\n");
     return Hminus_ff_long(lambda, chi);
 
-  printf(" Initialize\n");
   if (initialize) {
 
     /* --- Store the fractional indices of temperature only the
            first time around --                        -------------- */
 
     if (layer!=-1){
-      printf("  Single layer\n");
       theta = THETA0 / atmos.T[layer];
       if (theta <= thetaFF[0])
         _theta_index = 0;
@@ -505,7 +502,6 @@ bool_t Hminus_ff(double lambda, double *chi)
           (theta - thetaFF[index]) / (thetaFF[index+1] - thetaFF[index]);
       }
     } else {
-      printf("  Multi layer\n");
       theta_index = (double *) malloc(Nspace * sizeof(double));
       for (k = 0;  k < Nspace;  k++) {
         theta = THETA0 / atmos.T[k];
@@ -524,13 +520,11 @@ bool_t Hminus_ff(double lambda, double *chi)
     initialize = FALSE;
   }
 
-  printf(" Hunt()\n");
   Hunt(NFF, lambdaFF, lambda, &index);
   lambda_index = (double) index +
     (lambda - lambdaFF[index]) / (lambdaFF[index+1] - lambdaFF[index]);
 
   if (layer!=-1){
-    printf("  Set for single layer\n");
     k = layer;
     pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
     kappa  = bilinear(NTHETA, NFF, kappaFF,
@@ -539,7 +533,6 @@ bool_t Hminus_ff(double lambda, double *chi)
     return TRUE;
   }
 
-  printf("  Set for multi layer\n");
   for (k = 0;  k < Nspace;  k++) {
     pe     = atmos.ne[k] * KBOLTZMANN * atmos.T[k];
     kappa  = bilinear(NTHETA, NFF, kappaFF,
@@ -588,6 +581,20 @@ bool_t Hminus_ff_long(double lambda, double *chi)
                  lambda_inv*(D[n] + lambda_inv*(E[n] + lambda_inv*F[n])));
   }
   /* --- Then spatial dependence --                      ------------ */
+
+  int layer = atmos.active_layer;
+
+  if (layer!=-1){
+    chi[0]     = 0.0;
+    theta_n    = 1.0;
+    sqrt_theta = sqrt(THETA0 / atmos.T[layer]);
+    for (n = 1;  n < NJOHN;  n++) {
+      theta_n *= sqrt_theta;
+      chi[0]  += theta_n * Clambda[n];
+    }
+    chi[0] *= atmos.H->n[0][layer] * (atmos.ne[layer] * Ck);
+    return TRUE;
+  }
 
   for (k = 0;  k < atmos.Nspace;  k++) {
     chi[k]     = 0.0;
@@ -708,7 +715,6 @@ bool_t H2minus_ff(double lambda, double *chi) {
 
     /* --- When called with zero wavelength free memory for fractional
            indices --                                  -------------- */
-
     if (theta_index) free(theta_index);
     initialize = TRUE;
     return FALSE;

@@ -260,7 +260,7 @@ mySpectrum rhf1d(int pyrh_Ndep,
   }
 
   getCPU(1, TIME_START, NULL);
-  printTotalCPU();
+  // printTotalCPU();
 
   mySpectrum spec;
   spec.nlw = Nwave;

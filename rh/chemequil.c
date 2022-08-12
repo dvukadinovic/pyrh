@@ -322,7 +322,7 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
 	      break;
       niter++;
     }
-    if (dnmax > iterLimit && atmos.active_layer==-1) {
+    if (dnmax > iterLimit) {
       sprintf(messageStr, "Iteration not converged:\n"
               " temperature: %6.1f [K], \n"
 	      " density: %9.3E [m^-3],\n dnmax: %9.3E\n",
