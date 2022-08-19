@@ -125,6 +125,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   bool_t pyrh_io_flag = FALSE;
 
   getProfiles();
+  // spectrum.J is already filled with correct values; do we need this initSolution() here?
   initSolution(pyrh_io_flag);
   spectrum.J = J;
   if (input.backgr_pol) spectrum.J20 = J20;
@@ -148,6 +149,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   spec->sQ = (double *) malloc(spec->nlw * sizeof(double));
   spec->sU = (double *) malloc(spec->nlw * sizeof(double));
   spec->sV = (double *) malloc(spec->nlw * sizeof(double));
+  // spec->J  = matrix_double(spec->nlw+1, atmos.Nspace);
   int index;
   
   for (int idl=0; idl<spec->nlw; idl++){
@@ -160,6 +162,9 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
       spec->sV[idl] = spectrum.Stokes_V[index][0];
       spec->stokes = 1;
     }
+    // for (int idz=0; idz<atmos.Nspace; idz++)
+    //   spec->J[idl,idz] = &spectrum.J[idz][idl];
   }
-  // spec->J = spectrum.J;
+  spec->J = spectrum.J;
+  // memcpy(spec->J, spectrum.J, (spec->nlw+1)*atmos.Nspace * sizeof(double));
 }

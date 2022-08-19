@@ -118,9 +118,9 @@ void initSolution(bool_t pyrh_io_flag)
 
       spectrum.I = matrix_double(Nsr, Nplane);
       if (atmos.Stokes || input.backgr_pol) {
-	spectrum.Stokes_Q = matrix_double(Nsr, Nplane);
-	spectrum.Stokes_U = matrix_double(Nsr, Nplane);
-	spectrum.Stokes_V = matrix_double(Nsr, Nplane);
+      	spectrum.Stokes_Q = matrix_double(Nsr, Nplane);
+      	spectrum.Stokes_U = matrix_double(Nsr, Nplane);
+      	spectrum.Stokes_V = matrix_double(Nsr, Nplane);
       }
     }
     break;
@@ -187,17 +187,17 @@ void initSolution(bool_t pyrh_io_flag)
       
       for (k = 0;  k < atmos.Nspace;  k++) J[k] = 0.0;
       for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
-	writeJlambda(nspect, J);
+        writeJlambda(nspect, J);
 
       free(J);
 
       if (input.backgr_pol) {
-	J20 = (double *) malloc(atmos.Nspace * sizeof(double));
-	for (k = 0;  k < atmos.Nspace;  k++) J20[k] = 0.0;
-	for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
-	  writeJ20lambda(nspect, J20);
+      	J20 = (double *) malloc(atmos.Nspace * sizeof(double));
+      	for (k = 0;  k < atmos.Nspace;  k++) J20[k] = 0.0;
+      	for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
+      	  writeJ20lambda(nspect, J20);
 
-	free(J20);
+      	free(J20);
       }
     }
   } else {

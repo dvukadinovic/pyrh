@@ -204,7 +204,7 @@ bool_t Hydrogen_bf(double lambda, double *chi, double *eta)
       twohnu3_c2 = twohc / CUBE(lambda);
 
       np = atmos.H->n[atmos.H->Nlevel-1];
-      if (layer=-1)
+      if (layer!=-1)
       {
         k = atmos.active_layer;
         expla   = exp(-hc_kla/atmos.T[k]);

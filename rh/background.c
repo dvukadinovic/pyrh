@@ -338,30 +338,6 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     atmos.backgrflags[nspect].hasline     = FALSE;
     atmos.backgrflags[nspect].ispolarized = FALSE;
 
-    /* --- Opacity fudge coefficient by Shapiro+10 -- ----------------*/
-
-    // D.Vukadinovic: add opacity fudge correction from Shapiro+10
-    //   to total opacity and emissivity; excluding scattering
-    // if (do_of_sasha){
-    //   Linear(Nfudge_sasha, lambda_fudge_sasha, fudge_sasha,
-    //    1, &wavelength, &total_sasha_fudge, FALSE);
-      // for (k=1; k<=Nfudge_sasha-1; k++){
-      //   if (lambda_fudge_sasha[k] < wavelength && lambda_fudge_sasha[k+1] > wavelength){
-      //     fudge = (wavelength-lambda_fudge_sasha[k+1])/(lambda_fudge_sasha[k]-lambda_fudge_sasha[k+1]) * value_of[k] +
-      //       (wavelength-lambda_fudge_sasha[k])/(lambda_fudge_sasha[k+1]-lambda_fudge_sasha[k]) * value_of[k+1];
-      //   }
-      // }
-    // } else total_sasha_fudge = 1.0;
-
-    /* --- Line opacity fudge coefficient by Busa+01 -- --------------*/
-
-    // D.Vukadinovic: add line opacity fudge from Busa+01
-    // if (input.line_fudge){
-    //   line_fudge = get_line_of(wavelength);
-    // } else {
-    //   line_fudge = 1.0;
-    // }
-
     /* --- Initialize angle-independent quantities --  -------------- */
 
     for (k = 0;  k < atmos.Nspace;  k++) {
@@ -394,49 +370,34 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       }
     }
 
-    // D.Vukadinovic: line fudge for H minus opacity
-    // if (input.line_fudge){
-    //   for (k=0; k<atmos.Nspace; k++){
-    //     chi_ai[k] *= line_fudge;
-    //     eta_ai[k] *= line_fudge;
-    //   }
-    // }
-
-    // D.Vukadinovic: Shapiro+10 fudge for H minus opacitys
-    // if (do_of_sasha){
-    //   for (k=0; k<atmos.Nspace; k++){
-    //     chi_ai[k] *= total_sasha_fudge;
-    //     eta_ai[k] *= total_sasha_fudge;
-    //   }
-    // }
-
     /* --- Opacities from bound-free transitions in OH and CH -- ---- */
 
     if (OH_bf_opac(wavelength, chi, eta)) {
       for (k = 0;  k < atmos.Nspace;  k++) {
-      	chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
-      	eta_ai[k] += eta[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
+      	chi_ai[k] += chi[k];
+      	eta_ai[k] += eta[k];
       }
     }
     if (CH_bf_opac(wavelength, chi, eta)) {
       for (k = 0;  k < atmos.Nspace;  k++) {
-      	chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
-      	eta_ai[k] += eta[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
+      	chi_ai[k] += chi[k];
+      	eta_ai[k] += eta[k];
       }
     }
     /* --- Neutral Hydrogen Bound-Free and Free-Free --  ------------ */
 
     if (Hydrogen_bf(wavelength, chi, eta)) {
       for (k = 0;  k < atmos.Nspace;  k++) {
-      	chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
-      	eta_ai[k] += eta[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
+      	chi_ai[k] += chi[k];
+      	eta_ai[k] += eta[k];
       }
     }
     Hydrogen_ff(wavelength, chi);
     for (k = 0;  k < atmos.Nspace;  k++) {
-      chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
-      eta_ai[k] += chi[k] * Bnu[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
+      chi_ai[k] += chi[k];
+      eta_ai[k] += chi[k] * Bnu[k];
     }
+    
     /* --- Rayleigh scattering by neutral hydrogen --  -------------- */
 
     if (Rayleigh(wavelength, atmos.H, scatt)) {
@@ -455,8 +416,8 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
 
     if (H2plus_ff(wavelength, chi)) {
       for (k = 0;  k < atmos.Nspace;  k++) {
-      	chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
-      	eta_ai[k] += chi[k] * Bnu[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic
+      	chi_ai[k] += chi[k];
+      	eta_ai[k] += chi[k] * Bnu[k];
       }
     }
     /* --- Rayleigh scattering and free-free absorption by
@@ -469,8 +430,8 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     }
     if (H2minus_ff(wavelength, chi)) {
       for (k = 0;  k < atmos.Nspace;  k++) {
-      	chi_ai[k] += chi[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic; 
-      	eta_ai[k] += chi[k] * Bnu[k]; // * total_sasha_fudge * line_fudge; // D.Vukadinovic;
+      	chi_ai[k] += chi[k];
+      	eta_ai[k] += chi[k] * Bnu[k];
       }
     }
     /* --- Bound-Free opacities due to ``metals'' --   -------------- */
@@ -486,10 +447,10 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
 
     Metal_bf(wavelength, atmos.Natom-1, atmos.atoms+1, chi, eta);
     for (k = 0;  k < atmos.Nspace;  k++) {
-      chi_ai[k] += chi[k] * metal_fudge; // * total_sasha_fudge * line_fudge; // D.Vukadinovic;
-      eta_ai[k] += eta[k] * metal_fudge; // * total_sasha_fudge * line_fudge; // D.Vukadinovic;
+      chi_ai[k] += chi[k] * metal_fudge;
+      eta_ai[k] += eta[k] * metal_fudge;
     }
-
+    
     /* --- Add the scattering opacity to the absorption part to store
            the total opacity --                        -------------- */
 
@@ -503,6 +464,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       sca_ai[k] *= scatt_fudge; // * total_sasha_fudge; // D.Vukadinovic
       chi_ai[k] += sca_ai[k];
     }
+
     /* --- Now the contributions that may be angle-dependent due to the
            presence of atomic or molecular lines --    -------------- */
     if (atmos.moving || atmos.Stokes) {
@@ -654,19 +616,17 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       backgrflags = MolecularOpacity(wavelength, nspect, 0, TRUE,
 				     chi, eta, NULL);
       if (backgrflags.hasline) {
-	atmos.backgrflags[nspect].hasline = TRUE;
-	for (k = 0;  k < atmos.Nspace;  k++) {
-	  chi_c[k] += chi[k];
-	  eta_c[k] += eta[k];
-	}
+        atmos.backgrflags[nspect].hasline = TRUE;
+        for (k = 0;  k < atmos.Nspace;  k++) {
+          chi_c[k] += chi[k];
+          eta_c[k] += eta[k];
+        }
       }
       /* --- Store results --                          -------------- */
 
-      // printf("%e  ", chi_c[0]);
       atmos.backgrrecno[nspect] = backgrrecno;
       backgrrecno += writeBackground(nspect, 0, 0,
 				     chi_c, eta_c, sca_c, NULL);
-      // printf("spectrum.as.chi_c = %e\n", spectrum.as[nspect].chi_c[0]);
     }
   }
 
