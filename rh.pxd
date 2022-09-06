@@ -53,7 +53,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sV
 		double **J
 	
-	cdef mySpectrum rhf1d(int Ndep,
+	cdef mySpectrum rhf1d(double mu, int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
 			double *rh_nH, int atm_scale,

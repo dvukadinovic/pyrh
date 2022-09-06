@@ -84,7 +84,7 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 }
 
 // int argc, char *argv[], 
-mySpectrum rhf1d(int pyrh_Ndep,
+mySpectrum rhf1d(double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
@@ -266,7 +266,7 @@ mySpectrum rhf1d(int pyrh_Ndep,
   // printf("J -- %e | %e \n", spectrum.J[0][0],  spectrum.J[0][10]);
   // printf("     %e | %e \n", spectrum.J[10][0], spectrum.J[10][10]);
 
-  _solveray(argv, 1.0, &spec, spectrum.J, spectrum.J20);
+  _solveray(argv, mu, &spec, spectrum.J, spectrum.J20);
 
   return spec;
 }

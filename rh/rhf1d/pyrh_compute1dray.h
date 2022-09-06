@@ -12,7 +12,7 @@ typedef struct{
 	RLK_Line *rlk_lines;
 } myRLK_Line;
  
-mySpectrum rhf1d(int Ndep,
+mySpectrum rhf1d(double mu, int Ndep,
               double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
               double *rh_mag, double *rh_gamma, double *rh_chi,
               double *rh_nH, int atm_scale, 

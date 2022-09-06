@@ -139,6 +139,7 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef compute1d(self,
+				double mu,
 				int atm_scale,
 				cnp.ndarray[double, ndim=1, mode="c"] scale,
 				cnp.ndarray[double, ndim=1, mode="c"] temp,
@@ -171,7 +172,7 @@ cdef class RH:
 			print("\n  pyrh: Different number of lam_ids and lam_values.\n")
 			sys.exit()
 
-		spec = rh.rhf1d(Ndep,
+		spec = rh.rhf1d(mu, Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale,
