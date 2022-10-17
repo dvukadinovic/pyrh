@@ -16,8 +16,6 @@ tools.pyx
 .idea/pyrh.iml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
-dist/UNKNOWN-0.0.0-py3.6-linux-x86_64.egg
-dist/pyrh-0.1-py3.6-linux-x86_64.egg
 pyrh.egg-info/PKG-INFO
 pyrh.egg-info/SOURCES.txt
 pyrh.egg-info/dependency_links.txt

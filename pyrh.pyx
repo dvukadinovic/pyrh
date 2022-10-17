@@ -107,6 +107,7 @@ cdef class RH:
 	@cython.wraparound(False)
 	cpdef hse(self,
 			  int atm_scale,
+			  double pg_top,
 			  cnp.ndarray[double, ndim=1, mode="c"] scale,
 			  cnp.ndarray[double, ndim=1, mode="c"] temp,
 			  cnp.ndarray[double, ndim=1, mode="c"] ne,
@@ -123,7 +124,7 @@ cdef class RH:
 		cdef int Ndep = scale.shape[0]
 		cdef int fudge_num = fudge_lam.shape[0]
 
-		myPops = rh.hse(Ndep,
+		myPops = rh.hse(Ndep, pg_top,
 					 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 					 &mag[0], &gamma[0], &chi[0],
 					 &nH[0,0], &nHtot[0], atm_scale,

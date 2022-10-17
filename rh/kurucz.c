@@ -283,7 +283,7 @@ void readKuruczLines(char *inputFile)
 
 	/* --- Else use good old Unsoeld --            -------------- */
 
-        if (!useBarklem) {
+  if (!useBarklem) {
 	  getUnsoldcross(rlk);
 	}
 
