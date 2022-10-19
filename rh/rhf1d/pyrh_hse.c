@@ -243,7 +243,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
 
   // At the top boundary we specify gas pressure and obtain the electron pressure from it
   pg[0] = pg_top; // SI unit
-  printf("pyRH -- Pg = %e\n", pg[0]);
+  // printf("pyRH -- Pg = %e\n", pg[0]);
   
   atmos.active_layer = 0;
   iter = 0;
@@ -256,7 +256,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
   atmos.ne[0] = 0;
   Nm[0] = 0;
   while (iter<20){
-    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
+    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund;// + atmos.nHmin[0] + 2*atmos.H2->n[0];
     for (int n=0;  n<atmos.Natom; n++){
       atmos.atoms[n].ntotal[0] = atmos.atoms[n].abundance * atmos.nHtot[0];
     }
@@ -264,19 +264,21 @@ myPops hse(int pyrh_Ndep, double pg_top,
     get_ne(fromscratch=TRUE);
     SetLTEQuantities();
     pyrh_Background(equilibria_only=FALSE, total_opacity);
-    get_Nm_total(Nm, atmos.active_layer);
+    // get_Nm_total(Nm, atmos.active_layer);
 
-    pg[0] = atmos.gravity * geometry.tau_ref[0] * rho[0] / total_opacity[0];
+    // pg[0] = atmos.gravity * geometry.tau_ref[0] * rho[0] / total_opacity[0];
 
     iter++;
-    eta = fabs((atmos.nHtot[0] - nHtot_old)/nHtot_old);
-    nHtot_old = atmos.nHtot[0];
+    // eta = fabs((atmos.nHtot[0] - nHtot_old)/nHtot_old);
+    // nHtot_old = atmos.nHtot[0];
+    eta = fabs((atmos.ne[0] - nHtot_old)/nHtot_old);
+    nHtot_old = atmos.ne[0];
     if (eta<=1e-2) break;
   }
 
   if (eta>1e-2 && iter==20) printf("pyRH -- Max number of iterations reached...\n");
 
-  printf("pyRH -- Pg = %e\n", pg[0]);
+  printf("pyRH -- Pe = %e\n", atmos.ne[0] * KBOLTZMANN * atmos.T[0]*10);
 
   // printf("%d | %f | %e | %e | %e | %e\n", iter, atmos.T[0], atmos.ne[0], atmos.nHtot[0], total_opacity[0], Nm[0]);
 
@@ -301,18 +303,20 @@ myPops hse(int pyrh_Ndep, double pg_top,
       // integration in logarithmic optical depth scale
       dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
       if (iter==0){
-        dcmass = rho[k] / total_opacity[k];
-        pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+        dcmass = 1 / (total_opacity[k]/rho[k]);
+        // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+        pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
       }
       else{
         beta2 = total_opacity[k]/rho[k];
         beta1 = total_opacity[k-1]/rho[k-1];
-        // dcmass = log(beta2/beta1) / (beta2 - beta1);
-        dcmass = 2/(beta2 + beta1);
-        pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+        dcmass = log(beta2/beta1) / (beta2 - beta1);
+        // dcmass = 2/(beta2 + beta1);
+        // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+        pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
       }
       
-      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
+      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund;// + atmos.nHmin[k] + 2*atmos.H2->n[k];
       rho[k] = (AMU * atmos.wght_per_H) * atmos.nHtot[k];
 
       // get electron density and continuum opacity
@@ -322,7 +326,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
       get_ne(fromscratch=TRUE);
       SetLTEQuantities();
       pyrh_Background(equilibria_only=FALSE, total_opacity);
-      get_Nm_total(Nm, atmos.active_layer);
+      // get_Nm_total(Nm, atmos.active_layer);
       
       iter++;
       eta = fabs((atmos.nHtot[k] - nHtot_old)/nHtot_old);
@@ -331,9 +335,9 @@ myPops hse(int pyrh_Ndep, double pg_top,
     }
     // printf("------------\n");
     // printf("%d | %e | %e | %e | %e | %e\n", iter, eta, atmos.ne[k], atmos.nHtot[k], total_opacity[k], Nm[k]);
-    // printf("nHtot = %e\n", atmos.nHtot[k]);
+    // printf("nHmin = %e\n", atmos.nHmin[k]);
     // printf("k = %d | iter = %d | eta = %f\n ----------- \n", k, iter, eta);
-    // printf("k = %d | iter = %d\n ----------- \n")
+    // printf("k = %d | iter = %d\n ----------- \n", k, iter);
   }
 
   // store the populations
