@@ -258,7 +258,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
   atmos.H2->n[0] = 0;
   atmos.ne[0] = 0;
   Nm[0] = 0;
-  while (iter<20){
+  while (iter<50){
     atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
     for (int n=0;  n<atmos.Natom; n++){
       atmos.atoms[n].ntotal[0] = atmos.atoms[n].abundance * atmos.nHtot[0];
