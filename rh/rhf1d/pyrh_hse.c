@@ -104,7 +104,10 @@ myPops hse(int pyrh_Ndep, double pg_top,
   // we want to solve for ne
   input.solve_ne = ONCE;
   input.startJ = NEW_J;
-  
+  // Hydrogen populations are to be in LTE
+  // It equals pointers of NLTE and LTE populations
+  atmos.H_LTE = TRUE;
+
   // we want only to have reference wavelength
   // (but we will still have those from active atoms...)
   // input.wavetable_input = "none";
@@ -256,7 +259,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
   atmos.ne[0] = 0;
   Nm[0] = 0;
   while (iter<20){
-    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund;// + atmos.nHmin[0] + 2*atmos.H2->n[0];
+    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
     for (int n=0;  n<atmos.Natom; n++){
       atmos.atoms[n].ntotal[0] = atmos.atoms[n].abundance * atmos.nHtot[0];
     }
@@ -264,7 +267,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
     get_ne(fromscratch=TRUE);
     SetLTEQuantities();
     pyrh_Background(equilibria_only=FALSE, total_opacity);
-    // get_Nm_total(Nm, atmos.active_layer);
+    get_Nm_total(Nm, atmos.active_layer);
 
     // pg[0] = atmos.gravity * geometry.tau_ref[0] * rho[0] / total_opacity[0];
 
@@ -276,9 +279,10 @@ myPops hse(int pyrh_Ndep, double pg_top,
     if (eta<=1e-2) break;
   }
 
-  if (eta>1e-2 && iter==20) printf("pyRH -- Max number of iterations reached...\n");
+  if (eta>1e-2 && iter==20) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
 
-  printf("pyRH -- Pe = %e\n", atmos.ne[0] * KBOLTZMANN * atmos.T[0]*10);
+  // printf("pyRH -- Pe = %e\n", atmos.ne[0] * KBOLTZMANN * atmos.T[0]*10);
+  // printf("pyRH -- Pg = %e\n", pg[0]*10);
 
   // printf("%d | %f | %e | %e | %e | %e\n", iter, atmos.T[0], atmos.ne[0], atmos.nHtot[0], total_opacity[0], Nm[0]);
 
@@ -316,7 +320,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
         pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
       }
       
-      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund;// + atmos.nHmin[k] + 2*atmos.H2->n[k];
+      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
       rho[k] = (AMU * atmos.wght_per_H) * atmos.nHtot[k];
 
       // get electron density and continuum opacity
@@ -326,7 +330,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
       get_ne(fromscratch=TRUE);
       SetLTEQuantities();
       pyrh_Background(equilibria_only=FALSE, total_opacity);
-      // get_Nm_total(Nm, atmos.active_layer);
+      get_Nm_total(Nm, atmos.active_layer);
       
       iter++;
       eta = fabs((atmos.nHtot[k] - nHtot_old)/nHtot_old);
