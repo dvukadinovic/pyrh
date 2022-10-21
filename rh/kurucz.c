@@ -51,13 +51,22 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 27 3-character code such as AUT for autoionizing    A3  
 28 lande g for first level times 1000   I5
 29 lande g for second level times 1000   I5
-30 isotope shift of wavelength in mA 
+30 isotope shift of wavelength in mA
+31 [DV] (optional) orbital quantum number of first level I2
+32 [DV] (optional) orbital quantum number of second level I2
 
 
  Note: The periodic table index of Kurucz starts at 1 (for Hydrogen).
        In the RH routines counting starts at 0 in the atmos.elements
        structure. This discrepancy is accounted for in the opacity
        calculation (rlk_opacity.c).
+ Note: [DV] we added two more values to Kurucz line that contain information
+       on the orbital quantum numbers of levels that is used to compute the
+       broadening of a spectral line by ABO theory. the original implementation
+       does not read these numbers, it only reads the total angular momentum
+       (term state). Do not give these numbers if you do not know the level
+       configurations!
+
        --                                              -------------- */
 
 #include <ctype.h>
@@ -75,7 +84,8 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 #include "error.h"
 
 #define COMMENT_CHAR             "#"
-#define RLK_RECORD_LENGTH        160
+// #define RLK_RECORD_LENGTH        160
+#define RLK_RECORD_LENGTH        164
 #define Q_WING                   20.0
 #define MILLI                    1.0E-03
 #define ANGSTROM_TO_NM           0.1
@@ -245,6 +255,19 @@ void readKuruczLines(char *inputFile)
 
 	rlk->lambda0 = lambda0 / NM_TO_M;
 
+  // DV: read orbital quantum numbers of levels 
+  int Nread_l, li=-1, lj=-1;
+  bool_t got_orbital_numbers = FALSE;
+  Nread_l = sscanf(inputLine+160, "%2d %2d", &li, &lj);
+  if (Nread_l!=-1){
+    got_orbital_numbers = TRUE;
+    if (swap_levels){
+      SWAPDOUBLE(li, lj);
+    }
+    rlk->li = li;
+    rlk->lj = lj;
+  }
+
 	/* --- Get quantum numbers for angular momentum and spin -- - */
 
         determined = RLKdeterminate(labeli, labelj, rlk);
@@ -268,18 +291,31 @@ void readKuruczLines(char *inputFile)
         /* --- If possible use Barklem formalism --    -------------- */
 
 	useBarklem = FALSE;
-	if (determined) {
-	  if ((rlk->Li == S_ORBIT && rlk->Lj == P_ORBIT) ||
-              (rlk->Li == P_ORBIT && rlk->Lj == S_ORBIT)) {
-	    useBarklem = getBarklemcross(&bs_SP, rlk);
-	  } else if ((rlk->Li == P_ORBIT && rlk->Lj == D_ORBIT) ||
-		     (rlk->Li == D_ORBIT && rlk->Lj == P_ORBIT)) {
-	    useBarklem = getBarklemcross(&bs_PD, rlk);
-	  } else if ((rlk->Li == D_ORBIT && rlk->Lj == F_ORBIT) ||
-		     (rlk->Li == F_ORBIT && rlk->Lj == D_ORBIT)) {
-	    useBarklem = getBarklemcross(&bs_DF, rlk);
-	  }
-	}
+	// if (determined) {
+	//   if ((rlk->Li == S_ORBIT && rlk->Lj == P_ORBIT) ||
+ //              (rlk->Li == P_ORBIT && rlk->Lj == S_ORBIT)) {
+	//     useBarklem = getBarklemcross(&bs_SP, rlk);
+	//   } else if ((rlk->Li == P_ORBIT && rlk->Lj == D_ORBIT) ||
+	// 	     (rlk->Li == D_ORBIT && rlk->Lj == P_ORBIT)) {
+	//     useBarklem = getBarklemcross(&bs_PD, rlk);
+	//   } else if ((rlk->Li == D_ORBIT && rlk->Lj == F_ORBIT) ||
+	// 	     (rlk->Li == F_ORBIT && rlk->Lj == D_ORBIT)) {
+	//     useBarklem = getBarklemcross(&bs_DF, rlk);
+	//   }
+	// }
+  // [DV] we use orbital quantum number (l) to determine the ABO cross section,
+  // not the total angular momentum (L) from the term symbol.
+  if (got_orbital_numbers){
+    if ((rlk->li==0 && rlk->lj==1) || (rlk->li==1 && rlk->lj==0)){
+      useBarklem = getBarklemcross(&bs_SP, rlk);
+    }
+    if ((rlk->li==1 && rlk->lj==2) || (rlk->li==2 && rlk->lj==1)){
+      useBarklem = getBarklemcross(&bs_PD, rlk);
+    }
+    if ((rlk->li==2 && rlk->lj==3) || (rlk->li==3 && rlk->lj==2)){
+      useBarklem = getBarklemcross(&bs_DF, rlk);
+    }
+  }
 
 	/* --- Else use good old Unsoeld --            -------------- */
 
