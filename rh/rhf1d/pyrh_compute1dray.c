@@ -110,6 +110,8 @@ mySpectrum rhf1d(double mu, int pyrh_Ndep,
   readInput();
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
+  // For now, we only allow for H in LTE state
+  // atmos.H_LTE = TRUE;
   
   // set fudge factors
   if (do_fudge==1){

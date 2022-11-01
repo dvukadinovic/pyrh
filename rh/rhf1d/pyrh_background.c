@@ -471,27 +471,27 @@ void get_ne(bool_t fromscratch){
 
   int layer = atmos.active_layer;
 
-  Uk = getKuruczpf(&atmos.elements[0], 0, layer);
-  PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
-     exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
-  ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
-  ne_old *= 1.1; // source: Lightwaever 
-  // np = atmos.H->n[atmos.H->Nlevel-1];
-  // if (fromscratch) {
-  //   /* --- Get the initial solution from ionization of H only -- -- */
-  //   if (atmos.H_LTE) {
-  //     Uk = getKuruczpf(&atmos.elements[0], 0, layer);
-  //     PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
-  //        exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
-  //     ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
-  //   } else
-  //      ne_old = np[layer];
-  //      /* --- Copy into ne as well to calculate first fij and dfij - - */
-  //      atmos.ne[layer] = ne_old;
-  // } else {
-  //   /* --- Use original electron density as starting guess -- ----- */
-  //   ne_old = atmos.ne[layer];
-  // }
+  // Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+  // PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
+  //    exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
+  // ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
+  // ne_old *= 1.1; // source: Lightwaever 
+  np = atmos.H->n[atmos.H->Nlevel-1];
+  if (fromscratch) {
+    /* --- Get the initial solution from ionization of H only -- -- */
+    if (atmos.H_LTE) {
+      Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+      PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
+         exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
+      ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
+    } else
+       ne_old = np[layer];
+       /* --- Copy into ne as well to calculate first fij and dfij - - */
+       atmos.ne[layer] = ne_old;
+  } else {
+    /* --- Use original electron density as starting guess -- ----- */
+    ne_old = atmos.ne[layer];
+  }
 
   niter = 0;
   while (niter < N_MAX_ELECTRON_ITERATIONS) {

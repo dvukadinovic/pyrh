@@ -58,6 +58,7 @@ char messageStr[MAX_LINE_SIZE];
 #define NG_HSE_DELAY   0
 #define NG_HSE_ORDER   0
 #define NG_HSE_PERIOD  0
+#define NMAX_HSE_ITER  50
 
 void dummy(){
   int argc = 1;
@@ -258,7 +259,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
   atmos.H2->n[0] = 0;
   atmos.ne[0] = 0;
   Nm[0] = 0;
-  while (iter<50){
+  while (iter<NMAX_HSE_ITER){
     atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
     for (int n=0;  n<atmos.Natom; n++){
       atmos.atoms[n].ntotal[0] = atmos.atoms[n].abundance * atmos.nHtot[0];
@@ -279,7 +280,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
     if (eta<=1e-2) break;
   }
 
-  if (eta>1e-2 && iter==20) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
+  // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
 
   // printf("pyRH -- Pe = %e\n", atmos.ne[0] * KBOLTZMANN * atmos.T[0]*10);
   // printf("pyRH -- Pg = %e\n", pg[0]*10);
@@ -302,7 +303,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
     atmos.nHmin[k] = 0;
     atmos.H2->n[k] = 0;
     nHtot_old = 1;
-    while (iter<20){
+    while (iter<NMAX_HSE_ITER){
       // de la Cruz Rodriguez et al. 2019
       // integration in logarithmic optical depth scale
       dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
@@ -336,7 +337,9 @@ myPops hse(int pyrh_Ndep, double pg_top,
       eta = fabs((atmos.nHtot[k] - nHtot_old)/nHtot_old);
       nHtot_old = atmos.nHtot[k];
       if (eta<=1e-2) break;
+
     }
+    // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e @ %d\n", eta, k);
     // printf("------------\n");
     // printf("%d | %e | %e | %e | %e | %e\n", iter, eta, atmos.ne[k], atmos.nHtot[k], total_opacity[k], Nm[k]);
     // printf("nHmin = %e\n", atmos.nHmin[k]);
