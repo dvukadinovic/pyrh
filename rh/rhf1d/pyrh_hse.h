@@ -1,5 +1,5 @@
 typedef struct{
-	double **nH, *ne, *nHtot, *rho;
+	double **nH, *ne, *nHtot, *rho, *pg;
 } myPops;
 
 myPops hse(int pyrh_Ndep, double pg_top,

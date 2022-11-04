@@ -134,8 +134,9 @@ cdef class RH:
 		nHtot = convert_1d(myPops.nHtot, Ndep)
 		nH = convert_2d(myPops.nH, 6, Ndep)
 		rho = convert_1d(myPops.rho, Ndep)
+		pg = convert_1d(myPops.pg, Ndep)
 
-		return ne, nH, nHtot, rho
+		return ne, nH, nHtot, rho, pg
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)

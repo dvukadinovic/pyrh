@@ -126,9 +126,9 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
 
   getProfiles();
   // spectrum.J is already filled with correct values; do we need this initSolution() here?
-  initSolution(pyrh_io_flag);
-  spectrum.J = J;
-  if (input.backgr_pol) spectrum.J20 = J20;
+  // initSolution(pyrh_io_flag);
+  // spectrum.J = J;
+  // if (input.backgr_pol) spectrum.J20 = J20;
   initScatter();
 
   getCPU(1, TIME_POLL, "Total initialize");

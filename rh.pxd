@@ -73,6 +73,7 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 		double *nHtot
 		double **nH
 		double *rho
+		double *pg
 
 	cdef myPops hse(int Ndep, double pg_top,
 					double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,

@@ -237,6 +237,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
   pops.ne = malloc(atmos.Nspace * sizeof(double));
   pops.nHtot = malloc(atmos.Nspace * sizeof(double));
   pops.rho = malloc(atmos.Nspace * sizeof(double));
+  pops.pg = malloc(atmos.Nspace * sizeof(double));
 
   rho = (double *) malloc(atmos.Nspace * sizeof(double));
   pg = (double *) malloc(atmos.Nspace * sizeof(double));
@@ -351,7 +352,8 @@ myPops hse(int pyrh_Ndep, double pg_top,
   pops.nH = atmos.atoms[0].nstar;
   pops.ne = atmos.ne;
   pops.nHtot = atmos.nHtot;
-  pops.rho = memcpy(pops.rho, rho, atmos.Nspace * sizeof(double)) ;
+  pops.rho = memcpy(pops.rho, rho, atmos.Nspace * sizeof(double));
+  pops.pg = memcpy(pops.pg, pg, atmos.Nspace * sizeof(double));
   
   // clear
   free(rho); rho = NULL;
