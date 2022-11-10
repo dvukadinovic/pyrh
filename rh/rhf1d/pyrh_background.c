@@ -488,7 +488,7 @@ void get_ne(bool_t fromscratch){
       PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
          exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
       ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
-      if (layer==0) printf("PhiH = %e | atmos.nHtot = %e\n", PhiH, amtos.nHtot[layer]);
+      if (layer==0) printf("PhiH = %e | atmos.nHtot = %e\n", PhiH, atmos.nHtot[layer]);
     } else
        ne_old = np[layer];
        /* --- Copy into ne as well to calculate first fij and dfij - - */
