@@ -495,7 +495,7 @@ void get_ne(bool_t fromscratch){
     ne_old = atmos.ne[layer];
   }
 
-  if layer==0{
+  if (layer==0){
     printf("ne_start = %e\n", ne_old);
     printf("np = %e\n", np[0]);
   }
@@ -510,7 +510,7 @@ void get_ne(bool_t fromscratch){
       if (n == 0) {
         PhiHmin = 0.25*pow(C1/atmos.T[layer], 1.5) *
             exp(E_ION_HMIN / (KBOLTZMANN * atmos.T[layer]));
-        if layer==0{
+        if (layer==0){
           printf("PhiHmin = %e\n", PhiHmin);
         }
         error += ne_old * fjk[0] * PhiHmin;
@@ -523,7 +523,7 @@ void get_ne(bool_t fromscratch){
       }
     }
 
-    if layer==0{
+    if (layer==0){
       printf("error = %e | sum = %e\n", error, sum);
     }
 
