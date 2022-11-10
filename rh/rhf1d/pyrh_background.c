@@ -459,10 +459,6 @@ void get_ne(bool_t fromscratch){
   getCPU(3, TIME_START, NULL);
 
   C1 = (HPLANCK/(2.0*PI*M_ELECTRON)) * (HPLANCK/KBOLTZMANN);
-  if (atmos.active_layer==0){
-    printf("---- get_ne() ----\n");
-    printf("C1 = %e\n", C1);
-  }
 
   /* --- Figure out the largest array size needed so that we do not
          have to allocate and free memory all the time -- ----------- */
@@ -484,7 +480,8 @@ void get_ne(bool_t fromscratch){
   if (fromscratch) {
     /* --- Get the initial solution from ionization of H only -- -- */
     if (atmos.H_LTE) {
-      Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+      // Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+      Uk = 0;
       PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
          exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
       ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
@@ -498,11 +495,6 @@ void get_ne(bool_t fromscratch){
     ne_old = atmos.ne[layer];
   }
 
-  if (layer==0){
-    printf("ne_start = %e\n", ne_old);
-    printf("np = %e\n", np[0]);
-  }
-
   niter = 0;
   while (niter < N_MAX_ELECTRON_ITERATIONS) {
     error = ne_old / atmos.nHtot[layer];
@@ -513,9 +505,6 @@ void get_ne(bool_t fromscratch){
       if (n == 0) {
         PhiHmin = 0.25*pow(C1/atmos.T[layer], 1.5) *
             exp(E_ION_HMIN / (KBOLTZMANN * atmos.T[layer]));
-        if (layer==0){
-          printf("PhiHmin = %e\n", PhiHmin);
-        }
         error += ne_old * fjk[0] * PhiHmin;
         sum   -= (fjk[0] + ne_old * dfjk[0]) * PhiHmin;
       }
@@ -526,10 +515,6 @@ void get_ne(bool_t fromscratch){
       }
     }
 
-    if (layer==0){
-      printf("error = %e | sum = %e\n", error, sum);
-    }
-
     atmos.ne[layer] = ne_old -
         atmos.nHtot[layer] * error / (1.0 - atmos.nHtot[layer] * sum);
     dne = fabs((atmos.ne[layer] - ne_old)/ne_old);
@@ -537,10 +522,6 @@ void get_ne(bool_t fromscratch){
   
     if (dne <= MAX_ELECTRON_ERROR) break;
     niter++;
-  }
-
-  if (layer==0){
-    printf("---- done ----\n");
   }
 
   if (dne > MAX_ELECTRON_ERROR) {
