@@ -276,7 +276,7 @@ myPops hse(int pyrh_Ndep, double pg_top,
     iter++;
     // eta = fabs((atmos.nHtot[0] - nHtot_old)/nHtot_old);
     // nHtot_old = atmos.nHtot[0];
-    printf("nHtot = %e | ne = %e | total_opacity = %e\n", atmos.nHtot[0], atmos.ne[0], total_opacity[0]);
+    //printf("nHtot = %e | ne = %e | total_opacity = %e\n", atmos.nHtot[0], atmos.ne[0], total_opacity[0]);
     eta = fabs((atmos.ne[0] - nHtot_old)/nHtot_old);
     nHtot_old = atmos.ne[0];
     if (eta<=1e-2) break;
