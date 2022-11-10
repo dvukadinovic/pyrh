@@ -459,8 +459,10 @@ void get_ne(bool_t fromscratch){
   getCPU(3, TIME_START, NULL);
 
   C1 = (HPLANCK/(2.0*PI*M_ELECTRON)) * (HPLANCK/KBOLTZMANN);
-  printf("---- get_ne() ----\n");
-  printf("C1 = %e\n", C1);
+  if (atmos.active_layer==0){
+    printf("---- get_ne() ----\n");
+    printf("C1 = %e\n", C1);
+  }
 
   /* --- Figure out the largest array size needed so that we do not
          have to allocate and free memory all the time -- ----------- */
@@ -536,7 +538,9 @@ void get_ne(bool_t fromscratch){
     niter++;
   }
 
-  printf("---- done ----\n");
+  if (layer==0){
+    printf("---- done ----\n");
+  }
 
   if (dne > MAX_ELECTRON_ERROR) {
     sprintf(messageStr, "Electron density iteration not converged:\n"
