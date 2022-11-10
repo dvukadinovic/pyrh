@@ -151,10 +151,12 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   spec->sV = (double *) malloc(spec->nlw * sizeof(double));
   // spec->J  = matrix_double(spec->nlw+1, atmos.Nspace);
   int index;
+  double tmp;
   
   for (int idl=0; idl<spec->nlw; idl++){
     index = spectrum.wave_inds[idl];
-    spec->lam[idl] = spectrum.lambda[index];
+    vacuum_to_air(1, &spectrum.lambda[index], &tmp);
+    spec->lam[idl] = tmp;
     spec->sI[idl] = spectrum.I[index][0];
     if (atmos.Stokes){
       spec->sQ[idl] = spectrum.Stokes_Q[index][0];

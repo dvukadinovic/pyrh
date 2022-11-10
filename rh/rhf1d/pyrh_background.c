@@ -504,7 +504,7 @@ void get_ne(bool_t fromscratch){
         PhiHmin = 0.25*pow(C1/atmos.T[layer], 1.5) *
             exp(E_ION_HMIN / (KBOLTZMANN * atmos.T[layer]));
         error += ne_old * fjk[0] * PhiHmin;
-            sum   -= (fjk[0] + ne_old * dfjk[0]) * PhiHmin;
+        sum   -= (fjk[0] + ne_old * dfjk[0]) * PhiHmin;
       }
       for (j = 1;  j < atmos.elements[n].Nstage;  j++) {
         akj = atmos.elements[n].abund * j;

@@ -286,12 +286,12 @@ void ChemicalEquilibrium(int NmaxIter, double iterLimit)
         saha = Phi[i];
       	for (j = 0;  j < molecule->Nelement;  j++) {
       	  nu = nucl_index[i][j];
-                saha *= pow(fn0[nu] * n[nu], molecule->pt_count[j]);
+          saha *= pow(fn0[nu] * n[nu], molecule->pt_count[j]);
 
-        	  /* --- Contributions to equation of conservation for the
-                         nuclei in this molecule --            -------------- */
+        	/* --- Contributions to equation of conservation for the
+                 nuclei in this molecule --            -------------- */
 
-        	  f[nu] += molecule->pt_count[j] * n[Nnuclei + i];
+        	f[nu] += molecule->pt_count[j] * n[Nnuclei + i];
 	      }
 	      /* --- Saha equation for this molecule --      -------------- */
 

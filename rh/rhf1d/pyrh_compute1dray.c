@@ -270,6 +270,7 @@ mySpectrum rhf1d(double mu, int pyrh_Ndep,
 
   _solveray(argv, mu, &spec, spectrum.J, spectrum.J20);
 
+
   return spec;
 }
 /* ------- end ---------------------------- rhf1d.c ----------------- */
