@@ -485,7 +485,11 @@ void get_ne(bool_t fromscratch){
     if (atmos.H_LTE) {
       // Uk = getKuruczpf(&atmos.elements[0], 0, layer);
       Uk = 0;
-      if (layer==0) printf("ID = %s | w = %f | A = %f\n", tmp.ID, tmp.weight, tmp.abund);
+      if (layer==0){
+        for (int i_=0; i_<atmos.Npf; i_++){
+          printf("Tpf = %f | pf = %e\n", atmos.Tpf[i_], tmp.pf[0][i_]);
+        }
+      }
       PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
          exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
       ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
