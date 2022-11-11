@@ -474,17 +474,16 @@ void get_ne(bool_t fromscratch){
 
   int layer = atmos.active_layer;
 
-  // Uk = getKuruczpf(&atmos.elements[0], 0, layer);
-  // PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
-  //    exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
-  // ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[layer]*PhiH) - 1.0) / (2.0*PhiH);
-  // ne_old *= 1.1; // source: Lightwaever 
   np = atmos.H->n[atmos.H->Nlevel-1];
   if (fromscratch) {
     /* --- Get the initial solution from ionization of H only -- -- */
     if (atmos.H_LTE) {
-      Uk = getKuruczpf(&atmos.elements[0], 0, layer);
-      if (layer==0) printf("Uk = %f\n", Uk);
+      // Uk = getKuruczpf(&atmos.elements[0], 0, layer);
+      // Forced Uk for Hydrogen to 0 because on MPS clusters this has 
+      // value of 45 for some reason... 
+      // Partition functions are the same, temperature is the same, nHtot is
+      // the same. Not still clear why is there a difference. Synthesis works fine,
+      // only problem pertains in HSE computation for some reason.
       Uk = 0;
       PhiH = 0.5 * pow(C1/atmos.T[layer], 1.5) *
          exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[layer]));
