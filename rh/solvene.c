@@ -82,8 +82,7 @@ void Solve_ne(double *ne, bool_t fromscratch)
 
       if (atmos.H_LTE) {
 	      Uk = getKuruczpf(&atmos.elements[0], 0, k);
-        printf("Uk = %f\n", Uk);
-	      PhiH = 0.5 * pow(C1/atmos.T[k], 1.5) *
+        PhiH = 0.5 * pow(C1/atmos.T[k], 1.5) *
 	         exp(Uk + atmos.elements[0].ionpot[0]/(KBOLTZMANN*atmos.T[k]));
 	      ne_old = (sqrt(1.0 + 4.0*atmos.nHtot[k]*PhiH) - 1.0) / (2.0*PhiH);
       } else
