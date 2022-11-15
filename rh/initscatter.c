@@ -41,23 +41,21 @@ void initScatter()
   /* --- Fill the radiative rates from previous solution if 
          PRD lines are present --                      -------------- */
 
-  if (atmos.NPRDactive > 0  && input.startJ == OLD_J) {
-    for (n = 0;  n < atmos.Natom;  n++) {
-      atom = &atmos.atoms[n];
-      if (atom->active) {
-	readRadRate(atom);
-	for (kr = 0;  kr < atom->Nline;  kr++) {
-	  line = atom->line + kr;
-	  if (line->PRD) {
-	    if (input.PRD_angle_dep)
-	      PRDAngleScatter(line, LINEAR);
-	    else
-	      PRDScatter(line, LINEAR);
-	  }
-	}
-      }
-    }
-  }
+  // if (atmos.NPRDactive > 0  && input.startJ == OLD_J) {
+  //   for (n = 0;  n < atmos.Natom;  n++) {
+  //     atom = &atmos.atoms[n];
+  //     if (atom->active) {
+  //       readRadRate(atom);
+  //       for (kr = 0;  kr < atom->Nline;  kr++) {
+  //         line = atom->line + kr;
+  //         if (line->PRD) {
+  //           if (input.PRD_angle_dep) PRDAngleScatter(line, LINEAR);
+  //           else PRDScatter(line, LINEAR);
+	 //         }
+  //       }
+  //     }
+  //   }
+  // }
   /* --- Iterate the scattering in the background. Only iterate
          when we are also planning to do main iterations -- --------- */
 

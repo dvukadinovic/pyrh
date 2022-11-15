@@ -278,14 +278,14 @@ mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
   getCPU(1, TIME_START, NULL);
 
   mySpectrum spec;
-  spec.nlw = Nwave;
+  // spec.nlw = Nwave;
+  spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
   // printf("J -- %e | %e \n", spectrum.J[0][0],  spectrum.J[0][10]);
   // printf("     %e | %e \n", spectrum.J[10][0], spectrum.J[10][10]);
 
   _solveray(argv, mu, &spec, spectrum.J, spectrum.J20);
-
 
   return spec;
 }

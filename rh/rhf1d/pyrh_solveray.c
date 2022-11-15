@@ -35,12 +35,6 @@
 #include "constant.h"
 
 #include "pyrh_compute1dray.h"
-// #include "pyrh_solveray.h"
-
-#define COMMENT_CHAR        "#"
-
-#define RAY_INPUT_FILE      "ray.input"
-#define ASCII_SPECTRUM_FILE "spectrum_%4.2f.asc"
 
 /* --- Function prototypes --                          -------------- */
 
@@ -61,7 +55,6 @@ char messageStr[MAX_LINE_SIZE];
 // functions declaration
 int _getnumber(int* z);
 void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** J20);
-
 
 int _getnumber(int* z)
 {
@@ -142,31 +135,38 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   spec->sV = NULL;
   spec->J = NULL;
   spec->J20 = NULL;
-  
+
+  int Nlw = spec->nlw;// - 1;
+  Nlw -= 1;
+
   spec->stokes = 0;
-  spec->lam = (double *) malloc(spec->nlw * sizeof(double));
-  spec->sI = (double *) malloc(spec->nlw * sizeof(double));
-  spec->sQ = (double *) malloc(spec->nlw * sizeof(double));
-  spec->sU = (double *) malloc(spec->nlw * sizeof(double));
-  spec->sV = (double *) malloc(spec->nlw * sizeof(double));
-  // spec->J  = matrix_double(spec->nlw+1, atmos.Nspace);
-  int index;
+  spec->lam = (double *) malloc(Nlw * sizeof(double));
+  spec->sI = (double *) malloc(Nlw * sizeof(double));
+  spec->sQ = (double *) malloc(Nlw * sizeof(double));
+  spec->sU = (double *) malloc(Nlw * sizeof(double));
+  spec->sV = (double *) malloc(Nlw * sizeof(double));
+  // spec->J  = matrix_double(Nlw+1, atmos.Nspace);
+
+  int index=0;
   double tmp;
   
-  for (int idl=0; idl<spec->nlw; idl++){
-    index = spectrum.wave_inds[idl];
-    vacuum_to_air(1, &spectrum.lambda[index], &tmp);
-    spec->lam[idl] = tmp;
-    spec->sI[idl] = spectrum.I[index][0];
+  for (int idl=0; idl<Nlw+1; idl++){
+    // skip referent wavelength
+    if (spectrum.lambda[idl]==atmos.lambda_ref) continue;
+    vacuum_to_air(1, &spectrum.lambda[idl], &tmp);
+    spec->lam[index] = tmp;
+    spec->sI[index] = spectrum.I[idl][0];
     if (atmos.Stokes){
-      spec->sQ[idl] = spectrum.Stokes_Q[index][0];
-      spec->sU[idl] = spectrum.Stokes_U[index][0];
-      spec->sV[idl] = spectrum.Stokes_V[index][0];
+      spec->sQ[index] = spectrum.Stokes_Q[idl][0];
+      spec->sU[index] = spectrum.Stokes_U[idl][0];
+      spec->sV[index] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
     }
+    index += 1;
     // for (int idz=0; idz<atmos.Nspace; idz++)
     //   spec->J[idl,idz] = &spectrum.J[idz][idl];
   }
   spec->J = spectrum.J;
-  // memcpy(spec->J, spectrum.J, (spec->nlw+1)*atmos.Nspace * sizeof(double));
+  spec->nlw = Nlw;
+  // memcpy(spec->J, spectrum.J, (Nlw+1)*atmos.Nspace * sizeof(double));
 }

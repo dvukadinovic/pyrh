@@ -204,6 +204,7 @@ cdef class RH:
 				 Nlam, &lam_ids[0], &lam_values[0])
 				 # &self.wavetable[0], self.Nwave)
 
+		# spec.nlw -= 1
 		lam = convert_1d(spec.lam, spec.nlw)
 		sI = convert_1d(spec.sI, spec.nlw)
 		sQ, sU, sV = None, None, None
