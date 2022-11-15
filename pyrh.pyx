@@ -106,6 +106,7 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef hse(self,
+			  cwd,
 			  int atm_scale,
 			  double pg_top,
 			  cnp.ndarray[double, ndim=1, mode="c"] scale,
@@ -124,7 +125,16 @@ cdef class RH:
 		cdef int Ndep = scale.shape[0]
 		cdef int fudge_num = fudge_lam.shape[0]
 
-		myPops = rh.hse(Ndep, pg_top,
+		cdef char* argv[140]
+
+		py_list = cwd.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		myPops = rh.hse(argv[0], Ndep, pg_top,
 					 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 					 &mag[0], &gamma[0], &chi[0],
 					 &nH[0,0], &nHtot[0], atm_scale,
@@ -141,6 +151,7 @@ cdef class RH:
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
 	cpdef compute1d(self,
+				cwd,
 				double mu,
 				int atm_scale,
 				cnp.ndarray[double, ndim=1, mode="c"] scale,
@@ -174,7 +185,16 @@ cdef class RH:
 			print("\n  pyrh: Different number of lam_ids and lam_values.\n")
 			sys.exit()
 
-		spec = rh.rhf1d(mu, Ndep,
+		cdef char* argv[140]
+	
+		py_list = cwd.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		spec = rh.rhf1d(argv[0], mu, Ndep,
 				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
 				 &mag[0], &gamma[0], &chi[0],
 				 &nH[0,0], atm_scale,

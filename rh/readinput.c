@@ -48,8 +48,8 @@ void readInput()
   FILE *fp_keyword;
 
   Keyword theKeywords[] = {
-    {"ATMOS_FILE", "", FALSE, KEYWORD_REQUIRED, input.atmos_input,
-     setcharValue},
+    // {"ATMOS_FILE", "", FALSE, KEYWORD_REQUIRED, input.atmos_input,
+    //  setcharValue},
     {"ABUND_FILE", "", FALSE, KEYWORD_REQUIRED, input.abund_input,
      setcharValue},
 
@@ -156,22 +156,6 @@ void readInput()
      setcharValue},
     {"COOLING_OUTPUT", "none", FALSE, KEYWORD_OPTIONAL, input.coolingFile,
      setcharValue},
-    
-    // D.Vukadinovic: flag for computing RFs
-    {"RF_OUTPUT", "rfs.out", FALSE, KEYWORD_OPTIONAL, &input.rfs_output,
-     setcharValue},
-    {"RF_TEMP", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_temp,
-     setboolValue},
-    {"RF_VZ", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_vz,
-     setboolValue},
-    {"RF_VMIC", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_vmic,
-     setboolValue},
-    {"RF_MAG", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_mag,
-     setboolValue},
-    {"RF_GAMMA", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_gamma,
-     setboolValue},
-    {"RF_CHI", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.rf_chi,
-     setboolValue}, 
 
     {"VMICRO_CHAR", "",     FALSE, KEYWORD_REQUIRED, &atmos.vmicro_char,
      setdoubleValue},

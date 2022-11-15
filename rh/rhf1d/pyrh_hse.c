@@ -37,10 +37,6 @@
 #include "pyrh_hse.h"
 #include "pyrh_background.h"
 
-/* --- Function prototypes --                          -------------- */
-
-void _Hydrostatic(int NmaxIter, double iterLimit);
-
 /* --- Global variables --                             -------------- */
 
 Atmosphere atmos;
@@ -74,9 +70,14 @@ void dummy(){
   readAtomicModels();
 }
 
+void concatenate(char* dest, char* str1, char* str2){
+  strcpy(dest, str1);
+  strcat(dest, str2);
+}
+
 /* ------- begin -------------------------- pyrh_hse.c -------------- */
 
-myPops hse(int pyrh_Ndep, double pg_top,
+myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
            double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
            double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
            double *pyrh_nH, double *pyrh_nHtot, int pyrh_atm_scale, 
@@ -90,8 +91,10 @@ myPops hse(int pyrh_Ndep, double pg_top,
   Atom *atom;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};
+  int argc = 3;
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d", "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -100,6 +103,17 @@ myPops hse(int pyrh_Ndep, double pg_top,
   /* --- Read input data and initialize --             -------------- */
 
   readInput();
+
+  /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
+  char* tmp = malloc(160);
+  
+  // atomic list file
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+  // molecules list file
+  concatenate(tmp, "/", input.molecules_input);
+  concatenate(input.molecules_input, cwd, tmp);
+  
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
   // we want to solve for ne

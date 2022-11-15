@@ -84,7 +84,7 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 }
 
 // int argc, char *argv[], 
-mySpectrum rhf1d(double mu, int pyrh_Ndep,
+mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
@@ -100,14 +100,30 @@ mySpectrum rhf1d(double mu, int pyrh_Ndep,
   Molecule *molecule;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};
+  int argc = 3;
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d", "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
   readInput();
+  
+  /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
+  char* tmp = malloc(160);
+  
+  // atomic list file
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+  // molecules list file
+  concatenate(tmp, "/", input.molecules_input);
+  concatenate(input.molecules_input, cwd, tmp);
+  // Kurucz list file
+  concatenate(tmp, "/", input.KuruczData);
+  concatenate(input.KuruczData, cwd, tmp);
+
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
   // For now, we only allow for H in LTE state
