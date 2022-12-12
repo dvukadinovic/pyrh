@@ -83,8 +83,10 @@ typedef struct {
   bool_t magneto_optical, PRD_angle_dep, XRD, Eddington,
          backgr_pol, limit_memory, allow_passive_bb, NonICE,
          rlkscatter, xdr_endian, old_background, accelerate_mols,
-         rf_temp, rf_vz, rf_vmic, rf_mag, rf_gamma, rf_chi, // D.Vukadinovic
-         do_fudge; // D.Vukadinovic
+         // flag for applying OF [D.Vukadinovic]
+         do_fudge, 
+         // flag if we are performing HSE; then, all atoms/molecules are treated in LTE [D.Vukadinovic]
+         pyrhHSE; 
   enum   solution startJ;
   
   enum   StokesMode StokesMode;

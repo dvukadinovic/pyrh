@@ -81,6 +81,9 @@ void readMolecule(Molecule *molecule, char *fileName, bool_t active)
 
   /* --- Open the data file for current molecule --    -------------- */
 
+  // If we are performing HSE, we set all molecules to LTE (PASSIVE state)
+  if (input.pyrhHSE) active = FALSE;
+
   if ((fp_molecule = fopen(fileName, "r")) == NULL) {
     sprintf(messageStr, "Unable to open inputfile %s", fileName);
     Error(ERROR_LEVEL_2, routineName, messageStr);

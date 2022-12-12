@@ -108,17 +108,9 @@ cdef class RH:
 	cpdef hse(self,
 			  cwd,
 			  int atm_scale,
-			  double pg_top,
 			  cnp.ndarray[double, ndim=1, mode="c"] scale,
 			  cnp.ndarray[double, ndim=1, mode="c"] temp,
-			  cnp.ndarray[double, ndim=1, mode="c"] ne,
-			  cnp.ndarray[double, ndim=1, mode="c"] vz,
-			  cnp.ndarray[double, ndim=1, mode="c"] vmic,
-			  cnp.ndarray[double, ndim=1, mode="c"] mag,
-			  cnp.ndarray[double, ndim=1, mode="c"] gamma,
-			  cnp.ndarray[double, ndim=1, mode="c"] chi,
-			  cnp.ndarray[double, ndim=2, mode="c"] nH,
-			  cnp.ndarray[double, ndim=1, mode="c"] nHtot,
+			  double pg_top,
 			  int do_fudge,
 			  cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 			  cnp.ndarray[double, ndim=2, mode="c"] fudge):
@@ -135,9 +127,8 @@ cdef class RH:
 			argv[i_] = arr[i_]
 
 		myPops = rh.hse(argv[0], Ndep, pg_top,
-					 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
-					 &mag[0], &gamma[0], &chi[0],
-					 &nH[0,0], &nHtot[0], atm_scale,
+					 &scale[0], &temp[0],
+					 atm_scale,
 					 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
 
 		ne = convert_1d(myPops.ne, Ndep)
@@ -154,15 +145,7 @@ cdef class RH:
 				cwd,
 				double mu,
 				int atm_scale,
-				cnp.ndarray[double, ndim=1, mode="c"] scale,
-				cnp.ndarray[double, ndim=1, mode="c"] temp,
-				cnp.ndarray[double, ndim=1, mode="c"] ne,
-				cnp.ndarray[double, ndim=1, mode="c"] vz,
-				cnp.ndarray[double, ndim=1, mode="c"] vmic,
-				cnp.ndarray[double, ndim=1, mode="c"] mag,
-				cnp.ndarray[double, ndim=1, mode="c"] gamma,
-				cnp.ndarray[double, ndim=1, mode="c"] chi,
-				cnp.ndarray[double, ndim=2, mode="c"] nH,
+				cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 				cnp.ndarray[double, ndim=1, mode="c"] wave,
 				do_fudge,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
@@ -171,7 +154,7 @@ cdef class RH:
 				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
 				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values):
-		cdef int Ndep = scale.shape[0]
+		cdef int Ndep = atmosphere.shape[1]
 		cdef int fudge_num = fudge_lam.shape[0]
 		cdef int Nwave = wave.shape[0]
 		
@@ -195,9 +178,10 @@ cdef class RH:
 			argv[i_] = arr[i_]
 
 		spec = rh.rhf1d(argv[0], mu, Ndep,
-				 &scale[0], &temp[0], &ne[0], &vz[0], &vmic[0],
-				 &mag[0], &gamma[0], &chi[0],
-				 &nH[0,0], atm_scale,
+				 &atmosphere[0,0], &atmosphere[1,0], 
+				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
+				 &atmosphere[8,0], atm_scale,
 				 Nwave, &wave[0],
 				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
 				 Nloggf, &loggf_ids[0], &loggf_values[0],

@@ -110,6 +110,8 @@ mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
   SetFPEtraps();
 
   readInput();
+  // We are not performing HSE; atoms and molecules can be NLTE
+  input.pyrhHSE = FALSE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -225,6 +227,7 @@ mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
     geometry.vel[k] *= KM_TO_M;
     atmos.vturb[k]  *= KM_TO_M;
     atmos.ne[k]     /= CUBE(CM_TO_M);
+    atmos.B[k] /= 1e4; // G --> T
   }
 
   for (int k=0; k<geometry.Ndep; k++)

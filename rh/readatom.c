@@ -83,6 +83,9 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
   /* --- Open the data file for current model atom --  -------------- */
 
+  // If we are performing HSE, we set all atoms to LTE (PASSIVE state)
+  if (input.pyrhHSE) active = FALSE;
+
   initAtom(atom);
   if ((atom->fp_input = fopen(atom_file, "r")) == NULL) {
     sprintf(messageStr, "Unable to open input file %s", atom_file);

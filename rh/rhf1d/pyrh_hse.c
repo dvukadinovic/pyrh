@@ -78,9 +78,8 @@ void concatenate(char* dest, char* str1, char* str2){
 /* ------- begin -------------------------- pyrh_hse.c -------------- */
 
 myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
-           double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
-           double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-           double *pyrh_nH, double *pyrh_nHtot, int pyrh_atm_scale, 
+           double *pyrh_scale, double *pyrh_temp,
+           int pyrh_atm_scale, 
            int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
 {
   bool_t  equilibria_only, fromscratch;
@@ -103,6 +102,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   /* --- Read input data and initialize --             -------------- */
 
   readInput();
+  // We are performing HSE; all atoms and molecules are to be treated in LTE
+  input.pyrhHSE = TRUE;
 
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -122,12 +123,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   // Hydrogen populations are to be in LTE
   // It equals pointers of NLTE and LTE populations
   atmos.H_LTE = TRUE;
-
-  // we want only to have reference wavelength
-  // (but we will still have those from active atoms...)
-  // input.wavetable_input = "none";
-  // strcpy(input.wavetable_input, "none");
-  // input.kurucz_list = "none";
 
   /* --- Read input data for atmosphere --             -------------- */
 
@@ -153,6 +148,7 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     }
   }
 
+  // no Kurucz lines
   atmos.Nrlk = 0;
 
   geometry.Ndep = pyrh_Ndep;
@@ -173,55 +169,13 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   }
 
   memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
-  // memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));
-  atmos.ne = malloc(atmos.Nspace * sizeof(double));
-  memcpy(geometry.vel, pyrh_vz, geometry.Ndep * sizeof(double));
-  memcpy(atmos.vturb, pyrh_vmic, geometry.Ndep * sizeof(double));
-  memcpy(atmos.B, pyrh_mag, geometry.Ndep * sizeof(double));
-  memcpy(atmos.gamma_B, pyrh_gamma, geometry.Ndep * sizeof(double));
-  memcpy(atmos.chi_B, pyrh_chi, geometry.Ndep * sizeof(double));
-  atmos.Stokes = TRUE;
-
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  
-  // index=0;
-  // for (int n=0; n<atmos.NHydr; n++)
-  // {
-  //   for (int k=0; k<geometry.Ndep; k++)
-  //   {
-  //     atmos.nH[n][k] = pyrh_nH[index];
-  //     atmos.nH[n][k] /= CUBE(CM_TO_M);
-  //     index++;
-  //   }
-  // }
-
-  // set nHtot populations
   atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
   
-  // for (int k=0; k<geometry.Ndep; k++){
-  //   atmos.nHtot[k]  = pyrh_nHtot[k];
-  //   atmos.nHtot[k] /= CUBE(CM_TO_M);
-  // }
-
-  // check if atmosphere is non-static
+  // no polarization
+  atmos.Stokes = FALSE;
+  // no velocities in the atmosphere
   atmos.moving = FALSE;
-  
-  for (int k=0; k<geometry.Ndep; k++) {
-    // for (int n=0;  n<atmos.NHydr;  n++) {
-    //   atmos.nHtot[k] += atmos.nH[n][k];
-    // }
-    geometry.vel[k] *= KM_TO_M;
-    atmos.vturb[k]  *= KM_TO_M;
-    // atmos.ne[k]     /= CUBE(CM_TO_M);
-  }
-
-  for (int k=0; k<geometry.Ndep; k++)
-  {
-    if (fabs(geometry.vel[k]) >= atmos.vmacro_tresh) {
-      atmos.moving = TRUE;
-      break;
-    }
-  }
 
   /* --- redefine geometry for just this one ray --    -------------- */
 
@@ -230,7 +184,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
   geometry.muy[0] = 0.0;
   geometry.wmu[0] = 1.0;
-  if (atmos.Stokes) Bproject();
 
   /* --- read atoms and molecules ----------------------------------- */
   
