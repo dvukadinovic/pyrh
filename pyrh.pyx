@@ -29,6 +29,17 @@ cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 			pyarr[i,j] = arr[i][j]
 	return pyarr
 
+cpdef Pystring2char(lists):
+	cdef int N = len(lists)
+	cdef char* argv[140]
+
+	py_string = [item.encode("utf-8") for item in lists]
+	arr = (ctypes.c_char_p * N)(*py_string)
+	for i_ in range(N):
+		argv[i_] = arr[i_]
+
+	return N, argv
+
 class Spectrum(object):
 	def __init__(self, nlw=None, lam=None, sI=None, sQ=None, 
 				 sU=None, sV=None, J=None, Jrh=None, stokes=True):
@@ -51,11 +62,9 @@ class Spectrum(object):
 # add OF table as input to rhf1d()
 
 cdef class RH:
+
 	# cdef int Nrlk
 	# cdef rh.myRLK_Line rlk_lines
-
-	# cdef int argc
-	# cdef char* argv[10]
 
 	# cdef Py_ssize_t Nwave
 	# cdef array[double] wavetable
@@ -141,19 +150,51 @@ cdef class RH:
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)
+	cpdef get_tau(self,
+					cwd,
+					double mu,
+					int atm_scale,
+					cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
+					double lam_ref):
+		cdef int Ndep = atmosphere.shape[1]
+
+		cdef char* argv[140]
+	
+		py_list = cwd.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.ones(Ndep)
+
+		rh.get_tau(argv[0], mu, Ndep, &tau[0],
+				 &atmosphere[0,0], &atmosphere[1,0], 
+				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
+				 &atmosphere[8,0], atm_scale,
+				 lam_ref)
+
+		# tau = convert_1d(tau, Ndep)
+
+		return tau
+
+	@cython.boundscheck(False)
+	@cython.wraparound(False)
 	cpdef compute1d(self,
-				cwd,
-				double mu,
-				int atm_scale,
-				cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
-				cnp.ndarray[double, ndim=1, mode="c"] wave,
-				do_fudge,
-				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
-				cnp.ndarray[double, ndim=2, mode="c"] fudge,
-				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
-				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] lam_values):
+					cwd,
+					double mu,
+					int atm_scale,
+					cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
+					cnp.ndarray[double, ndim=1, mode="c"] wave,
+					do_fudge,
+					cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
+					cnp.ndarray[double, ndim=2, mode="c"] fudge,
+					cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
+					cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
+					cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
+					cnp.ndarray[double, ndim=1, mode="c"] lam_values):
 		cdef int Ndep = atmosphere.shape[1]
 		cdef int fudge_num = fudge_lam.shape[0]
 		cdef int Nwave = wave.shape[0]
@@ -185,7 +226,8 @@ cdef class RH:
 				 Nwave, &wave[0],
 				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
 				 Nloggf, &loggf_ids[0], &loggf_values[0],
-				 Nlam, &lam_ids[0], &lam_values[0])
+				 Nlam, &lam_ids[0], &lam_values[0],
+				 0, argv[0])
 				 # &self.wavetable[0], self.Nwave)
 
 		# spec.nlw -= 1

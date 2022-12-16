@@ -53,15 +53,15 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sV
 		double **J
 	
-	cdef mySpectrum rhf1d(char* cwd, double mu, int Ndep,
+	cdef mySpectrum rhf1d(char *cwd, double mu, int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
 			double *rh_mag, double *rh_gamma, double *rh_chi,
 			double *rh_nH, int atm_scale,
 			int Nwave, double *lam,
 			int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
 			int Nloggf, int *loggf_ids, double* loggf_values,
-			int Nlam, int *lam_ids, double *lam_values)
-			# double *wavetable, int Nwave)
+			int Nlam, int *lam_ids, double *lam_values,
+			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
 
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
@@ -81,3 +81,9 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 					int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
 
 	cdef void dummy()
+
+	cdef void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
+		              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
+		              double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
+		              double *pyrh_nH, int pyrh_atm_scale, 
+		              double lam_ref)

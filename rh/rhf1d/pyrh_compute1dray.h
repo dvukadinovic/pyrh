@@ -12,14 +12,15 @@ typedef struct{
 	RLK_Line *rlk_lines;
 } myRLK_Line;
  
-mySpectrum rhf1d(char* cwd, double mu, int Ndep,
-              double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
-              double *rh_mag, double *rh_gamma, double *rh_chi,
-              double *rh_nH, int atm_scale, 
+mySpectrum rhf1d(char *cwd, double mu, int Ndep,
+              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
+              double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
+              double *pyrh_nH, int atm_scale, 
               int Nwave, double *lam,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
-              int Nlam, int *lam_ids, double *lam_values);
-              // double *wavetable, int Nwave); // myRLK_Line *pyrh_rlk_lines,
+              int Nlam, int *lam_ids, double *lam_values,
+              int NKurucz_lists, char *Kurucz_lists);
+              // myRLK_Line *pyrh_rlk_lines,
 
 myRLK_Line get_RLK_lines(int argc, char *argv[]);

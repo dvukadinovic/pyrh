@@ -93,7 +93,6 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
   geometry.muy[0] = 0.0;
   geometry.wmu[0] = 1.0;
-  // this has to be reprojected for new muz (but from input B vector, not from already projected from rhf1d())
   if (atmos.Stokes) Bproject();
 
   /* --- Open file with background opacities --        -------------- */
@@ -118,7 +117,8 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
   bool_t pyrh_io_flag = FALSE;
 
   getProfiles();
-  // spectrum.J is already filled with correct values; do we need this initSolution() here?
+  // spectrum.J is already filled with correct values; do we need this initSolution() here? 
+  // It seems not (tested on H in ACTIVE state; everything was exactly the same as from original RH)
   // initSolution(pyrh_io_flag);
   // spectrum.J = J;
   // if (input.backgr_pol) spectrum.J20 = J20;

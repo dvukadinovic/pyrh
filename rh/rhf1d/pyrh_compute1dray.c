@@ -84,15 +84,16 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
 }
 
 // int argc, char *argv[], 
-mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
+mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
               int Nwave, double *lam,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
-              int Nlam, int *lam_ids, double *lam_values)
-              // double *wavetable, int Nwave) // myRLK_Line *pyrh_rlk_lines,
+              int Nlam, int *lam_ids, double *lam_values,
+              int NKurucz_lists, char *Kurucz_lists)
+              // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact, index;
@@ -104,6 +105,8 @@ mySpectrum rhf1d(char* cwd, double mu, int pyrh_Ndep,
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   char* argv[] = {"../rhf1d", "-i", keyword_input};
+
+  // printf("NKurucz_lists = %d\n", NKurucz_lists);
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
