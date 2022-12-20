@@ -186,7 +186,7 @@ cdef class RH:
 					int atm_scale,
 					cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 					cnp.ndarray[double, ndim=1, mode="c"] wave,
-					do_fudge,
+					int do_fudge,
 					cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
 					cnp.ndarray[double, ndim=2, mode="c"] fudge,
 					cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,

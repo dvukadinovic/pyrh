@@ -291,7 +291,26 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // printf("J -- %e | %e \n", spectrum.J[0][0],  spectrum.J[0][10]);
   // printf("     %e | %e \n", spectrum.J[10][0], spectrum.J[10][10]);
 
-  _solveray(argv, mu, &spec, spectrum.J, spectrum.J20);
+  _solveray(argv, mu, &spec);
+
+  //--- free all the memory that we do not use anymore
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.chi_c_lam[nspect]);
+  free(spectrum.chi_c_lam); spectrum.chi_c_lam = NULL;
+  
+  if (input.magneto_optical){
+    for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+      free(spectrum.chip_c_lam[nspect]);
+    free(spectrum.chip_c_lam); spectrum.chip_c_lam = NULL;
+  }
+
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.eta_c_lam[nspect]);
+  free(spectrum.eta_c_lam); spectrum.eta_c_lam = NULL;
+
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.sca_c_lam[nspect]);
+  free(spectrum.sca_c_lam); spectrum.sca_c_lam = NULL;
 
   return spec;
 }

@@ -86,7 +86,6 @@ void writeImu(int nspect, int mu, bool_t to_obs, double *I);
 void writeSpectrum(Spectrum *spectrum);
 void writeOpacity();
 
-
 /* --- Wavelength conversion --                         ------------- */
 
 void vacuum_to_air(int Nlambda, double *lambda_vac, double *lambda_air);

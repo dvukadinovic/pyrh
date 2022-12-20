@@ -54,7 +54,7 @@ char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** J20);
+void _solveray(char *argv[], double muz, mySpectrum *spec);
 
 int _getnumber(int* z)
 {
@@ -65,7 +65,7 @@ int _getnumber(int* z)
 
 /* ------- begin -------------------------- solveray.c -------------- */
 
-void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** J20)
+void _solveray(char *argv[], double muz, mySpectrum *spec)
 {
   register int n, k, la;
 
@@ -102,23 +102,12 @@ void _solveray(char *argv[], double muz, mySpectrum *spec, double** J, double** 
     Background(analyze_output=FALSE, equilibria_only=FALSE);
   } else {
     Background(analyze_output=FALSE, equilibria_only=TRUE);
-
-  //   if ((atmos.fd_background =
-	 // open(input.background_File, O_RDONLY, 0)) == -1) {
-  //     sprintf(messageStr, "Unable to open inputfile %s",
-	 //      input.background_File);
-  //     Error(ERROR_LEVEL_2, argv[0], messageStr);
-  //   }
-  //   readBRS();
   }
-  // convertScales(&atmos, &geometry);
-
-
-  bool_t pyrh_io_flag = FALSE;
 
   getProfiles();
   // spectrum.J is already filled with correct values; do we need this initSolution() here? 
   // It seems not (tested on H in ACTIVE state; everything was exactly the same as from original RH)
+  // bool_t pyrh_io_flag = FALSE;
   // initSolution(pyrh_io_flag);
   // spectrum.J = J;
   // if (input.backgr_pol) spectrum.J20 = J20;

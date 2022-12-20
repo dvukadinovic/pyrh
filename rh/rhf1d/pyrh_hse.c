@@ -341,7 +341,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   free(Nm); Nm = NULL;
   free(total_opacity); total_opacity = NULL;
   
-  
   return pops;
 }
 /* ------- end ---------------------------- pyrh_hse.c -------------- */
