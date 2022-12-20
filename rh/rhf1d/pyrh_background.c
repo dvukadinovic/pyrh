@@ -325,19 +325,19 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
   
     /* --- Opacities from bound-free transitions in OH and CH -- ---- */
 
-    // if (OH_bf_opac(wavelength, chi, eta)) {
-    //   if (debug) printf("Get OH_bf opacity\n");
-    // 	chi_ai[k] += chi[k];
-    // 	eta_ai[k] += eta[k];
-    //   total_opacity[layer] += chi[k];
-    // }
+    if (OH_bf_opac(wavelength, chi, eta)) {
+      if (debug) printf("Get OH_bf opacity\n");
+    	chi_ai[k] += chi[k];
+    	eta_ai[k] += eta[k];
+      total_opacity[layer] += chi[k];
+    }
     
-    // if (CH_bf_opac(wavelength, chi, eta)) {
-    //   if (debug) printf("Get CH_bf opacity\n");
-    // 	chi_ai[k] += chi[k];
-    // 	eta_ai[k] += eta[k];
-    //   total_opacity[layer] += chi[k];
-    // }
+    if (CH_bf_opac(wavelength, chi, eta)) {
+      if (debug) printf("Get CH_bf opacity\n");
+    	chi_ai[k] += chi[k];
+    	eta_ai[k] += eta[k];
+      total_opacity[layer] += chi[k];
+    }
     
      /* --- Neutral Hydrogen Bound-Free and Free-Free --  ------------ */
 
@@ -356,16 +356,16 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
     
     /* --- Rayleigh scattering by neutral hydrogen --  -------------- */
 
-    // if (Rayleigh(wavelength, atmos.H, scatt)) {
-    //   if (debug) printf("Get Rayleigh opacity\n");
-	   //  sca_ai[k]  += scatt[k];
-    // }
+    if (Rayleigh(wavelength, atmos.H, scatt)) {
+      if (debug) printf("Get Rayleigh opacity\n");
+	    sca_ai[k]  += scatt[k];
+    }
 
     /* --- Rayleigh scattering by neutral helium --    -------------- */
-    // if (He && Rayleigh(wavelength, He, scatt)) {
-    //   if (debug) printf("Get Rayleigh opacity\n");
-	   //  sca_ai[k]  += scatt[k];
-    // }
+    if (He && Rayleigh(wavelength, He, scatt)) {
+      if (debug) printf("Get Rayleigh opacity\n");
+	    sca_ai[k]  += scatt[k];
+    }
     /* --- Absorption by H + H^+ (referred to as H2plus free-free) -- */
 
     if (H2plus_ff(wavelength, chi)) {
@@ -378,17 +378,17 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
     /* --- Rayleigh scattering and free-free absorption by
            molecular hydrogen --                       -------------- */
 
-    // if (Rayleigh_H2(wavelength, scatt)) {
-    //   if (debug) printf("Get Rayleigh_H2 opacity\n");
-	   //  sca_ai[k]  += scatt[k];
-    // }
+    if (Rayleigh_H2(wavelength, scatt)) {
+      if (debug) printf("Get Rayleigh_H2 opacity\n");
+	    sca_ai[k]  += scatt[k];
+    }
     
-    // if (H2minus_ff(wavelength, chi)) {
-    //   if (debug) printf("Get H2minus_ff opacity\n");
-    // 	chi_ai[k] += chi[k];
-    // 	eta_ai[k] += chi[k] * Bnu[k];
-    //   total_opacity[layer] += chi[k];
-    // }
+    if (H2minus_ff(wavelength, chi)) {
+      if (debug) printf("Get H2minus_ff opacity\n");
+    	chi_ai[k] += chi[k];
+    	eta_ai[k] += chi[k] * Bnu[k];
+      total_opacity[layer] += chi[k];
+    }
     
     /* --- Bound-Free opacities due to ``metals'' --   -------------- */
 
@@ -423,11 +423,11 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
 
   /* --- Free the temporary space allocated in the ff routines -- --- */
 
-  // Hminus_ff(0.0, NULL);
+  Hminus_ff(0.0, NULL);
   // printf("Cleaning!\n");
-  // H2minus_ff(0.0, NULL);
+  H2minus_ff(0.0, NULL);
   // printf("Cleaning!\n");
-  // H2plus_ff(0.0, NULL);
+  H2plus_ff(0.0, NULL);
 
   // printf("Cleaning!\n");
   free(chi);
