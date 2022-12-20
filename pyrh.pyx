@@ -176,8 +176,6 @@ cdef class RH:
 				 &atmosphere[8,0], atm_scale,
 				 lam_ref)
 
-		# tau = convert_1d(tau, Ndep)
-
 		return tau
 
 	@cython.boundscheck(False)
@@ -242,7 +240,8 @@ cdef class RH:
 		# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
 		# Nlam = len(lam)
-		return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, None, None, spec.stokes)
+		return sI, sQ, sU, sV
+		# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, None, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
