@@ -109,8 +109,8 @@ cdef class RH:
 
 		return wave
 
-	cpdef dummy(self):
-		rh.dummy()
+	# cpdef dummy(self):
+	# 	rh.dummy()
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)

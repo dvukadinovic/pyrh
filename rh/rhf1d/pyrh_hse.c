@@ -39,15 +39,21 @@
 
 /* --- Global variables --                             -------------- */
 
-Atmosphere atmos;
-Geometry geometry;
-Spectrum spectrum;
-ProgramStats stats;
-InputData input;
-CommandLine commandline;
-char messageStr[MAX_LINE_SIZE];
+// Atmosphere atmos;
+// Geometry geometry;
+// Spectrum spectrum;
+// InputData input;
 
-// enum Topology topology = ONE_D_PLANE;
+
+/* --- Global variables --- */
+
+extern Atmosphere atmos;
+extern Geometry geometry;
+extern Spectrum spectrum;
+extern ProgramStats stats;
+extern InputData input;
+extern CommandLine commandline;
+extern char messageStr[MAX_LINE_SIZE];
 
 /* --- Acceleration parameters --                      -------------- */
 
