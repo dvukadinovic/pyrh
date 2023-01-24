@@ -42,13 +42,23 @@
 
 enum Topology topology = ONE_D_PLANE;
 
+// Atmosphere atmos;
+// Geometry geometry;
+// Spectrum spectrum;
+// ProgramStats stats;
+// InputData input;
+// CommandLine commandline;
+
+
+/* --- Global variables --- */
+
 Atmosphere atmos;
 Geometry geometry;
 Spectrum spectrum;
 ProgramStats stats;
 InputData input;
 CommandLine commandline;
-char messageStr[MAX_MESSAGE_LENGTH];
+char messageStr[MAX_LINE_SIZE];
 
 /* ------- begin -------------------------- rhf1d.c ----------------- */
 

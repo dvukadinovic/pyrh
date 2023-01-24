@@ -129,10 +129,17 @@
 
 /* --- Global variables --                             -------------- */
 
+// extern Atmosphere atmos;
+// extern Spectrum spectrum;
+// extern InputData input;
+
+
+/* --- Global variables --- */
+
 extern Atmosphere atmos;
 extern Spectrum spectrum;
 extern InputData input;
-extern char messageStr[];
+extern char messageStr[MAX_LINE_SIZE];
 
 void pyrh_Background(bool_t equilibria_only, double* total_opacity)
 {
@@ -527,13 +534,13 @@ void get_ne(bool_t fromscratch){
     niter++;
   }
 
-  if (dne > MAX_ELECTRON_ERROR) {
-    sprintf(messageStr, "Electron density iteration not converged:\n"
-      " spatial location: %d, temperature: %6.1f [K], \n"
-      " density: %9.3E [m^-3],\n dnemax: %9.3E\n",
-      k, atmos.T[k], atmos.nHtot[k], dne);
-    Error(WARNING, routineName, messageStr);
-  }
+  // if (dne > MAX_ELECTRON_ERROR) {
+  //   sprintf(messageStr, "Electron density iteration not converged:\n"
+  //     " spatial location: %d, temperature: %6.1f [K], \n"
+  //     " density: %9.3E [m^-3],\n dnemax: %9.3E\n",
+  //     k, atmos.T[k], atmos.nHtot[k], dne);
+  //   Error(WARNING, routineName, messageStr);
+  // }
 
   free(fjk);  free(dfjk);
 

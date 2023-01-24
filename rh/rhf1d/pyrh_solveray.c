@@ -43,14 +43,21 @@
 
 // enum Topology topology = ONE_D_PLANE;
 
+// extern Atmosphere atmos;
+// extern Geometry geometry;
+// extern InputData input;
+// extern Spectrum spectrum;
+
+
+/* --- Global variables --- */
+
 extern Atmosphere atmos;
 extern Geometry geometry;
-// ProgramStats stats;
+extern Spectrum spectrum;
+extern ProgramStats stats;
 extern InputData input;
-// CommandLine commandline;
-
-Spectrum spectrum;
-char messageStr[MAX_LINE_SIZE];
+extern CommandLine commandline;
+extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);

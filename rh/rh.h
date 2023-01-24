@@ -56,7 +56,6 @@ enum VoigtAlgorithm {ARMSTRONG, RYBICKI, HUI_ETAL, HUMLICEK, LOOKUP};
 
 #define PERMISSIONS  0666
 
-
 /* --- Function prototypes --                          -------------- */
 
 void   SetFPEtraps(void);
