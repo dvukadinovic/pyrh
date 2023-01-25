@@ -18,9 +18,12 @@ for item in rhf1d:
 rh_c_files.append("pyrh.pyx")
 # rh_c_files.append("tools.pyx")
 
+# for item in rh_c_files:
+# 	print(item)
+
 # remove some of the files
 rh_c_files.remove("rh/collision_Oslo.c")
-rh_c_files.remove("rh/rhf1d/rf_ray.c")
+# rh_c_files.remove("rh/rhf1d/rf_ray.c")
 
 setup(
 	name="pyrh",
