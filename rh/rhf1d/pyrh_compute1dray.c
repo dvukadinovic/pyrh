@@ -21,6 +21,7 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 #include <string.h>
+#include <sys/sysinfo.h>
 
 #include "rh.h"
 #include "atom.h"
@@ -107,6 +108,20 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 {
   bool_t write_analyze_output, equilibria_only;
   int    niter, nact, index;
+
+  struct sysinfo sinfo;
+  double totalRAM, freeRAM1, freeRAM2, mem_unit;
+  int IOflag;
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   totalRAM = sinfo.totalram;
+  //   mem_unit = sinfo.mem_unit / 1024.0 / 1024.0;
+  //   freeRAM1 = sinfo.freeram * mem_unit;
+  //   printf("free RAM %f\n", freeRAM1);
+  // }
 
   Molecule *molecule;
 
@@ -252,15 +267,48 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   if (atmos.Stokes) Bproject();
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("After allocating atmosphere %f\n", freeRAM1 - freeRAM2);
+  // }
   
   readAtomicModels();
   readMolecularModels();
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("Before allocating opacity/emisivity %f\n", freeRAM1 - freeRAM2);
+  // }
+
   SortLambda(lam, Nwave);
 
   getBoundary(&geometry);
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("After allocating opacity/emisivity %f\n", freeRAM1 - freeRAM2);
+  // }
   
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("After Background() %f\n", freeRAM1 - freeRAM2);
+  // }
 
   bool_t pyrh_io_flag = FALSE;
 
@@ -275,6 +323,14 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   getCPU(1, TIME_POLL, "Total Initialize");
 
   /* --- Solve radiative transfer for active ingredients -- --------- */
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("Before iteration %f\n", freeRAM1 - freeRAM2);
+  // }
 
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
@@ -301,6 +357,14 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // printf("J -- %e | %e \n", spectrum.J[0][0],  spectrum.J[0][10]);
   // printf("     %e | %e \n", spectrum.J[10][0], spectrum.J[10][10]);
 
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("Before solveray() %f\n", freeRAM1 - freeRAM2);
+  // }
+
   _solveray(argv, mu, &spec);
 
   //--- free all the memory that we do not use anymore
@@ -321,6 +385,14 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   for (int nspect=0; nspect < spectrum.Nspect; nspect++)
     free(spectrum.sca_c_lam[nspect]);
   free(spectrum.sca_c_lam); spectrum.sca_c_lam = NULL;
+
+  // IOflag = sysinfo(&sinfo);
+  // if (IOflag!=0){
+  //   printf("Could not read sysinfo...\n");
+  // } else{
+  //   freeRAM2 = sinfo.freeram * mem_unit;
+  //   printf("After freeing opacity/emisivity %f\n", freeRAM1 - freeRAM2);
+  // }
 
   return spec;
 }
