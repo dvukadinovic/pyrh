@@ -219,6 +219,12 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
       geometry.cmass[k] = POW10(pyrh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
     }
   }
+  if (pyrh_atm_scale==2){
+    geometry.scale = GEOMETRIC;
+    for (int k=0; k<geometry.Ndep; k++){
+      geometry.height[k] = pyrh_scale[k] * KM_TO_M;
+    }
+  }
 
   memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
   memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));

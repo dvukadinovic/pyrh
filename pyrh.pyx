@@ -149,6 +149,26 @@ cpdef hse(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+cpdef get_pe(cwd,
+			 int atm_scale,
+			 cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
+			 cnp.ndarray[double, ndim=1, mode="c"] ne):
+	cdef int Ndep = atmosphere.shape[1]
+
+	cdef char* argv[140]
+
+	py_list = cwd.split(" ")
+	argc = len(py_list)
+	py_string = [item.encode("utf-8") for item in py_list]
+	arr = (ctypes.c_char_p * argc)(*py_string)
+	for i_ in range(argc):
+		argv[i_] = arr[i_]
+
+	rh.get_pe(argv[0], mu, Ndep, &)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cpdef get_tau(cwd,
 			  double mu,
 			  int atm_scale,
@@ -246,3 +266,4 @@ cpdef compute1d(cwd,
 
 	# def get_Nrlk(self):
 	# 	return self.Nrlk
+
