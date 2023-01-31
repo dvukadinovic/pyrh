@@ -149,10 +149,10 @@ cpdef hse(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef get_pe(cwd,
-			 int atm_scale,
-			 cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
-			 cnp.ndarray[double, ndim=1, mode="c"] ne):
+cpdef get_ne_from_nH(cwd,
+					 int atm_scale,
+					 cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
+					 cnp.ndarray[double, ndim=1, mode="c"] nH):
 	cdef int Ndep = atmosphere.shape[1]
 
 	cdef char* argv[140]
@@ -164,8 +164,9 @@ cpdef get_pe(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	rh.get_pe(argv[0], mu, Ndep, &)
-
+	rh.get_ne_from_nH(argv[0], atm_scale, Ndep, 
+			  &atmosphere[0,0], &atmosphere[1,0], 
+			  &nH[0], &atmosphere[2,0])
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

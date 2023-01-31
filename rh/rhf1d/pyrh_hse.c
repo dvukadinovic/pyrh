@@ -512,3 +512,87 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   }
 
 }
+
+void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep, 
+                    double *pyrh_scale, double *pyrh_temp, 
+                    double *pyrh_nH, double *pyrh_ne)
+{
+  bool_t equilibria_only;
+  int    niter, nact, index;
+
+  /* --- Read input data and initialize --             -------------- */
+  int argc = 3;
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d", "-i", keyword_input};
+
+  setOptions(argc, argv);
+  getCPU(0, TIME_START, NULL);
+  SetFPEtraps();
+
+  readInput();
+  // We are not performing HSE; atoms and molecules can be NLTE
+  input.pyrhHSE = TRUE;
+  
+  /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
+  char* tmp = malloc(160);
+  
+  // atomic list file
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+  // molecules list file
+  concatenate(tmp, "/", input.molecules_input);
+  concatenate(input.molecules_input, cwd, tmp);
+  // Kurucz list file
+  concatenate(tmp, "/", input.KuruczData);
+  concatenate(input.KuruczData, cwd, tmp);
+  // input.KuruczData = NULL;
+  atmos.Nrlk = 0;
+
+  spectrum.updateJ = TRUE;
+  input.limit_memory = FALSE;
+  // For now, we only allow for H in LTE state
+  atmos.H_LTE = TRUE;
+  
+  geometry.Ndep = pyrh_Ndep;
+  
+  getCPU(1, TIME_START, NULL);
+  MULTIatmos(&atmos, &geometry);
+    
+  if (pyrh_atm_scale==0){
+    geometry.scale = TAU500;
+    for (int k=0; k<geometry.Ndep; k++) 
+      geometry.tau_ref[k] = POW10(pyrh_scale[k]);
+  }
+  if (pyrh_atm_scale==1){
+    geometry.scale = COLUMN_MASS;
+    for (int k=0; k<geometry.Ndep; k++){
+      geometry.cmass[k] = POW10(pyrh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
+    }
+  }
+  if (pyrh_atm_scale==2){
+    geometry.scale = GEOMETRIC;
+    for (int k=0; k<geometry.Ndep; k++){
+      geometry.height[k] = pyrh_scale[k] * KM_TO_M;
+    }
+  }
+
+  atmos.T = pyrh_temp;
+  atmos.ne = pyrh_ne;
+  atmos.nHtot = pyrh_nH;
+
+  atmos.Stokes = FALSE;
+
+  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
+  
+  // check if atmosphere is non-static
+  atmos.moving = FALSE;
+  
+  readAtomicModels();
+  readMolecularModels();
+
+  atmos.active_layer = -1;
+  input.solve_ne = ONCE;
+  Background(FALSE, TRUE);
+
+}

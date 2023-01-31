@@ -14,3 +14,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
              double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
              double *pyrh_nH, int pyrh_atm_scale, 
              double lam_ref);
+
+void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep, 
+                    double *pyrh_scale, double *pyrh_temp, 
+                    double *pyrh_nH, double *pyrh_ne);
