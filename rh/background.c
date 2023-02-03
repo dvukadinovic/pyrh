@@ -285,7 +285,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   // if we already read lines, skip reading
   // important only when we do SOLVE_NE in ITERATION mode
   // for large line files it will speed things up
-  if (atmos.Nrlk == 0){
+  if (atmos.Nrlk==0 && !input.pyrhHSE){
     readKuruczLines(input.KuruczData);
   }
   
