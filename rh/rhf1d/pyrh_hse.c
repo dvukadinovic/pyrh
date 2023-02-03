@@ -76,10 +76,10 @@ void dummy(){
   readAtomicModels();
 }
 
-void concatenate(char* dest, char* str1, char* str2){
-  strcpy(dest, str1);
-  strcat(dest, str2);
-}
+// void concatenate(char* dest, char* str1, char* str2){
+//   strcpy(dest, str1);
+//   strcat(dest, str2);
+// }
 
 /* ------- begin -------------------------- pyrh_hse.c -------------- */
 
@@ -180,10 +180,14 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     }
   }
 
-  memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
+  atmos.T = pyrh_temp;
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
-  
+  atmos.ne = (double *) malloc(geometry.Ndep * sizeof(double));
+  atmos.nHtot = (double *) malloc(geometry.Ndep * sizeof(double));
+
+  // it is needed in some routines...
+  atmos.vturb = (double *) calloc(geometry.Ndep, sizeof(double));
+
   // no polarization
   atmos.Stokes = FALSE;
   // no velocities in the atmosphere
@@ -240,7 +244,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   atmos.ne[0] = 0;
   Nm[0] = 0;
   while (iter<NMAX_HSE_ITER){
-    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
+    // atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
+    atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0]) / atmos.totalAbund;
     for (int n=0;  n<atmos.Natom; n++){
       atmos.atoms[n].ntotal[0] = atmos.atoms[n].abundance * atmos.nHtot[0];
     }
@@ -260,6 +265,7 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     nHtot_old = atmos.ne[0];
     if (eta<=1e-2) break;
   }
+  // printf("[0] -- %e\n", atmos.nHtot[0]);
 
   // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
 
@@ -288,21 +294,26 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
       // de la Cruz Rodriguez et al. 2019
       // integration in logarithmic optical depth scale
       dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
-      if (iter==0){
-        dcmass = 1 / (total_opacity[k]/rho[k]);
-        // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
-        pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
-      }
-      else{
-        beta2 = total_opacity[k]/rho[k];
-        beta1 = total_opacity[k-1]/rho[k-1];
-        dcmass = log(beta2/beta1) / (beta2 - beta1);
-        // dcmass = 2/(beta2 + beta1);
-        // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
-        pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
-      }
+      // if (iter==0){
+      //   dcmass = 1 / (total_opacity[k]/rho[k]);
+      //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+      //   pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
+      // }
+      // else{
+      //   beta2 = total_opacity[k]/rho[k];
+      //   beta1 = total_opacity[k-1]/rho[k-1];
+      //   dcmass = log(beta2/beta1) / (beta2 - beta1);
+      //   // dcmass = 2/(beta2 + beta1);
+      //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
+      //   pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
+      // }
+      beta1 = rho[k-1]/total_opacity[k-1] * geometry.tau_ref[k-1];
+      beta2 = rho[k]/total_opacity[k] * geometry.tau_ref[k];
+      pg[k] = pg[k-1] + LOG10 * atmos.gravity * (beta2 + beta1)/2 * dlogtau;
+      pg[k] *= 1.05;
       
-      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
+      // atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
+      atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k]) / atmos.totalAbund;
       rho[k] = (AMU * atmos.wght_per_H) * atmos.nHtot[k];
 
       // get electron density and continuum opacity
@@ -318,8 +329,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
       eta = fabs((atmos.nHtot[k] - nHtot_old)/nHtot_old);
       nHtot_old = atmos.nHtot[k];
       if (eta<=1e-2) break;
-
     }
+    // printf("[%d] -- %e\n", k, atmos.nHtot[k]);
     // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e @ %d\n", eta, k);
     // printf("------------\n");
     // printf("%d | %e | %e | %e | %e | %e\n", iter, eta, atmos.ne[k], atmos.nHtot[k], total_opacity[k], Nm[k]);
@@ -353,7 +364,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
 
 void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
-             double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
              double *pyrh_nH, int pyrh_atm_scale, 
              double lam_ref)
 {
@@ -373,7 +383,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   SetFPEtraps();
 
   readInput();
-  // We are not performing HSE; atoms and molecules can be NLTE
+  
+  // We are performing 'HSE'; atoms and molecules are in LTE
   input.pyrhHSE = TRUE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
@@ -385,10 +396,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   // molecules list file
   concatenate(tmp, "/", input.molecules_input);
   concatenate(input.molecules_input, cwd, tmp);
-  // Kurucz list file
-  concatenate(tmp, "/", input.KuruczData);
-  concatenate(input.KuruczData, cwd, tmp);
-  // input.KuruczData = NULL;
+
   atmos.Nrlk = 0;
 
   spectrum.updateJ = TRUE;
@@ -406,6 +414,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     for (int k=0; k<geometry.Ndep; k++) 
       geometry.tau_ref[k] = POW10(pyrh_scale[k]);
   }
+  free(geometry.tau_ref);
+  geometry.tau_ref = tau_ref;
   if (pyrh_atm_scale==1){
     geometry.scale = COLUMN_MASS;
     for (int k=0; k<geometry.Ndep; k++){
@@ -419,39 +429,21 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     }
   }
 
-  memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
-  memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));
-  memcpy(geometry.vel, pyrh_vz, geometry.Ndep * sizeof(double));
-  memcpy(atmos.vturb, pyrh_vmic, geometry.Ndep * sizeof(double));
-  // memcpy(atmos.B, pyrh_mag, geometry.Ndep * sizeof(double));
-  // memcpy(atmos.gamma_B, pyrh_gamma, geometry.Ndep * sizeof(double));
-  // memcpy(atmos.chi_B, pyrh_chi, geometry.Ndep * sizeof(double));
+  atmos.T = pyrh_temp;
+  atmos.ne = pyrh_ne;
+  geometry.vel = pyrh_vz;
+  atmos.vturb = pyrh_vmic;
+  atmos.nHtot = pyrh_nH;
+  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
+ 
   atmos.Stokes = FALSE;
 
-  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  index=0;
-  for (int n=0; n<atmos.NHydr; n++)
-  {
-    for (int k=0; k<geometry.Ndep; k++)
-    {
-      atmos.nH[n][k] = pyrh_nH[index];
-      atmos.nH[n][k] /= CUBE(CM_TO_M);
-      index++;
-    }
-  }
-
-  atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
-  
   for (int k=0; k<geometry.Ndep; k++)
   {
-    for (int n=0;  n<atmos.NHydr;  n++)
-    {
-      atmos.nHtot[k] += atmos.nH[n][k];
-    }
     geometry.vel[k] *= KM_TO_M;
     atmos.vturb[k]  *= KM_TO_M;
     atmos.ne[k]     /= CUBE(CM_TO_M);
-    atmos.B[k] /= 1e4; // G --> T
+    atmos.nHtot[k] /= CUBE(CM_TO_M);
   }
 
   // check if atmosphere is non-static
@@ -463,57 +455,33 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
       break;
     }
   }
-
-  if (atmos.Stokes) Bproject();
   
   readAtomicModels();
   readMolecularModels();
 
   double* wavetable = (double *) malloc(1 * sizeof(double));
-  int Nwav = 1;
-  wavetable[0] = 500;
+  int Nwav = 0;
+  // wavetable[0] = 500;
   SortLambda(wavetable, Nwav);
 
   getBoundary(&geometry);
 
-  // double* total_opacity = (double*) malloc(atmos.Nspace * sizeof(double)); // total opacity @ lam_ref
-
-  // for (int k=0; k<atmos.Nspace; k++){
-  //   atmos.active_layer = k;
-  //   pyrh_Background(equilibria_only=FALSE, total_opacity);
-  // }
-
   atmos.active_layer = -1;
-
   input.solve_ne = NONE;
   Background(FALSE, FALSE);
   convertScales(&atmos, &geometry);
 
-  // for (int k=0; k<atmos.Nspace; k++){
-  //   printf("tau = %e | cmass = %e | height = %e | chic = %e\n", geometry.tau_ref[k], geometry.cmass[k], geometry.height[k], spectrum.chi_c_lam[0][k]);
-  // }
-
-  wavetable[0] = lam_ref;
-  atmos.lambda_ref = lam_ref;
-  SortLambda(wavetable, Nwav);
-
-  Background(FALSE, FALSE);
-
-  geometry.scale = COLUMN_MASS;
-  convertScales(&atmos, &geometry);
-
-  // printf("-----\n");
-  // for (int k=0; k<atmos.Nspace; k++){
-  //   printf("tau = %e | cmass = %e | height = %e | chic = %e\n", geometry.tau_ref[k], geometry.cmass[k], geometry.height[k], spectrum.chi_c_lam[0][k]);
-  // }
-
-  for (int k=0; k<atmos.Nspace; k++){
-    tau_ref[k] = geometry.tau_ref[k];
+  // revert units (since we pass pointers...)
+  for (int k=0; k<geometry.Ndep; k++){
+    geometry.vel[k] /= KM_TO_M;
+    atmos.vturb[k] /= KM_TO_M;
+    atmos.ne[k] *= CUBE(CM_TO_M);
+    atmos.nHtot[k] *= CUBE(CM_TO_M);
   }
-
 }
 
-void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep, 
+void get_ne_from_nH(char *cwd, 
+                    int pyrh_atm_scale, int pyrh_Ndep, 
                     double *pyrh_scale, double *pyrh_temp, 
                     double *pyrh_nH, double *pyrh_ne)
 {
@@ -531,6 +499,7 @@ void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep,
   SetFPEtraps();
 
   readInput();
+  // input = pyrh_input;
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = TRUE;
   
@@ -558,7 +527,7 @@ void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep,
   
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry);
-    
+
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
     for (int k=0; k<geometry.Ndep; k++) 
@@ -581,12 +550,18 @@ void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep,
   atmos.ne = pyrh_ne;
   atmos.nHtot = pyrh_nH;
 
+  // 1/cm3 --> 1/m3
+  for (int k=0; k<geometry.Ndep; k++){
+    atmos.nHtot[k] /= CUBE(CM_TO_M);
+  }
+
+  // it is needed in some routines...
+  atmos.vturb = (double *) calloc(geometry.Ndep, sizeof(double));
+
   atmos.Stokes = FALSE;
+  atmos.moving = FALSE;
 
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  
-  // check if atmosphere is non-static
-  atmos.moving = FALSE;
   
   readAtomicModels();
   readMolecularModels();
@@ -594,5 +569,35 @@ void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep,
   atmos.active_layer = -1;
   input.solve_ne = ONCE;
   Background(FALSE, TRUE);
+
+  // 1/m3 --> 1/cm3
+  for (int k=0; k<geometry.Ndep; k++){
+    atmos.ne[k] *= CUBE(CM_TO_M);
+    atmos.nHtot[k] *= CUBE(CM_TO_M);
+  }
+
+  // free atmosphere related data
+  free(atmos.vturb);
+  
+  int n;
+  if (atmos.Natom > 1) {
+    for (n = 1;  n < atmos.Natom;  n++)
+      if (!atmos.atoms[n].active  &&  
+          !atmos.hydrostatic  &&
+    input.solve_ne < ITERATION)
+  freeAtom(&atmos.atoms[n]);
+  }
+  if (atmos.Nmolecule > 1) {
+    for (n = 1;  n < atmos.Nmolecule;  n++)
+      if (!atmos.molecules[n].active  &&  
+          !atmos.hydrostatic  &&
+    input.solve_ne < ITERATION) 
+  freeMolecule(&atmos.molecules[n]);
+  }
+
+  // free geometry related data
+  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); 
+  if (geometry.cmass!=NULL) free(geometry.cmass);
+  if (geometry.height!=NULL) free(geometry.height);
 
 }

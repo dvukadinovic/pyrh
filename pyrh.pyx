@@ -62,6 +62,8 @@ class Spectrum(object):
 # add OF table as input to rhf1d()
 
 cdef class RH:
+	cdef rh.InputData ID;
+	cdef rh.AtMol AtomsMolecules;
 
 	# cdef int Nrlk
 	# cdef rh.myRLK_Line rlk_lines
@@ -70,8 +72,35 @@ cdef class RH:
 	# cdef array[double] wavetable
 	# cdef double[::1] wavetable
 
-	def __init__(self):
-		pass
+	def __init__(self, cwd):
+		self.readInputData(cwd)
+
+	cpdef readInputData(self, cwd):
+		cdef char* argv[140];
+
+		py_list = cwd.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		self.ID = rh.get_InputData(argv[0])
+
+	cpdef readAtomsMolecules(self, cwd):
+		cdef char* argv[140]
+
+		py_list = cwd.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			argv[i_] = arr[i_]
+
+		self.AtomsMolecules = rh.read_AtomsMolecules(self.ID, argv[0])
+
+	cpdef check_ID(self):
+		rh.check_ID(self.ID)
 
 	# def __reduce__(self):
 	# 	return (self.__class__, (None, None))
@@ -108,6 +137,28 @@ cdef class RH:
 				wave[i] = wave[i] * fact
 
 		return wave
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef get_ne_from_nH(cwd,
+					 int atm_scale,
+					 cnp.ndarray[double, ndim=1, mode="c"] scale,
+					 cnp.ndarray[double, ndim=2, mode="c"] atmosphere):
+	cdef int Ndep = atmosphere.shape[1]
+
+	cdef char* argv[140]
+
+	py_list = cwd.split(" ")
+	argc = len(py_list)
+	py_string = [item.encode("utf-8") for item in py_list]
+	arr = (ctypes.c_char_p * argc)(*py_string)
+	for i_ in range(argc):
+		argv[i_] = arr[i_]
+
+	rh.get_ne_from_nH(argv[0], 
+			  atm_scale, Ndep, 
+			  &scale[0], &atmosphere[1,0], 
+			  &atmosphere[8,0], &atmosphere[2,0])
 
 	# cpdef dummy(self):
 	# 	rh.dummy()
@@ -149,30 +200,10 @@ cpdef hse(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef get_ne_from_nH(cwd,
-					 int atm_scale,
-					 cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
-					 cnp.ndarray[double, ndim=1, mode="c"] nH):
-	cdef int Ndep = atmosphere.shape[1]
-
-	cdef char* argv[140]
-
-	py_list = cwd.split(" ")
-	argc = len(py_list)
-	py_string = [item.encode("utf-8") for item in py_list]
-	arr = (ctypes.c_char_p * argc)(*py_string)
-	for i_ in range(argc):
-		argv[i_] = arr[i_]
-
-	rh.get_ne_from_nH(argv[0], atm_scale, Ndep, 
-			  &atmosphere[0,0], &atmosphere[1,0], 
-			  &nH[0], &atmosphere[2,0])
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cpdef get_tau(cwd,
 			  double mu,
 			  int atm_scale,
+			  cnp.ndarray[double, ndim=1, mode="c"] scale,
 			  cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 			  double lam_ref):
 	cdef int Ndep = atmosphere.shape[1]
@@ -186,16 +217,11 @@ cpdef get_tau(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.ones(Ndep)
-
-	rh.get_tau(argv[0], mu, Ndep, &tau[0],
-			 &atmosphere[0,0], &atmosphere[1,0], 
+	rh.get_tau(argv[0], mu, Ndep, &atmosphere[0,0],
+			 &scale[0], &atmosphere[1,0], 
 			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
-			 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
 			 &atmosphere[8,0], atm_scale,
 			 lam_ref)
-
-	return tau
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

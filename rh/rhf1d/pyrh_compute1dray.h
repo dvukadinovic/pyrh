@@ -2,6 +2,21 @@
 #include "../atom.h"
 
 typedef struct{
+    Atom *atoms;
+    Molecule *molecules;
+    Element *elements;
+
+    int Nelem; // number of *elements;
+    int Npf; // number of partition function elements
+
+    double totalAbund, wght_per_H, avgMolWght;
+
+    double *Tpf; // partition function
+
+
+} AtMol;
+
+typedef struct{
 	int nlw, Nrays, stokes;
 	double *lam, *sI, *sQ, *sU, *sV;
 	double **J, **J20;
@@ -11,6 +26,10 @@ typedef struct{
 	int Nrlk;
 	RLK_Line *rlk_lines;
 } myRLK_Line;
+
+InputData get_InputData(char *cwd);
+AtMol read_AtomsMolecules(InputData pyrh_input, char *cwd);
+void check_ID(InputData ID);
  
 mySpectrum rhf1d(char *cwd, double mu, int Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,

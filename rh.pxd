@@ -14,6 +14,16 @@ cdef extern from "rh/rh.h":
 # 	cdef enum S_interpol_stokes: DELO_PARABOLIC, DELO_BEZIER3
 
 cdef extern from "rh/atom.h":
+	ctypedef struct Atom:
+		pass
+
+	ctypedef struct Element:
+		pass
+
+	ctypedef struct Molecule:
+		pass
+
+cdef extern from "rh/atom.h":
 	cdef enum vdWaals: UNSOLD, RIDDER_RENSBERGEN, BARKLEM, KURUCZ
 
 	ctypedef struct ZeemanMultiplet:
@@ -36,7 +46,11 @@ cdef extern from "rh/atom.h":
 		# double isotope_frac, gL_i, gL_j, hfs_i, hfs_j, iso_dl
 		# double cross, alpha
 		# ZeemanMultiplet *zm;
-	
+
+cdef extern from "rh/inputs.h":
+	ctypedef struct InputData:
+		pass	
+
 cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	ctypedef struct myRLK_Line:
 		int Nrlk
@@ -52,6 +66,12 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sU
 		double *sV
 		double **J
+
+	ctypedef struct AtMol:
+		pass
+		# Atom *atoms;
+		# Molecule *molecules;
+		# Element *elements;
 	
 	cdef mySpectrum rhf1d(char *cwd, double mu, int Ndep,
 			double *rh_scale, double *rh_temp, double *rh_ne, double *rh_vz, double *rh_vmic,
@@ -66,6 +86,10 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
 	# cdef void dummy(myRLK_Line *rlk_lines)
+
+	cdef InputData get_InputData(char *cwd)
+	cdef AtMol read_AtomsMolecules(InputData pyrh_input, char *cwd)
+	cdef void check_ID(InputData ID)
 
 cdef extern from "rh/rhf1d/pyrh_hse.h":
 	ctypedef struct myPops:
@@ -84,10 +108,10 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 
 	cdef void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
 		              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
-		              double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
 		              double *pyrh_nH, int pyrh_atm_scale, 
 		              double lam_ref)
 
-	cdef void get_ne_from_nH(char *cwd, int pyrh_atm_scale, int pyrh_Ndep, 
+	cdef void get_ne_from_nH(char *cwd, 
+					int pyrh_atm_scale, int pyrh_Ndep, 
                     double *pyrh_scale, double *pyrh_temp, 
                     double *pyrh_nH, double *pyrh_ne)

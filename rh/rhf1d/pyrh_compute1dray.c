@@ -77,6 +77,11 @@ char messageStr[MAX_LINE_SIZE];
 // save every output from rhf1d() that we need for solveray(), then we can
 // make it. For now, let us stick to solveray() call directly from the rhf1d().
 
+void concatenate(char* dest, char* str1, char* str2){
+  strcpy(dest, str1);
+  strcat(dest, str2);
+}
+
 myRLK_Line get_RLK_lines(int argc, char *argv[])
 {
   myRLK_Line output;
@@ -92,6 +97,68 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
   output.Nrlk = atmos.Nrlk;
 
   return output;
+}
+
+InputData get_InputData(char *cwd)
+{
+  /* --- Read input data and initialize --             -------------- */
+  int argc = 3;
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d", "-i", keyword_input};
+
+  setOptions(argc, argv);
+  getCPU(0, TIME_START, NULL);
+  SetFPEtraps();
+
+  readInput();
+
+  return input;
+}
+
+AtMol read_AtomsMolecules(InputData pyrh_input, char *cwd)
+{
+  AtMol AtomsMolecules;
+  
+  input = pyrh_input;
+  
+  /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
+  char* tmp = malloc(160);
+  
+  // atomic list file
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+  // molecules list file
+  concatenate(tmp, "/", input.molecules_input);
+  concatenate(input.molecules_input, cwd, tmp);
+  // Kurucz list file
+  concatenate(tmp, "/", input.KuruczData);
+  concatenate(input.KuruczData, cwd, tmp);
+
+  readAbundance(&atmos);
+
+  // AtomsMolecules.elements = atmos.elements;
+  // AtomsMolecules.Nelem = atmos.Nelem;
+  // AtomsMolecules.Tpf = atmos.Tpf;
+  // AtomsMolecules.Npf = atmos.Npf;
+  // AtomsMolecules.totalAbund = atmos.totalAbund;
+  // AtomsMolecules.wght_per_H = atmos.avgWeight;
+  // AtomsMolecules.avgMolWght = atmos.avgWeight / atmos.totalAbund;
+
+  // readAtomicModels();
+  // readMolecularModels();
+
+  // AtomsMolecules.atoms = atmos.atoms;
+  // AtomsMolecules.molecules = atmos.molecules;
+  
+  return AtomsMolecules;
+}
+
+
+void check_ID(InputData ID)
+{
+  printf("%d\n", ID.NmaxIter);
+  printf("%s\n", ID.atoms_input);
 }
 
 // int argc, char *argv[], 
@@ -226,41 +293,28 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     }
   }
 
-  memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
-  memcpy(atmos.ne, pyrh_ne, geometry.Ndep * sizeof(double));
-  memcpy(geometry.vel, pyrh_vz, geometry.Ndep * sizeof(double));
-  memcpy(atmos.vturb, pyrh_vmic, geometry.Ndep * sizeof(double));
-  memcpy(atmos.B, pyrh_mag, geometry.Ndep * sizeof(double));
-  memcpy(atmos.gamma_B, pyrh_gamma, geometry.Ndep * sizeof(double));
-  memcpy(atmos.chi_B, pyrh_chi, geometry.Ndep * sizeof(double));
+  // memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
+  atmos.T = pyrh_temp;
+  atmos.ne = pyrh_ne;
+  geometry.vel = pyrh_vz;
+  atmos.vturb = pyrh_vmic;
+  atmos.B = pyrh_mag;
+  atmos.gamma_B = pyrh_gamma;
+  atmos.chi_B = pyrh_chi;
+  atmos.nHtot = pyrh_nH;
+  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
+
   atmos.Stokes = TRUE;
 
-  atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  index=0;
-  for (int n=0; n<atmos.NHydr; n++)
-  {
-    for (int k=0; k<geometry.Ndep; k++)
-    {
-      atmos.nH[n][k] = pyrh_nH[index];
-      atmos.nH[n][k] /= CUBE(CM_TO_M);
-      index++;
-    }
-  }
-
-  atmos.nHtot = (double *) calloc(geometry.Ndep, sizeof(double));
-  
   // check if atmosphere is non-static
   atmos.moving = FALSE;
   
   for (int k=0; k<geometry.Ndep; k++)
   {
-    for (int n=0;  n<atmos.NHydr;  n++)
-    {
-      atmos.nHtot[k] += atmos.nH[n][k];
-    }
     geometry.vel[k] *= KM_TO_M;
     atmos.vturb[k]  *= KM_TO_M;
     atmos.ne[k]     /= CUBE(CM_TO_M);
+    atmos.nHtot[k]  /= CUBE(CM_TO_M);
     atmos.B[k] /= 1e4; // G --> T
   }
 
@@ -372,6 +426,15 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // }
 
   _solveray(argv, mu, &spec);
+
+  // revert units (since we pass pointers...)
+  for (int k=0; k<geometry.Ndep; k++){
+    geometry.vel[k] /= KM_TO_M;
+    atmos.vturb[k]  /= KM_TO_M;
+    atmos.ne[k]     *= CUBE(CM_TO_M);
+    atmos.nHtot[k]  *= CUBE(CM_TO_M);
+    atmos.B[k]      *= 1e4; // T --> G
+  }
 
   //--- free all the memory that we do not use anymore
   for (int nspect=0; nspect < spectrum.Nspect; nspect++)
