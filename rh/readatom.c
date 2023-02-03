@@ -333,25 +333,24 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
 
       if (atmos.Stokes) {
-	if (line->g_Lande_eff != 0.0 ||
-	    (determinate(atom->label[i], atom->g[i], &nq, &S, &L, &Jl) &&
-	     determinate(atom->label[j], atom->g[j], &nq, &S, &L, &Ju) &&
-	     fabs(Ju - Jl) <= 1.0)) {
-
-          if (line->Ncomponent > 1) {
-	    sprintf(messageStr,
-		    "Line %3d -> %3d: cannot treat composite line "
-                    "with polarization", j, i);
-	    Error(ERROR_LEVEL_2, routineName, messageStr);
-	  }
-	  line->polarizable = TRUE;
-	} else {
-	  sprintf(messageStr,
-		  " -- Treating line %3d -> %3d without polarization%s\n",
-		  j, i, (kr == Nline-1) ? "\n" : "");
-	  Error(MESSAGE, routineName, messageStr);
-	  line->polarizable = FALSE;
-	}
+      	if (line->g_Lande_eff != 0.0 ||
+      	    (determinate(atom->label[i], atom->g[i], &nq, &S, &L, &Jl) &&
+      	     determinate(atom->label[j], atom->g[j], &nq, &S, &L, &Ju) &&
+      	     fabs(Ju - Jl) <= 1.0)) {
+              if (line->Ncomponent > 1) {
+          	    sprintf(messageStr,
+          		    "Line %3d -> %3d: cannot treat composite line "
+                              "with polarization", j, i);
+          	    Error(ERROR_LEVEL_2, routineName, messageStr);
+          	  }
+	           line->polarizable = TRUE;
+        } else {
+      	  sprintf(messageStr,
+      		  " -- Treating line %3d -> %3d without polarization%s\n",
+      		  j, i, (kr == Nline-1) ? "\n" : "");
+      	  Error(MESSAGE, routineName, messageStr);
+      	  line->polarizable = FALSE;
+        }
       }
     }
   }

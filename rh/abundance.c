@@ -33,7 +33,7 @@
 
        If the Hydrogen abundance equals 12.0 the routine assumes that
        abundances are given on a DEX scale. They are then converted to
-       base 10 numbers (i.e. A = 10^A - 12.0).
+       base 10 numbers (i.e. A = 10^(A - 12.0)).
 
        A metallicity factor is applied to elements other than hydrogen.
        metallicity = POW10(input.metallicity).
@@ -71,7 +71,6 @@
 
 extern InputData input;
 extern char messageStr[];
-
 
 /* ------- begin -------------------------- readAbundance.c --------- */
 
