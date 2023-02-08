@@ -430,6 +430,7 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
 
   /* --- Free the temporary space allocated in the ff routines -- --- */
 
+  // printf("Cleaning!\n");
   Hminus_ff(0.0, NULL);
   // printf("Cleaning!\n");
   H2minus_ff(0.0, NULL);

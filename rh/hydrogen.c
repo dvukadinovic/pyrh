@@ -476,7 +476,10 @@ bool_t Hminus_ff(double lambda, double *chi)
     /* --- When called with zero wavelength free memory for fractional
            indices --                                  -------------- */
 
-    if (theta_index) free(theta_index);
+    // clean only if we are doing it for the whole atmosphere in one run
+    if (layer==-1){
+      if (theta_index) free(theta_index);
+    }
     initialize = TRUE;
     return FALSE;
   }
@@ -715,7 +718,9 @@ bool_t H2minus_ff(double lambda, double *chi) {
 
     /* --- When called with zero wavelength free memory for fractional
            indices --                                  -------------- */
-    if (theta_index) free(theta_index);
+    if (layer==-1){
+      if (theta_index) free(theta_index);
+    }
     initialize = TRUE;
     return FALSE;
   }
@@ -866,7 +871,9 @@ bool_t H2plus_ff(double lambda, double *chi)
     /* --- When called with zero wavelength free memory for fractional
            indices --                                  -------------- */
 
-    if (temp_index) free(temp_index);
+    if (layer==-1){
+      if (temp_index) free(temp_index);
+    }
     initialize = TRUE;
     return FALSE;
   }
