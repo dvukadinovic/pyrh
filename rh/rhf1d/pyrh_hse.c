@@ -212,7 +212,7 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   wavetable[0] = 500.00;
   int Nwav = 1;
   SortLambda(wavetable, Nwav);
-
+  
   /* --- define variables for HSE------------------------------------ */
 
   myPops pops;
@@ -265,7 +265,12 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     nHtot_old = atmos.ne[0];
     if (eta<=1e-2) break;
   }
-  // printf("[0] -- %e\n", atmos.nHtot[0]);
+
+  if (geometry.scale==GEOMETRIC){
+    geometry.cmass[0] = (atmos.nHtot[0] * atmos.totalAbund + atmos.ne[0]) * (KBOLTZMANN*atmos.T[0]/atmos.gravity);
+    geometry.tau_ref[0] = 0.5 * total_opacity[0] * (geometry.height[0] - geometry.height[1]);
+    if (geometry.tau_ref[0] > 1.0) geometry.tau_ref[0] = 0.0;
+  }
 
   // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
 
@@ -293,7 +298,7 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     while (iter<NMAX_HSE_ITER){
       // de la Cruz Rodriguez et al. 2019
       // integration in logarithmic optical depth scale
-      dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
+      if (geometry.scale==TAU500) dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
       // if (iter==0){
       //   dcmass = 1 / (total_opacity[k]/rho[k]);
       //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
@@ -307,15 +312,22 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
       //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
       //   pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
       // }
-      beta1 = rho[k-1]/total_opacity[k-1] * geometry.tau_ref[k-1];
-      beta2 = rho[k]/total_opacity[k] * geometry.tau_ref[k];
-      pg[k] = pg[k-1] + LOG10 * atmos.gravity * (beta2 + beta1)/2 * dlogtau;
-      pg[k] *= 1.05;
+      if (geometry.scale==TAU500){
+        beta1 = rho[k-1]/total_opacity[k-1] * geometry.tau_ref[k-1];
+        beta2 = rho[k]/total_opacity[k] * geometry.tau_ref[k];
+        pg[k] = pg[k-1] + LOG10 * atmos.gravity * (beta2 + beta1)/2 * dlogtau;
+      }
+      if (geometry.scale==GEOMETRIC){
+        pg[k] = pg[k-1] + atmos.gravity * (rho[k] + rho[k-1])/2 * (geometry.height[k-1] - geometry.height[k]);
+        
+        // get other scales
+        geometry.cmass[k]  = geometry.cmass[k-1]  + 0.5*(rho[k-1] + rho[k]) * (geometry.height[k-1] - geometry.height[k]);
+        geometry.tau_ref[k] = geometry.tau_ref[k-1] + 0.5*(total_opacity[k-1] + total_opacity[k]) * (geometry.height[k-1] - geometry.height[k]);
+      }
       
       // atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
       atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k]) / atmos.totalAbund;
       rho[k] = (AMU * atmos.wght_per_H) * atmos.nHtot[k];
-
       // get electron density and continuum opacity
       for (int n=0;  n<atmos.Natom; n++){
         atmos.atoms[n].ntotal[k] = atmos.atoms[n].abundance * atmos.nHtot[k];
@@ -330,10 +342,9 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
       nHtot_old = atmos.nHtot[k];
       if (eta<=1e-2) break;
     }
-    // printf("[%d] -- %e\n", k, atmos.nHtot[k]);
     // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e @ %d\n", eta, k);
     // printf("------------\n");
-    // printf("%d | %e | %e | %e | %e | %e\n", iter, eta, atmos.ne[k], atmos.nHtot[k], total_opacity[k], Nm[k]);
+    // printf("%d | %e | %e | %e | %e | %e | %e \n", iter, eta, atmos.ne[k], atmos.nHtot[k], total_opacity[k], pg[k], rho[k]);
     // printf("nHmin = %e\n", atmos.nHmin[k]);
     // printf("k = %d | iter = %d | eta = %f\n ----------- \n", k, iter, eta);
     // printf("k = %d | iter = %d\n ----------- \n", k, iter);
