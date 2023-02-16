@@ -207,6 +207,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   readInput();
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;
+  // input.solve_ne = ONCE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -361,6 +362,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
+  // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
 
   // IOflag = sysinfo(&sinfo);
   // if (IOflag!=0){

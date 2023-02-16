@@ -217,11 +217,15 @@ cpdef get_tau(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	rh.get_tau(argv[0], mu, Ndep, &atmosphere[0,0],
+	cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.empty(Ndep)
+
+	rh.get_tau(argv[0], mu, Ndep, &tau[0],
 			 &scale[0], &atmosphere[1,0], 
 			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
 			 &atmosphere[8,0], atm_scale,
 			 lam_ref)
+
+	return tau
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

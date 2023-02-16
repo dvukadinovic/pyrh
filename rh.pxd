@@ -13,6 +13,10 @@ cdef extern from "rh/rh.h":
 # 	cdef enum S_interpol: S_LINEAR, S_PARABOLIC, S_BEZIER3
 # 	cdef enum S_interpol_stokes: DELO_PARABOLIC, DELO_BEZIER3
 
+# produced error because geometry.h does not know Atmosphere structure...
+# cdef extern from "rh/rhf1d/geometry.h":
+# 	cdef enum mass_scale: GEOMETRIC, COLUMN_MASS, TAU500
+
 cdef extern from "rh/atom.h":
 	ctypedef struct Atom:
 		pass
