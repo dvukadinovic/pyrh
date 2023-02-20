@@ -1,3 +1,17 @@
+# Installation
+
+The RH code uses bool_t defined in rpc/types.h and is dependent on the
+rpc/xdr.h IO (which is in pyrh obsolete; but is not removed from the code
+completely). Before installation, types.h and xdr.h, located in ./headers, must be copied into /usr/include/rpc for RH to include them.
+
+To install the package, do it as:
+
+python setup.py install
+
+On every change of the code, it needs to be recompiled since it is a shared
+library that needs to be changed are re-imported in the code in order to see
+change.
+
 # Important notes
 
 We set the keyword LIMIT_MEMORY to be FALSE all the time. It is mannualy
