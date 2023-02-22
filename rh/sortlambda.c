@@ -559,6 +559,8 @@ void SortLambda(double* wavetable, int Nwave)
 /* ------- end ---------------------------- SortLambda.c ------------ */
 
 void allocateOpacityEmissivity(){
+  int nspect;
+
   spectrum.chi_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
   for (nspect=0; nspect < spectrum.Nspect; nspect++)
     spectrum.chi_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
