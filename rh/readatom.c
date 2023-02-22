@@ -721,6 +721,17 @@ void freeAtom(Atom *atom)
 }
 /* ------- end ---------------------------- freeAtom.c -------------- */
 
+void freeAtoms()
+{
+    if (atmos.Natom > 1) {
+        for (int n = 1;  n < atmos.Natom;  n++)
+          if (!atmos.atoms[n].active  &&
+              !atmos.hydrostatic  &&
+        input.solve_ne < ITERATION)
+      freeAtom(&atmos.atoms[n]);
+    }
+}
+
 /* ------- begin -------------------------- freeAtomicLine.c -------- */
 
 void freeAtomicLine(AtomicLine *line)

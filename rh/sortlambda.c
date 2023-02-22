@@ -223,23 +223,7 @@ void SortLambda(double* wavetable, int Nwave)
   /* --- Allocate space for wavelength dependendent opacities and 
   emissivities --- */
 
-  spectrum.chi_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
-  for (nspect=0; nspect < spectrum.Nspect; nspect++)
-    spectrum.chi_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
-  
-  if (input.magneto_optical){
-    spectrum.chip_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
-    for (nspect=0; nspect < spectrum.Nspect; nspect++)
-      spectrum.chip_c_lam[nspect] = (double *) malloc(3*atmos.Nspace * sizeof(double));
-  }
-
-  spectrum.eta_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
-  for (nspect=0; nspect < spectrum.Nspect; nspect++)
-    spectrum.eta_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
-
-  spectrum.sca_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
-  for (nspect=0; nspect < spectrum.Nspect; nspect++)
-    spectrum.sca_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+  allocateOpacityEmissivity();
 
 
   /* --- Get the input wavelengts indices after sorting --- */
@@ -573,3 +557,43 @@ void SortLambda(double* wavetable, int Nwave)
   getCPU(2, TIME_POLL, "SortLambda");
 }
 /* ------- end ---------------------------- SortLambda.c ------------ */
+
+void allocateOpacityEmissivity(){
+  spectrum.chi_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.chi_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+
+  if (input.magneto_optical){
+    spectrum.chip_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+    for (nspect=0; nspect < spectrum.Nspect; nspect++)
+      spectrum.chip_c_lam[nspect] = (double *) malloc(3*atmos.Nspace * sizeof(double));
+  }
+
+  spectrum.eta_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.eta_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+
+  spectrum.sca_c_lam = (double **)malloc(spectrum.Nspect * sizeof(double*));
+  for (nspect=0; nspect < spectrum.Nspect; nspect++)
+    spectrum.sca_c_lam[nspect] = (double *) malloc(4*atmos.Nspace * sizeof(double));
+}
+
+void freeOpacityEmissivity(){
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.chi_c_lam[nspect]);
+  free(spectrum.chi_c_lam); spectrum.chi_c_lam = NULL;
+
+  if (input.magneto_optical){
+    for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+      free(spectrum.chip_c_lam[nspect]);
+    free(spectrum.chip_c_lam); spectrum.chip_c_lam = NULL;
+  }
+
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.eta_c_lam[nspect]);
+  free(spectrum.eta_c_lam); spectrum.eta_c_lam = NULL;
+
+  for (int nspect=0; nspect < spectrum.Nspect; nspect++)
+    free(spectrum.sca_c_lam[nspect]);
+  free(spectrum.sca_c_lam); spectrum.sca_c_lam = NULL;
+}

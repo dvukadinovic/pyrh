@@ -444,6 +444,17 @@ void freeMolecule(Molecule *molecule)
 }
 /* ------- end ---------------------------- freeMolecule.c ---------- */
 
+void freeMolecules()
+{
+    if (atmos.Nmolecule > 1) {
+        for (int n = 1;  n < atmos.Nmolecule;  n++)
+          if (!atmos.molecules[n].active  &&
+              !atmos.hydrostatic  &&
+        input.solve_ne < ITERATION)
+      freeMolecule(&atmos.molecules[n]);
+    }
+}
+
 /* ------- begin -------------------------- initMolLine.c ----------- */
 
 void initMolLine(MolecularLine *mrt, enum type line_type)

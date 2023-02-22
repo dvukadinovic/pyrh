@@ -401,10 +401,16 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
 
   // convertScales(&atmos, &geometry);
 
-  // printf("tau = %e\n", geometry.tau_ref[0]);
-  // printf("tau = %e\n", geometry.tau_ref[10]);
-  // printf("tau = %e\n", geometry.tau_ref[20]);
-  
+  freeAtoms();
+  freeMolecules();
+
+  freeOpacityEmissivity();
+
+  // free geometry related data
+  if (geometry.tau_ref!=NULL) free(geometry.tau_ref);
+  if (geometry.cmass!=NULL) free(geometry.cmass);
+  if (geometry.height!=NULL) free(geometry.height);
+
   // clear
   free(rho); rho = NULL;
   free(pg); pg = NULL;
@@ -531,6 +537,17 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     atmos.ne[k] *= CUBE(CM_TO_M);
     atmos.nHtot[k] *= CUBE(CM_TO_M);
   }
+
+  freeAtoms();
+  freeMolecules();
+
+  freeOpacityEmissivity();
+
+  // free geometry related data
+//  if (geometry.tau_ref!=NULL) free(geometry.tau_ref);
+  if (geometry.cmass!=NULL) free(geometry.cmass);
+  if (geometry.height!=NULL) free(geometry.height);
+
 }
 
 void get_ne_from_nH(char *cwd, 
@@ -631,22 +648,9 @@ void get_ne_from_nH(char *cwd,
 
   // free atmosphere related data
   free(atmos.vturb);
-  
-  int n;
-  if (atmos.Natom > 1) {
-    for (n = 1;  n < atmos.Natom;  n++)
-      if (!atmos.atoms[n].active  &&  
-          !atmos.hydrostatic  &&
-    input.solve_ne < ITERATION)
-  freeAtom(&atmos.atoms[n]);
-  }
-  if (atmos.Nmolecule > 1) {
-    for (n = 1;  n < atmos.Nmolecule;  n++)
-      if (!atmos.molecules[n].active  &&  
-          !atmos.hydrostatic  &&
-    input.solve_ne < ITERATION) 
-  freeMolecule(&atmos.molecules[n]);
-  }
+
+  freeAtoms();
+  freeMolecules();
 
   // free geometry related data
   if (geometry.tau_ref!=NULL) free(geometry.tau_ref); 
