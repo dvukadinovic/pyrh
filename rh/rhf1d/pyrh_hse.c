@@ -544,7 +544,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   freeOpacityEmissivity();
 
   // free geometry related data
-//  if (geometry.tau_ref!=NULL) free(geometry.tau_ref);
+//  if (geo metry.tau_ref!=NULL) free(geometry.tau_ref);
   if (geometry.cmass!=NULL) free(geometry.cmass);
   if (geometry.height!=NULL) free(geometry.height);
 
