@@ -99,68 +99,6 @@ myRLK_Line get_RLK_lines(int argc, char *argv[])
   return output;
 }
 
-InputData get_InputData(char *cwd)
-{
-  /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
-
-  setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
-  SetFPEtraps();
-
-  readInput();
-
-  return input;
-}
-
-AtMol read_AtomsMolecules(InputData pyrh_input, char *cwd)
-{
-  AtMol AtomsMolecules;
-  
-  input = pyrh_input;
-  
-  /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
-  char* tmp = malloc(160);
-  
-  // atomic list file
-  concatenate(tmp, "/", input.atoms_input);
-  concatenate(input.atoms_input, cwd, tmp);
-  // molecules list file
-  concatenate(tmp, "/", input.molecules_input);
-  concatenate(input.molecules_input, cwd, tmp);
-  // Kurucz list file
-  concatenate(tmp, "/", input.KuruczData);
-  concatenate(input.KuruczData, cwd, tmp);
-
-  readAbundance(&atmos);
-
-  // AtomsMolecules.elements = atmos.elements;
-  // AtomsMolecules.Nelem = atmos.Nelem;
-  // AtomsMolecules.Tpf = atmos.Tpf;
-  // AtomsMolecules.Npf = atmos.Npf;
-  // AtomsMolecules.totalAbund = atmos.totalAbund;
-  // AtomsMolecules.wght_per_H = atmos.avgWeight;
-  // AtomsMolecules.avgMolWght = atmos.avgWeight / atmos.totalAbund;
-
-  // readAtomicModels();
-  // readMolecularModels();
-
-  // AtomsMolecules.atoms = atmos.atoms;
-  // AtomsMolecules.molecules = atmos.molecules;
-  
-  return AtomsMolecules;
-}
-
-
-void check_ID(InputData ID)
-{
-  printf("%d\n", ID.NmaxIter);
-  printf("%s\n", ID.atoms_input);
-}
-
 // int argc, char *argv[], 
 mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
@@ -279,7 +217,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     }
   }
 
-  // memcpy(atmos.T, pyrh_temp, geometry.Ndep * sizeof(double));
   atmos.T = pyrh_temp;
   atmos.ne = pyrh_ne;
   geometry.vel = pyrh_vz;
@@ -357,7 +294,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   getCPU(1, TIME_START, NULL);
 
   mySpectrum spec;
-  // spec.nlw = Nwave;
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
@@ -377,12 +313,25 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   freeAtoms();
   freeMolecules();
 
+  if (atmos.Stokes){
+    freeMatrix(atmos.cos_gamma);
+    freeMatrix(atmos.cos_2chi);
+    freeMatrix(atmos.sin_2chi);
+  }
+
   freeOpacityEmissivity();
 
+  if (atmos.Nrlk!=0) {
+    freePartitionFunction();
+  }
+
   // free geometry related data
-  if (geometry.tau_ref!=NULL) free(geometry.tau_ref);
-  if (geometry.cmass!=NULL) free(geometry.cmass);
-  if (geometry.height!=NULL) free(geometry.height);
+  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
+  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
+  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+
+  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
 
   return spec;
 }
