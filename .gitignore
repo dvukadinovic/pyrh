@@ -1,5 +1,6 @@
 build/*
 dist/*
+pyrh.egg-info
 pyrh.egg-info/*
 pyrh.c
 tools.c
