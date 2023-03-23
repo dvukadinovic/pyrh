@@ -116,21 +116,19 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   Molecule *molecule;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  strcpy(commandline.keyword_input, keyword_input);
 
-  // printf("NKurucz_lists = %d\n", NKurucz_lists);
+  int argc = 1;
+  char* argv[] = {};
+  // = {"../rhf1d", "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
   readInput();
-  // We are not performing HSE; atoms and molecules can be NLTE
-  input.pyrhHSE = FALSE;
-  // input.solve_ne = ONCE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -145,11 +143,20 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   concatenate(tmp, "/", input.KuruczData);
   concatenate(input.KuruczData, cwd, tmp);
 
+  // DV: override/set some parameters 
+  // atoms and molecules can be NLTE (if HSE=TRUE, than everything is LTE)
+  input.pyrhHSE = FALSE;
+  // we do not solve for ne pops, we provide them
+  input.solve_ne = FALSE;
+  // we have to recompute J
   spectrum.updateJ = TRUE;
+  // 
   input.limit_memory = FALSE;
-  // For now, we only allow for H in LTE state
+  // treatment of Hydrogen in the background. In LTE case it should be TRUE
   // atmos.H_LTE = TRUE;
   
+  // --- DV --- this is where I stoped with reading the RH workflow.
+
   // set fudge factors
   if (do_fudge==1){
     input.do_fudge = TRUE;
