@@ -48,6 +48,7 @@ void readInput()
   FILE *fp_keyword;
 
   Keyword theKeywords[] = {
+    // DV: obsolete in pyrh
     // {"ATMOS_FILE", "", FALSE, KEYWORD_REQUIRED, input.atmos_input,
     //  setcharValue},
     {"ABUND_FILE", "", FALSE, KEYWORD_REQUIRED, input.abund_input,
@@ -61,12 +62,13 @@ void readInput()
      setboolValue},
     {"ATMOS_ITOP", "none", FALSE, KEYWORD_OPTIONAL, input.Itop, setcharValue},
 
-    {"WAVETABLE", "none", FALSE, KEYWORD_OPTIONAL, input.wavetable_input,
-     setcharValue},
+    // DV: obsolete in pyrh
+    // {"WAVETABLE", "none", FALSE, KEYWORD_OPTIONAL, input.wavetable_input,
+    //  setcharValue},
     {"ATOMS_FILE",  "", FALSE, KEYWORD_REQUIRED, input.atoms_input,
      setcharValue},
     
-    // D.Vukadinovic (03.05.2022.) -- path to Barklem tables
+    // DV: path to Barklem tables
     {"BARKLEM_SP_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_sp_data,
      setcharValue},
     {"BARKLEM_PD_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_pd_data,
@@ -132,14 +134,15 @@ void readInput()
     {"OPACITY_FUDGE", "none", FALSE, KEYWORD_OPTIONAL, &input.fudgeData,
      setcharValue},
    
-    // D.Vukadinovic (10.05.2022.) -- flag for doing fudge or not; 
-    //    data provided through call to rhf1d() function
+    // DV: flag for doing fudge or not; 
+    //     data provided through call to rhf1d() function
     {"DO_FUDGE", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.do_fudge,
      setboolValue},
 
     {"METALLICITY", "0.0", FALSE, KEYWORD_DEFAULT, &input.metallicity,
      setdoubleValue},
     
+    // DV: none of the outputs are generated with pyrh
     {"ATMOS_OUTPUT", "atmos.out", FALSE, KEYWORD_DEFAULT, input.atmos_output,
      setcharValue},
     {"GEOMETRY_OUTPUT", "geometry.out", FALSE, KEYWORD_OPTIONAL,
