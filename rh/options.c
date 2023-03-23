@@ -49,17 +49,22 @@ void setOptions(int argc, char *argv[])
   };
   Noption = sizeof(theOptions) / sizeof(Option);
 
-  parse(argc, argv, Noption, theOptions);
+  // parse(argc, argv, Noption, theOptions);
 
-  if (strlen(logfileName) > 0) {
-    if ((commandline.logfile = fopen(logfileName, "w")) == NULL) {
-      sprintf(messageStr, "Unable to open log file %s", logfileName);
-      Error(ERROR_LEVEL_2, routineName, messageStr);
-    }
-    setvbuf(commandline.logfile, NULL, _IOLBF, BUFSIZ);
-  } else
-    commandline.logfile = stderr;
+  // if (strlen(logfileName) > 0) {
+  //   if ((commandline.logfile = fopen(logfileName, "w")) == NULL) {
+  //     sprintf(messageStr, "Unable to open log file %s", logfileName);
+  //     Error(ERROR_LEVEL_2, routineName, messageStr);
+  //   }
+  //   setvbuf(commandline.logfile, NULL, _IOLBF, BUFSIZ);
+  // } else
 
-  commandline.wavetable = (strlen(wavetable) > 0) ? wavetable : NULL;
+  // DV: overrided the parameters by hand.
+  commandline.logfile = stderr;
+  commandline.quiet = TRUE;
+  commandline.showkeywords = FALSE;
+
+  // DV: no purpose in the whole code at all.
+  // commandline.wavetable = (strlen(wavetable) > 0) ? wavetable : NULL;
 }
 /* ------- end ---------------------------- setOptions.c ------------ */
