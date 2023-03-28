@@ -62,10 +62,10 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
        calculation (rlk_opacity.c).
  Note: [DV] we added two more values to Kurucz line that contain information
        on the orbital quantum numbers of levels that is used to compute the
-       broadening of a spectral line by ABO theory. the original implementation
+       broadening of a spectral line by ABO theory. The original implementation
        does not read these numbers, it only reads the total angular momentum
-       (term state). Do not give these numbers if you do not know the level
-       configurations!
+       (term state). Do not give these numbers if you do not know the levels
+       configuration.
 
        --                                              -------------- */
 
