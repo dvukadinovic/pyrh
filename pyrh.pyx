@@ -9,6 +9,8 @@ import cython
 import ctypes
 import sys
 
+from libc.stdlib cimport malloc, free
+
 cnp.import_array()
 
 # cimport tools
@@ -61,9 +63,16 @@ class Spectrum(object):
 		
 # add OF table as input to rhf1d()
 
+cdef void string2pointer(string, char* c_char_pointer):
+	py_list = string.split(" ")
+	argc = len(py_list)
+	py_string = [item.encode("utf-8") for item in py_list]
+	arr = (ctypes.c_char_p * argc)(*py_string)
+	for i_ in range(argc):
+		c_char_pointer[i_] = arr[i_]
+
 cdef class RH:
-	cdef rh.InputData ID;
-	cdef rh.AtMol AtomsMolecules;
+	cdef char* cwd[160]
 
 	# cdef int Nrlk
 	# cdef rh.myRLK_Line rlk_lines
@@ -73,70 +82,14 @@ cdef class RH:
 	# cdef double[::1] wavetable
 
 	def __init__(self, cwd):
-		self.readInputData(cwd)
-
-	cpdef readInputData(self, cwd):
-		cdef char* argv[140];
-
+		# convert cwd to the c char pointer
 		py_list = cwd.split(" ")
 		argc = len(py_list)
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * argc)(*py_string)
 		for i_ in range(argc):
-			argv[i_] = arr[i_]
-
-		self.ID = rh.get_InputData(argv[0])
-
-	cpdef readAtomsMolecules(self, cwd):
-		cdef char* argv[140]
-
-		py_list = cwd.split(" ")
-		argc = len(py_list)
-		py_string = [item.encode("utf-8") for item in py_list]
-		arr = (ctypes.c_char_p * argc)(*py_string)
-		for i_ in range(argc):
-			argv[i_] = arr[i_]
-
-		self.AtomsMolecules = rh.read_AtomsMolecules(self.ID, argv[0])
-
-	cpdef check_ID(self):
-		rh.check_ID(self.ID)
-
-	# def __reduce__(self):
-	# 	return (self.__class__, (None, None))
-
-	# def __init__(self, input="keyword.input", logfile=None, quiet=True):
-	# 	py_argv = "rhf1d" + " -input " + input
-	# 	if logfile is not None:
-	# 		py_argv += " -logfile " + logfile
-	# 	if quiet:
-	# 		py_argv += " -quiet"
-
-	# 	py_list = py_argv.split(" ")
-	# 	self.argc = len(py_list)
-	# 	py_string = [item.encode("utf-8") for item in py_list]
-	# 	arr = (ctypes.c_char_p * self.argc)(*py_string)
-	# 	cdef Py_ssize_t i_
-	# 	for i_ in range(self.argc):
-	# 		self.argv[i_] = arr[i_]
-
-		# self.Nrlk = 0
-		# self.Nwave = 0
-
-	@cython.boundscheck(False)
-	@cython.wraparound(False)
-	cpdef set_wavetable(self, cnp.ndarray[double, ndim=1, mode="c"] wave):
-		cdef Py_ssize_t i
-		cdef double sigma_sq
-		cdef double fact
-		cdef Py_ssize_t Nwave = wave.size
-		for i in range(Nwave):
-			if wave[i]>199.9352:
-				sigma_sq = (1.0e7/wave[i])*(1.0e7/wave[i])
-				fact = 1.0000834213 + 2.406030e6/(1.3e10 - sigma_sq) + 1.5997e4/(3.89e9 - sigma_sq)
-				wave[i] = wave[i] * fact
-
-		return wave
+			self.cwd[i_] = arr[i_]
+		# string2pointer(cwd, self.cwd[0])
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

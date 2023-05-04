@@ -142,7 +142,7 @@ void distribute_nH()
   }
   /* --- Free memory for atmospheric populations --    -------------- */
 
-  freeMatrix((void **) atmos.nH);
+  if(atmos.nH!=NULL) freeMatrix((void **) atmos.nH);
 }
 /* ------- end ---------------------------- distribute_nH.c --------- */
 

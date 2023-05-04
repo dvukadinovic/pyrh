@@ -643,7 +643,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   /* --- Clean up but keep H, H2, and active atom and/or molecule
          if appropriate --                               ------------ */
 
-  // D.Vukadinovic: we want to save atomic i molecules if we want
+  // D.Vukadinovic: we want to save atomic and molecules if we want
   //                to calculate and RF inside RH.
  //  if (atmos.Natom > 1) {
  //    for (n = 1;  n < atmos.Natom;  n++)

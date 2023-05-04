@@ -62,25 +62,6 @@ extern char messageStr[MAX_LINE_SIZE];
 #define NG_HSE_PERIOD  0
 #define NMAX_HSE_ITER  50
 
-void dummy(){
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};
-
-  setOptions(argc, argv);
-  SetFPEtraps();
-
-  readInput();
-
-  MULTIatmos(&atmos, &geometry);
-
-  readAtomicModels();
-}
-
-// void concatenate(char* dest, char* str1, char* str2){
-//   strcpy(dest, str1);
-//   strcat(dest, str2);
-// }
-
 /* ------- begin -------------------------- pyrh_hse.c -------------- */
 
 myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
@@ -401,17 +382,32 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
 
   // convertScales(&atmos, &geometry);
 
+  //--- free all the memory that we do not use anymore
+
   freeAtoms();
   freeMolecules();
 
+  if (atmos.Stokes){
+    freeMatrix(atmos.cos_gamma);
+    freeMatrix(atmos.cos_2chi);
+    freeMatrix(atmos.sin_2chi);
+  }
+
   freeOpacityEmissivity();
 
-  // free geometry related data
-  if (geometry.tau_ref!=NULL) free(geometry.tau_ref);
-  if (geometry.cmass!=NULL) free(geometry.cmass);
-  if (geometry.height!=NULL) free(geometry.height);
+  if (atmos.Nrlk!=0) {
+    freePartitionFunction();
+  }
 
-  // clear
+  // free geometry related data
+  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
+  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
+  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+
+  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+
+  // clear HSE related parameters
   free(rho); rho = NULL;
   free(pg); pg = NULL;
   free(Nm); Nm = NULL;
@@ -432,10 +428,10 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   Molecule *molecule;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  int argc = 1;
+  // char* keyword_input = malloc(160);
+  // concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -519,8 +515,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   readMolecularModels();
 
   double* wavetable = (double *) malloc(1 * sizeof(double));
-  int Nwav = 0;
-  // wavetable[0] = 500;
+  int Nwav = 1;
+  wavetable[0] = lam_ref;
   SortLambda(wavetable, Nwav);
 
   getBoundary(&geometry);
@@ -538,16 +534,30 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     atmos.nHtot[k] *= CUBE(CM_TO_M);
   }
 
+  //--- free all the memory that we do not use anymore
+
   freeAtoms();
   freeMolecules();
 
+  if (atmos.Stokes){
+    freeMatrix(atmos.cos_gamma);
+    freeMatrix(atmos.cos_2chi);
+    freeMatrix(atmos.sin_2chi);
+  }
+
   freeOpacityEmissivity();
 
-  // free geometry related data
-//  if (geo metry.tau_ref!=NULL) free(geometry.tau_ref);
-  if (geometry.cmass!=NULL) free(geometry.cmass);
-  if (geometry.height!=NULL) free(geometry.height);
+  if (atmos.Nrlk!=0) {
+    freePartitionFunction();
+  }
 
+  // free geometry related data
+  // if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
+  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
+  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+
+  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
 }
 
 void get_ne_from_nH(char *cwd, 
@@ -559,10 +569,10 @@ void get_ne_from_nH(char *cwd,
   int    niter, nact, index;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  int argc = 1;
+  // char* keyword_input = malloc(160);
+  // concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -646,15 +656,30 @@ void get_ne_from_nH(char *cwd,
     atmos.nHtot[k] *= CUBE(CM_TO_M);
   }
 
-  // free atmosphere related data
-  free(atmos.vturb);
+  //--- free all the memory that we do not use anymore
 
   freeAtoms();
   freeMolecules();
 
+  if (atmos.Stokes){
+    freeMatrix(atmos.cos_gamma);
+    freeMatrix(atmos.cos_2chi);
+    freeMatrix(atmos.sin_2chi);
+  }
+
+  // free atmosphere related data
+  free(atmos.vturb);
+
+  if (atmos.Nrlk!=0) {
+    freePartitionFunction();
+  }
+
   // free geometry related data
-  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); 
-  if (geometry.cmass!=NULL) free(geometry.cmass);
-  if (geometry.height!=NULL) free(geometry.height);
+  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
+  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
+  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+
+  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
 
 }

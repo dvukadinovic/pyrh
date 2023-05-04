@@ -27,7 +27,6 @@ cdef extern from "rh/atom.h":
 	ctypedef struct Molecule:
 		pass
 
-cdef extern from "rh/atom.h":
 	cdef enum vdWaals: UNSOLD, RIDDER_RENSBERGEN, BARKLEM, KURUCZ
 
 	ctypedef struct ZeemanMultiplet:
@@ -50,6 +49,10 @@ cdef extern from "rh/atom.h":
 		# double isotope_frac, gL_i, gL_j, hfs_i, hfs_j, iso_dl
 		# double cross, alpha
 		# ZeemanMultiplet *zm;
+
+cdef extern from "rh/atmos.h":
+	ctypedef struct Atmosphere:
+		pass
 
 cdef extern from "rh/inputs.h":
 	ctypedef struct InputData:
@@ -91,9 +94,8 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
 	# cdef void dummy(myRLK_Line *rlk_lines)
 
-	cdef InputData get_InputData(char *cwd)
-	cdef AtMol read_AtomsMolecules(InputData pyrh_input, char *cwd)
-	cdef void check_ID(InputData ID)
+	cdef void read_inputs(char *cwd, InputData *pyrh_input_data, Atmosphere *pyrh_atmos)
+	cdef void check_inputs(InputData ID, Atmosphere a)
 
 cdef extern from "rh/rhf1d/pyrh_hse.h":
 	ctypedef struct myPops:
