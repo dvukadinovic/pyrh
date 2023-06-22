@@ -37,7 +37,8 @@
 <p>For Unix based systems:</p>
 <ol class="arabic simple">
 <li><p>Install Cython module: <a class="reference external" href="https://cython.readthedocs.io/en/stable/src/quickstart/install.html">https://cython.readthedocs.io/en/stable/src/quickstart/install.html</a>. You would also need <code class="docutils literal notranslate"><span class="pre">numpy</span></code> module for <cite>pyrh</cite>.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> and check for any possible errors. Make sure that OS is using the <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler as default one. Otherwise you have to manually set the environment variable to point ot the correct <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler.</p></li>
+<li><p>Define an environment variable <cite>CC</cite> and <cite>CXX</cite> to point to the GCC compiler that is compatible for CPU architecture.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> and check for any possible errors.</p></li>
 </ol>
 <p>If everything went without any error, you have functional <cite>pyrh</cite> module! Now, lets compute some spectra!</p>
 </section>
