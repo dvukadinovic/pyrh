@@ -11,24 +11,21 @@ import numpy
 Only CFLAGS needs to be modified
 To Do:
   -- remove duplicate flags from CFLAGS (scarry, will skip it)
-  -- if Mac OS X (with M1/M2 CPUs), remove the '-arch x86_64' flag from CFLAGS
+  -- if Mac OS X (with M1/M2 CPUs): remove the '-arch x86_64' flag from CFLAGS
+  -- add flag '-DSIMDON' to switch to SIMD matrix inversion (if on Intel arch)
 
 """
 
+_platform = platform()
+
 def remove_intel_arch(x):
     if type(x) is str:
-        # if x=="-O2":
-        #     return ""
-        # if x.startswith("-O2 "):
-        #     return remove_pthread(x[len("-O2 "):])
-        # if x.endswith(" -O2"):
-        #     return remove_pthread(x[:-len(" -O2")])
-        return x.replace(" -arch x86_64 ", " ")
-        # return x.replace(" -O3 ", " ")
+        x.replace(" -arch x86_64 ", " ")
     return x
 
 def my_get_config_vars(*args):
     result = default_get_config_vars(*args)
+    
     # sometimes result is a list and sometimes a dict
     if type(result) is list:
         return [remove_intel_arch(x) for x in result]
@@ -37,12 +34,14 @@ def my_get_config_vars(*args):
     else:
         raise Exception("cannot handle type " + type(result))
 
-if sys.platform=="macOS":
+    return result
+
+if "arm" in _platform: 
     dsc.get_config_vars = my_get_config_vars
 
-print(dsc.get_config_vars()["CFLAGS"])
-
-sys.exit()
+extra_compile_args = None
+if "x86" in _platform:
+    extra_compile_args = ["-DSIMDON"]
 
 rh_c_files = glob.glob("rh/*.c")
 
@@ -70,8 +69,12 @@ setup(
 	name="pyrh",
 	version="0.2",
 	author="Dusan Vukadionvic",
-	ext_modules=cythonize([Extension("pyrh", rh_c_files,
-							runtime_library_dirs=["rh"])],
-							compiler_directives={"language_level" : "3"}),
+	ext_modules=cythonize([Extension(
+                            "pyrh", rh_c_files,
+							runtime_library_dirs=["rh"],
+                            extra_compile_args=extra_compile_args
+                            )
+                          ],
+						  compiler_directives={"language_level" : "3"}),
 	include_dirs=[numpy.get_include()]
 )

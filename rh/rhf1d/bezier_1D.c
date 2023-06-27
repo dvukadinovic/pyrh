@@ -237,7 +237,8 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     }
     /* --- Solve linear system to get the intensity -- -------------- */
       
-    SIMD_MatInv(Md[0]);   // Invert Md
+    // SIMD_MatInv(Md[0]);   // Invert Md
+    MatInv(Md[0]);
     m4v(Md, V0, V1);      // Multiply Md^-1 * V0
 
     for(i=0;i<4;i++) I[i][k] = V1[i];
@@ -288,7 +289,8 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
   /* --- Solve linear system --                    ------------------ */
   
-  SIMD_MatInv(Md[0]); // Invert Md
+  // SIMD_MatInv(Md[0]); // Invert Md
+  MatInv(Md[0]);
   m4v(Md,V0,V1);      // Multiply Md^-1 * V0
   
   for (n = 0;  n < 4;  n++) I[n][k] = V1[n];
