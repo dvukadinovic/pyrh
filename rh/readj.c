@@ -16,6 +16,7 @@
              sequentially to overcome this. --         -------------- */
 
 #include <unistd.h>
+#include <string.h> // memcpy()
 
 #include "rh.h"
 #include "atom.h"
