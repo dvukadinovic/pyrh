@@ -86,7 +86,8 @@ typedef struct {
          // flag for applying OF [D.Vukadinovic]
          do_fudge, 
          // flag if we are performing HSE; then, all atoms/molecules are treated in LTE [D.Vukadinovic]
-         pyrhHSE; 
+         pyrhHSE,
+         LS_Lande; // flag for computing the Lande factors in LS
   enum   solution startJ;
   
   enum   StokesMode StokesMode;

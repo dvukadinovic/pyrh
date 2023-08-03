@@ -498,7 +498,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     geometry.vel[k] *= KM_TO_M;
     atmos.vturb[k]  *= KM_TO_M;
     atmos.ne[k]     /= CUBE(CM_TO_M);
-    atmos.nHtot[k] /= CUBE(CM_TO_M);
+    atmos.nHtot[k]  /= CUBE(CM_TO_M);
   }
 
   // check if atmosphere is non-static

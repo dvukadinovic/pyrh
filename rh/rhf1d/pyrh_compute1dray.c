@@ -18,10 +18,9 @@
 
        --                                              -------------- */
 
-// #include <stdlib.h>
+#include <stdlib.h>
 // #include <stdio.h>
 #include <string.h>
-#include <sys/sysinfo.h>
 
 #include "rh.h"
 #include "atom.h"
@@ -127,6 +126,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
+  // input.PYRH_PATH = getenv("PYRH_PATH");
   readInput();
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;

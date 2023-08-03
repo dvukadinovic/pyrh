@@ -815,6 +815,7 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
     for (Mu = -Ju;  Mu <= Ju;  Mu++)
       if (fabs(Mu - Ml) <= 1.0) zm->Ncomponent++;
   }
+
   zm->q        = (int *) malloc(zm->Ncomponent * sizeof(int));
   zm->strength = (double *) malloc(zm->Ncomponent * sizeof(double));
   zm->shift    = (double *) malloc(zm->Ncomponent * sizeof(double));
@@ -824,8 +825,27 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
 
   /* --- Fill the structure and normalize the strengths -- -------- */
 
-  gLl = Lande(rlk->Si, rlk->Li, Jl);
-  gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+  if (input.LS_Lande){
+    /* Lande factors in LS coupling */
+    gLl = Lande(rlk->Si, rlk->Li, Jl);
+    gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+  }
+  else{
+    /* Compute Lande factors for each level in the LS coupling 
+       if -99 values are provided in the Kurucz line list.
+    */
+    if (rlk->gL_i==-99*MILLI){
+      gLl = Lande(rlk->Si, rlk->Li, Jl);
+    } else {
+      gLl = rlk->gL_i;
+    }
+
+    if (rlk->gL_j==-99*MILLI){
+      gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+    } else {
+      gLu = rlk->gL_j;
+    }
+  }
 
   // printf("gL_l = %f, gL_u = %f\n", gLl, gLu);
 
@@ -833,13 +853,13 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
   for (Ml = -Jl;  Ml <= Jl;  Ml++) {
     for (Mu = -Ju;  Mu <= Ju;  Mu++) {
       if (fabs(Mu - Ml) <= 1.0) {
-	zm->q[n]        = (int) (Ml - Mu);
-	zm->shift[n]    = gLl*Ml - gLu*Mu;
-	zm->strength[n] = ZeemanStrength(Ju, Mu, Jl, Ml);
-	  
-	norm[zm->q[n]+1] += zm->strength[n];
+      	zm->q[n]        = (int) (Ml - Mu);
+      	zm->shift[n]    = gLl*Ml - gLu*Mu;
+      	zm->strength[n] = ZeemanStrength(Ju, Mu, Jl, Ml);
+      	  
+      	norm[zm->q[n]+1] += zm->strength[n];
         if (zm->q[n] == 1) g_eff += zm->shift[n] * zm->strength[n];
-	n++;
+      	n++;
       }
     }
   }

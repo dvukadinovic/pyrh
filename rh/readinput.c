@@ -74,6 +74,11 @@ void readInput()
     {"BARKLEM_DF_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_df_data,
      setcharValue},
 
+     // D.Vukadinovic (03.08.2023.) -- if Lande factors are to be computed in 
+     // the LS coupling or taken explicitly (LS coupled if value is -99)
+     {"LS_LANDE", "TRUE", FALSE, KEYWORD_DEFAULT, &input.LS_Lande,
+     setboolValue},
+
     {"MOLECULES_FILE",  "", FALSE, KEYWORD_REQUIRED, input.molecules_input,
      setcharValue},
     {"NON_ICE", "FALSE", FALSE, KEYWORD_OPTIONAL, &input.NonICE,
