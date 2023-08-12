@@ -345,6 +345,15 @@ void readKuruczLines(char *inputFile)
       	  SWAPDOUBLE(rlk->gL_i, rlk->gL_j);
       	}
 
+        // [D.V 11.08.2023] Even if SLJ number cannot be read, we can have polarizable line
+        //   because user has provided directly the Lande factors for each level.
+        //   Works only if LS_LANDE = FALSE (keyword.input file).
+        if (!input.LS_Lande){
+          if (rlk->gL_i!=-99*MILLI && rlk->gL_j!=-99*MILLI){
+            rlk->polarizable = TRUE;
+          }
+        }
+
       	/*      Nread += sscanf(inputLine+154, "%d", &iso_dl); */
       	iso_dl = 0;
       	rlk->iso_dl = iso_dl * MILLI * ANGSTROM_TO_NM;
@@ -846,8 +855,6 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
       gLu = rlk->gL_j;
     }
   }
-
-  // printf("gL_l = %f, gL_u = %f\n", gLl, gLu);
 
   n = 0;
   for (Ml = -Jl;  Ml <= Jl;  Ml++) {
