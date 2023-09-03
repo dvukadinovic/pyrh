@@ -162,7 +162,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     ne_iter++;
   }
   SetLTEQuantities();
-  
+
   if (input.NonICE)
     readMolecules(MOLECULAR_CONCENTRATION_FILE);
   else

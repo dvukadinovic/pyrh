@@ -681,5 +681,4 @@ void get_ne_from_nH(char *cwd,
 
   if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
   if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
-
 }
