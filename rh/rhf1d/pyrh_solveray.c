@@ -149,8 +149,9 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   for (int idl=0; idl<Nlw+1; idl++){
     // skip referent wavelength
     if (spectrum.lambda[idl]==atmos.lambda_ref) continue;
-    vacuum_to_air(1, &spectrum.lambda[idl], &tmp);
-    spec->lam[index] = tmp;
+    // vacuum_to_air(1, &spectrum.lambda[idl], &tmp);
+    // spec->lam[index] = tmp;
+    spec->lam[index] = spectrum.lambda[idl];
     spec->sI[index] = spectrum.I[idl][0];
     if (atmos.Stokes){
       spec->sQ[index] = spectrum.Stokes_Q[idl][0];

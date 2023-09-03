@@ -241,7 +241,7 @@ cpdef compute1d(cwd,
 	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
 	# Nlam = len(lam)
-	return sI, sQ, sU, sV
+	return sI, sQ, sU, sV, lam
 	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, None, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
