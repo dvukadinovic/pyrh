@@ -120,11 +120,13 @@ Fe
 # multiplet: 816     614.156  [nm]    FeI 3d6 4s 5s e5DE 2 --> FeI 3d6 4s 4p z5PO 3
    19   14  3.500E-03    VOIGT   41 ASYMM       2.0     4.0   UNSOLD   1.00   0.00   1.00   0.00  8.700E+05  0.000E+00
 # multiplet: 816     630.263  [nm]    FeI 3d6 4s 5s e5DE 0 --> FeI 3d6 4s 4p z5PO 1
-##   21   16  6.500E-03    VOIGT   75 ASYMM       1.5     5.0   UNSOLD   4.00   0.00   1.00   0.00  8.511E+07  1.000E+00
-   21   16  2.465E-02    VOIGT   75 ASYMM       1.5     5.0   UNSOLD   4.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+##   21   16  6.500E-03    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   4.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+##   21   16  2.465E-02    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   4.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+   21   16  3.828E-02    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   4.00   0.00   1.00   0.00  8.511E+07  1.000E+00
 # multiplet: 816     630.144  [nm]    FeI 3d6 4s 5s e5DE 2 --> FeI 3d6 4s 4p z5PO 2
-##   19   15  1.090E-02    VOIGT   75 ASYMM       1.5     5.0   UNSOLD   1.00   0.00   1.00   0.00  8.511E+07  1.000E+00
-   19   15  4.256E-02    VOIGT   75 ASYMM       1.5     5.0   UNSOLD   1.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+##   19   15  1.090E-02    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   1.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+##   19   15  4.256E-02    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   1.00   0.00   1.00   0.00  8.511E+07  1.000E+00
+   19   15  1.076E-01    VOIGT   75 ASYMM       1.5     5.0   BARKLEM   1.00   0.00   1.00   0.00  8.511E+07  1.000E+00
 #
 # B-F transitions 
 #   j    i alpha[m^-2]   Nlambda   Wavel. Dep.   lamb_min [nm]
