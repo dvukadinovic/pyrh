@@ -749,16 +749,16 @@ double RLKProfile(RLK_Line *rlk, int k, int mu, bool_t to_obs,
 
       switch (rlk->zm->q[nz]) {
       case -1:
-	phi_sm += rlk->zm->strength[nz] * H;
-	psi_sm += rlk->zm->strength[nz] * F;
-	break;
+      	phi_sm += rlk->zm->strength[nz] * H;
+      	psi_sm += rlk->zm->strength[nz] * F;
+      	break;
       case  0:
-	phi_pi += rlk->zm->strength[nz] * H;
-	psi_pi += rlk->zm->strength[nz] * F;
-	break;
+      	phi_pi += rlk->zm->strength[nz] * H;
+      	psi_pi += rlk->zm->strength[nz] * F;
+      	break;
       case  1:
-	phi_sp += rlk->zm->strength[nz] * H;
-	psi_sp += rlk->zm->strength[nz] * F;
+      	phi_sp += rlk->zm->strength[nz] * H;
+      	psi_sp += rlk->zm->strength[nz] * F;
       }
     }
     phi_sigma = phi_sp + phi_sm;
