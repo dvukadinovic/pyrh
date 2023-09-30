@@ -417,13 +417,12 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
        
        /* --- dchi/ds at downwind point --             -------------- */
        
-       if (fabs(k - k_end) > 1) {
-	 dsdn2=fabs(geometry.height[k+2*dk] -
-		    geometry.height[k+dk]) * zmu;
-	 dchi_dn = cent_deriv(dsdn,dsdn2,chi[k],chi[k+dk],chi[k+2*dk]);       
-       } else {
-	 dchi_dn=(chi[k+dk]-chi[k])/dsdn;
-       }
+      if (fabs(k - k_end) > 1) {
+        dsdn2 = fabs(geometry.height[k+2*dk] - geometry.height[k+dk]) * zmu;
+        dchi_dn = cent_deriv(dsdn, dsdn2, chi[k], chi[k+dk], chi[k+2*dk]);       
+      } else {
+        dchi_dn=(chi[k+dk]-chi[k])/dsdn;
+      }
        
        /* --- Make sure that c1 and c2 don't go below zero -- ------- */
     
@@ -450,8 +449,7 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
      
        /* --- Solve integral in this interval --       -------------- */
        
-       I[k]= I_upw*eps + alpha*S[k] + beta*S[k-dk] +
-	 gamma * c1 + theta * c2; 
+       I[k]= I_upw*eps + alpha*S[k] + beta*S[k-dk] + gamma * c1 + theta * c2; 
 
        /* --- Diagonal operator --                     -------------- */
 
@@ -461,8 +459,7 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       
       /* --- Piecewise linear integration at end of ray -- ---------- */
       
-      dtau_uw = 0.5 * zmu * (chi[k] + chi[k-dk]) *
-	fabs(geometry.height[k] - geometry.height[k-dk]);
+      dtau_uw = 0.5 * zmu * (chi[k] + chi[k-dk]) * fabs(geometry.height[k] - geometry.height[k-dk]);
       
       /* --- Defined negative in Han's implementation -- ------------ */
       
