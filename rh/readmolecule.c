@@ -932,6 +932,8 @@ void readMolecularModels(void)
   FILE   *fp_molecules;
   Molecule *molecule;
   Element *element;
+  char *tmp = malloc(160);
+  char *tmp2 = malloc(160);
 
   getCPU(2, TIME_START, NULL);
 
@@ -963,6 +965,10 @@ void readMolecularModels(void)
     Nread = sscanf(inputLine, "%s %s %s %s",
 		   filename, actionKey, popsKey, popsFile);
     checkNread(Nread, Nrequired=3, routineName, checkPoint=2);
+
+    concatenate(tmp, input.pyrh_path, "/rh/Molecules/");
+    concatenate(tmp2, tmp, filename);
+    strcpy(filename, tmp2);
 
     moleculeID = getMoleculeID(filename);
 

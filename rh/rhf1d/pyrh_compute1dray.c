@@ -126,7 +126,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
-  // input.PYRH_PATH = getenv("PYRH_PATH");
   readInput();
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;

@@ -790,6 +790,8 @@ void readAtomicModels(void)
   FILE   *fp_atoms;
   Atom   *atom;
   Element *element;
+  char *tmp = malloc(160);
+  char *tmp2 = malloc(160);
 
   getCPU(2, TIME_START, NULL);
 
@@ -816,6 +818,11 @@ void readAtomicModels(void)
     Nread = sscanf(inputLine, "%s %s %s %s ",
 		   filename, actionKey, popsKey, popsFile);
     checkNread(Nread, Nrequired=3, routineName, checkPoint=2);
+
+    // get a full path to the atomic file
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(tmp2, tmp, filename);
+    strcpy(filename, tmp2);
 
     atomID = getAtomID(filename);
     if (n ==  0  &&  !strstr(atomID, "H ")) {

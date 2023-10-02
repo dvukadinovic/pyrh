@@ -80,6 +80,7 @@ typedef struct {
          coolingFile[MAX_VALUE_LENGTH],
          Itop[MAX_VALUE_LENGTH],
          rfs_output[MAX_VALUE_LENGTH]; // D.Vukadinovic
+  char*  pyrh_path; // D.Vukadinovic
   bool_t magneto_optical, PRD_angle_dep, XRD, Eddington,
          backgr_pol, limit_memory, allow_passive_bb, NonICE,
          rlkscatter, xdr_endian, old_background, accelerate_mols,
