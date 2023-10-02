@@ -522,20 +522,21 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       				      chi, eta, scatt, chip);
       	    if (backgrflags.hasline) {
       	      atmos.backgrflags[nspect].hasline = TRUE;
-                    if (backgrflags.ispolarized) {
-                      NrecStokes = 4;
-                      atmos.backgrflags[nspect].ispolarized = TRUE;
-                      if (input.magneto_optical) {
-                        for (k = 0;  k < 3*atmos.Nspace;  k++)
-                          chip_c[k] += chip[k];
-                      }
-                    } else
-                      NrecStokes = 1;
+              if (backgrflags.ispolarized) {
+                NrecStokes = 4;
+                atmos.backgrflags[nspect].ispolarized = TRUE;
+                if (input.magneto_optical) {
+                  for (k = 0;  k < 3*atmos.Nspace;  k++)
+                    chip_c[k] += chip[k];
+                }
+              } else
+                NrecStokes = 1;
 
-                    for (k = 0;  k < NrecStokes*atmos.Nspace;  k++) {
-                      chi_c[k] += chi[k];
-                      eta_c[k] += eta[k];
-                    }
+              for (k = 0;  k < NrecStokes*atmos.Nspace;  k++) {
+                chi_c[k] += chi[k];
+                eta_c[k] += eta[k];
+              }
+
       	      if (input.rlkscatter) {
             		for (k = 0;  k < atmos.Nspace;  k++) {
             		  sca_c[k] += scatt[k];
@@ -544,7 +545,8 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       	      }
       	    }
       	  }
-	  /* --- Add opacity from molecular lines --   -------------- */
+
+        /* --- Add opacity from molecular lines --   -------------- */
 
   	    backgrflags = MolecularOpacity(wavelength, nspect, mu, to_obs,
   					 chi, eta, chip);

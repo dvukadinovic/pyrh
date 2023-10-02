@@ -225,6 +225,9 @@ void SortLambda(double* wavetable, int Nwave)
 
   allocateOpacityEmissivity();
 
+  // alocate space for derivatives of opacity and emissivity if we are computing atomic RFs
+  if (input.get_atomic_rfs) allocateOpacityEmissivityDer();
+
 
   /* --- Get the input wavelengts indices after sorting --- */
   spectrum.wave_inds = (int *) malloc(Nwave * sizeof(int));
@@ -598,4 +601,23 @@ void freeOpacityEmissivity(){
   for (int nspect=0; nspect < spectrum.Nspect; nspect++)
     free(spectrum.sca_c_lam[nspect]);
   free(spectrum.sca_c_lam); spectrum.sca_c_lam = NULL;
+}
+
+void allocateOpacityEmissivityDer(){
+  // derivative of continuum opacity (including Kurucz lines)
+  spectrum.dchi_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  
+  // derivative of continuum emissivity (including Kurucz lines)
+  spectrum.deta_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  
+  // spectrum.dchip_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars)
+  // spectrum.dsca_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars)
+}
+
+void freeOpacityEmissivityDer(){
+  freeMatrix3d(spectrum.dchi_c_lam, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.deta_c_lam, spectrum.Nspect, atmos.Nspace);
+  // freeMatrix3d(spectrum.dchip_c_lam, spectrum.Nspect, atmos.Nspace);
+  // freeMatrix3d(spectrum.dsca_c_lam, spectrum.Nspect, atmos.Nspace);
+
 }

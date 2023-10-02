@@ -206,7 +206,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	    Error(ERROR_LEVEL_1, routineName, messageStr);	    
       	  }
       	} else {
-      	  
+
       	  for (k = 0;  k < Nspace;  k++)
       	    S[k] /= chi[k];
 
@@ -296,7 +296,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       if (input.backgr_pol) writeJ20lambda(nspect, J20);
     }
   }
-  
+
   /* --- Clean up --                                 ---------------- */
   free_as(nspect, eval_operator);
   if (eval_operator) free(Psi);

@@ -81,6 +81,28 @@ double **matrix_double(int Nrow, int Ncol)
 
   return Matrix;
 }
+double **matrix3d_double(int Nrow, int Ncol, int Ndep)
+{
+  register int i, j;
+
+  int     typeSize = sizeof(double), pointerSize = sizeof(double *), doublepointerSize = sizeof(double **);
+  double  ***Matrix3d;
+
+  Matrix3d = malloc(Nrow * sizeof(*Matrix3d));
+  Matrix3d[0] = malloc(Nrow*Ncol * sizeof(*Matrix3d[0]));
+  Matrix3d[0][0] = malloc(Nrow*Ncol*Ndep * sizeof(Matrix3d[0][0])); // Contiguous
+  
+  for (i = 1; i < Nrow; i++) {
+    Matrix3d[i] = &Matrix3d[0][i*Ncol];
+  }
+  
+  for (j = 1; j < Nrow*Ncol; j++) {
+    Matrix3d[0][j] = &Matrix3d[0][0][j*Ndep];
+  }
+
+  return Matrix3d;
+}
+
 /* ------- end ---------------------------- matrix_double.c --------- */
 
 /* ------- begin -------------------------- freeMatrix.c ------------ */
@@ -100,3 +122,19 @@ void freeMatrix(void **matrix)
   }
 }
 /* ------- end ---------------------------- freeMatrix.c ------------ */
+
+void freeMatrix3d(void ***matrix3d, int Nrow, int Ncol)
+{
+  const char routineName[] = "freeMatrix";
+
+  if (matrix3d == NULL  ||  matrix3d[0] == NULL || matrix3d[0,0] == NULL) {
+    sprintf(messageStr, "Trying to free NULL pointer");
+    Error(ERROR_LEVEL_2, routineName, messageStr);
+  } else {
+    /* --- Free the memory allocated for matrix matrix3d -- ----------- */
+
+    free(matrix3d[0][0]);
+    free(matrix3d[0]);
+    free(matrix3d);
+  }
+}

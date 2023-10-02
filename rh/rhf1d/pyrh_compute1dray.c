@@ -129,6 +129,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   readInput();
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;
+
+  // get info if we need to compute semin-analytical RFs for atomic parameters
+  input.get_atomic_rfs = FALSE;
+  input.n_atomic_pars = 0;
+
   // input.solve_ne = ONCE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
@@ -172,6 +177,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
     atmos.loggf_values = loggf_values;
+    input.get_atomic_rfs = TRUE;
+    input.n_atomic_pars += Nloggf;
   }
 
   // set lam0 indices and values if forwarded
@@ -182,6 +189,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
+    input.get_atomic_rfs = TRUE;
+    input.n_atomic_pars += Nlam;
   }
 
   // if (pyrh_rlk_lines->Nrlk!=0){
@@ -255,6 +264,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   SortLambda(lam, Nwave);
 
+  // allocate space for atomic RFs if needed
+  if (input.get_atomic_rfs){
+    atmos.atomic_rfs = matrix3d_double(4, spectrum.Nspect, input.n_atomic_pars);
+  }
+
   getBoundary(&geometry);
   
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
@@ -312,6 +326,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   freeAtoms();
   freeMolecules();
 
+
   if (atmos.Stokes){
     freeMatrix(atmos.cos_gamma);
     freeMatrix(atmos.cos_2chi);
@@ -319,6 +334,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   freeOpacityEmissivity();
+  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
 
   if (atmos.Nrlk!=0) {
     freePartitionFunction();

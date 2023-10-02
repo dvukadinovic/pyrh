@@ -239,7 +239,7 @@ void readKuruczLines(char *inputFile)
       	  lambda0 = (HPLANCK * CLIGHT) / (rlk->Ej - rlk->Ei);
       	}
 
-        rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj;  
+        rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj; 
         if (atmos.Nloggf>=1){
           for (int idl=0; idl<atmos.Nloggf; idl++){
             if (atmos.loggf_ids[idl]==line_index){
@@ -577,106 +577,105 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
 	     stage, and if abundance is set --         -------------- */
 
       if ((rlk->stage < element->Nstage - 1) && element->abundance_set) {
-	contributes = TRUE;
-	if ((metal = element->model) != NULL) {
+      	contributes = TRUE;
+      	if ((metal = element->model) != NULL) {
 
           /* --- If an explicit atomic model is present check that we
-	         do not already account for this line in this way - - */
+	        do not already account for this line in this way - - */
 
-	  for (kr = 0;  kr < metal->Nline;  kr++) {
-	    line = metal->line + kr;
-	    dlamb_wing = line->lambda0 * line->qwing *
-	      (atmos.vmicro_char / CLIGHT);
-	    if (fabs(lambda - line->lambda0) <= dlamb_wing &&
-		metal->stage[line->i] == rlk->stage) {
-	      contributes = FALSE;
-	      break;
-	    }
-	  }
-	}
+      	  for (kr = 0;  kr < metal->Nline;  kr++) {
+      	    line = metal->line + kr;
+      	    dlamb_wing = line->lambda0 * line->qwing *
+      	      (atmos.vmicro_char / CLIGHT);
+      	    if (fabs(lambda - line->lambda0) <= dlamb_wing &&
+      		    metal->stage[line->i] == rlk->stage) {
+      	      contributes = FALSE;
+      	      break;
+      	    }
+      	  }
+      	}
       } else
-	contributes = FALSE;
+        contributes = FALSE;
 
       /* --- Get opacity from line --                  -------------- */
 
       if (contributes) {
-	hc_la      = (HPLANCK * CLIGHT) / (rlk->lambda0 * NM_TO_M);
-	Bijhc_4PI  = hc_4PI * rlk->Bij * rlk->isotope_frac *
-	  rlk->hyperfine_frac * rlk->gi;
-	twohnu3_c2 = rlk->Aji / rlk->Bji;
+      	hc_la      = (HPLANCK * CLIGHT) / (rlk->lambda0 * NM_TO_M);
+      	Bijhc_4PI  = hc_4PI * rlk->Bij * rlk->isotope_frac * rlk->hyperfine_frac * rlk->gi;
+      	twohnu3_c2 = rlk->Aji / rlk->Bji;
 
-	if (input.rlkscatter) {
-	  if (rlk->stage == 0) {
-	    x  = 0.68;
-	    C3 = C / (C2_atom * SQ(rlk->lambda0 * NM_TO_M));
-	  } else {
-	    x  = 0.0;
-	    C3 = C / (C2_ion * SQ(rlk->lambda0 * NM_TO_M));
-	  }
+      	if (input.rlkscatter) {
+      	  if (rlk->stage == 0) {
+      	    x  = 0.68;
+      	    C3 = C / (C2_atom * SQ(rlk->lambda0 * NM_TO_M));
+      	  } else {
+      	    x  = 0.0;
+      	    C3 = C / (C2_ion * SQ(rlk->lambda0 * NM_TO_M));
+      	  }
 
-	  dE = rlk->Ej - rlk->Ei;
-	}
+      	  dE = rlk->Ej - rlk->Ei;
+      	}
+        
         /* --- Set flag that line is present at this wavelength -- -- */
 
-	backgrflags.hasline = TRUE;
-	if (rlk->polarizable) {
-	  backgrflags.ispolarized = TRUE;
-	  if (rlk->zm == NULL) rlk->zm = RLKZeeman(rlk);
-	}
+      	backgrflags.hasline = TRUE;
+      	if (rlk->polarizable) {
+      	  backgrflags.ispolarized = TRUE;
+      	  if (rlk->zm == NULL) rlk->zm = RLKZeeman(rlk);
+      	}
 
         if (element->n == NULL) {
-	  element->n = matrix_double(element->Nstage, atmos.Nspace);
-	  LTEpops_elem(element);
-	}
+      	  element->n = matrix_double(element->Nstage, atmos.Nspace);
+      	  LTEpops_elem(element);
+      	}
         Linear(atmos.Npf, atmos.Tpf, element->pf[rlk->stage],
-	       atmos.Nspace, atmos.T, pf, hunt=TRUE);
+         atmos.Nspace, atmos.T, pf, hunt=TRUE);
 
-	for (k = 0;  k < atmos.Nspace;  k++) {
-	  phi = RLKProfile(rlk, k, mu, to_obs, lambda,
-			   &phi_Q, &phi_U, &phi_V,
-			   &psi_Q, &psi_U, &psi_V);
+      	for (k = 0;  k < atmos.Nspace;  k++) {
+      	  phi = RLKProfile(rlk, k, mu, to_obs, lambda,
+      			   &phi_Q, &phi_U, &phi_V,
+      			   &psi_Q, &psi_U, &psi_V);
 
-	  if (phi){
-	    kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
-	    ni_gi = element->n[rlk->stage][k] * exp(-rlk->Ei*kT - pf[k]);
+      	  if (phi){
+      	    kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
+      	    ni_gi = element->n[rlk->stage][k] * exp(-rlk->Ei*kT - pf[k]);
             nj_gj = ni_gi * exp(-hc_la * kT);
 
-	    chi_l = Bijhc_4PI * (ni_gi - nj_gj);
-	    eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
+      	    chi_l = Bijhc_4PI * (ni_gi - nj_gj);
+      	    eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
 
-	    if (input.rlkscatter) {
-	      epsilon = 1.0 / (1.0 + C3 * pow(atmos.T[k], 1.5) /
-			       (atmos.ne[k] * 
-				pow(KBOLTZMANN * atmos.T[k] / dE, 1 + x)));
+      	    if (input.rlkscatter) {
+      	      epsilon = 1.0 / (1.0 + C3 * pow(atmos.T[k], 1.5) /
+      			       (atmos.ne[k] * pow(KBOLTZMANN * atmos.T[k] / dE, 1 + x)));
 
               scatt[k] += (1.0 - epsilon) * chi_l * phi;
-	      chi_l    *= epsilon;
+      	      chi_l    *= epsilon; 
               eta_l    *= epsilon;
-	    }
+      	    }
 
-	    chi[k] += chi_l * phi;
-	    eta[k] += eta_l * phi;
+      	    chi[k] += chi_l * phi;
+      	    eta[k] += eta_l * phi;
 
-	    if (rlk->zm != NULL && rlk->Grad) {
-	      chi_Q[k] += chi_l * phi_Q;
-	      chi_U[k] += chi_l * phi_U;
-	      chi_V[k] += chi_l * phi_V;
+      	    if (rlk->zm != NULL && rlk->Grad) {
+      	      chi_Q[k] += chi_l * phi_Q;
+      	      chi_U[k] += chi_l * phi_U;
+      	      chi_V[k] += chi_l * phi_V;
 
-	      eta_Q[k] += eta_l * phi_Q;
-	      eta_U[k] += eta_l * phi_U;
-	      eta_V[k] += eta_l * phi_V;
+      	      eta_Q[k] += eta_l * phi_Q;
+      	      eta_U[k] += eta_l * phi_U;
+      	      eta_V[k] += eta_l * phi_V;
 
-	      if (input.magneto_optical) {
-		chip_Q[k] += chi_l * psi_Q;
-		chip_U[k] += chi_l * psi_U;
-		chip_V[k] += chi_l * psi_V;
-	      }
-	    }
-	  }
-	}
-      }
-    }
-  }
+      	      if (input.magneto_optical) {
+            		chip_Q[k] += chi_l * psi_Q;
+            		chip_U[k] += chi_l * psi_U;
+            		chip_V[k] += chi_l * psi_V;
+      	      }
+      	    }
+      	  } // end if(phi)
+      	} // end for loop over k
+      } // end if(contributes)
+    } // end if (lam <= dlamchar)
+  } // end for loop over n
 
   free(pf);
   return backgrflags;

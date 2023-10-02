@@ -88,6 +88,8 @@ typedef struct {
          do_fudge, 
          // flag if we are performing HSE; then, all atoms/molecules are treated in LTE [D.Vukadinovic]
          pyrhHSE,
+         // flag for computing semi-analytically the RFs for atomic line parameters
+         get_atomic_rfs,
          LS_Lande; // flag for computing the Lande factors in LS
   enum   solution startJ;
   
@@ -99,7 +101,9 @@ typedef struct {
   enum   ne_solution solve_ne;
   int    isum, Ngdelay, Ngorder, Ngperiod, NmaxIter,
          PRD_NmaxIter, PRD_Ngdelay, PRD_Ngorder, PRD_Ngperiod,
-         NmaxScatter, Nthreads;
+         NmaxScatter, Nthreads,
+         // number of atomic line parameters for which we want to compute RFs
+         n_atomic_pars;
   double iterLimit, PRDiterLimit, metallicity;
 
   pthread_attr_t thread_attr;

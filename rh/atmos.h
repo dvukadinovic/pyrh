@@ -55,6 +55,7 @@ typedef struct {
           vmicro_char, vmacro_tresh, lambda_ref, *wmu, *Tpf,
          *nHtot, **nH, *nHmin, *B, *gamma_B, *chi_B, B_char,
         **cos_gamma, **cos_2chi, **sin_2chi;
+  double ***atomic_rfs;
   AngleSet  angleSet;
   Element  *elements;
   Atom     *H, *atoms, **activeatoms;
