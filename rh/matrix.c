@@ -81,6 +81,9 @@ double **matrix_double(int Nrow, int Ncol)
 
   return Matrix;
 }
+/* ------- end ---------------------------- matrix_double.c --------- */
+
+/* ------- begin -------------------------- matrix3d_double.c --------- */
 double **matrix3d_double(int Nrow, int Ncol, int Ndep)
 {
   register int i, j;
@@ -88,7 +91,7 @@ double **matrix3d_double(int Nrow, int Ncol, int Ndep)
   int     typeSize = sizeof(double), pointerSize = sizeof(double *), doublepointerSize = sizeof(double **);
   double  ***Matrix3d;
 
-  Matrix3d = malloc(Nrow * sizeof(*Matrix3d));
+  Matrix3d = calloc(Nrow, sizeof(*Matrix3d));
   Matrix3d[0] = malloc(Nrow*Ncol * sizeof(*Matrix3d[0]));
   Matrix3d[0][0] = malloc(Nrow*Ncol*Ndep * sizeof(Matrix3d[0][0])); // Contiguous
   
@@ -102,8 +105,8 @@ double **matrix3d_double(int Nrow, int Ncol, int Ndep)
 
   return Matrix3d;
 }
+/* ------- end ---------------------------- matrix3d_double.c --------- */
 
-/* ------- end ---------------------------- matrix_double.c --------- */
 
 /* ------- begin -------------------------- freeMatrix.c ------------ */
 
@@ -123,7 +126,7 @@ void freeMatrix(void **matrix)
 }
 /* ------- end ---------------------------- freeMatrix.c ------------ */
 
-void freeMatrix3d(void ***matrix3d, int Nrow, int Ncol)
+void freeMatrix3d(void ***matrix3d)
 {
   const char routineName[] = "freeMatrix";
 

@@ -91,6 +91,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 #define ANGSTROM_TO_NM           0.1
 #define MAX_GAUSS_DOPPLER        7.0
 #define USE_TABULATED_WAVELENGTH 1
+#define LN10                     log(10)
 
 
 /* --- Function prototypes --                          -------------- */
@@ -222,6 +223,10 @@ void readKuruczLines(char *inputFile)
           for (int idl=0; idl<atmos.Nlam; idl++){
             if (atmos.lam_ids[idl]==line_index){
               lambda_air += atmos.lam_values[idl];
+              if (input.get_atomic_rfs){
+                rlk->get_dlam_rf = TRUE;
+                rlk->dlam_rf_ind = idl;
+              }
             }
           }
         }  
@@ -244,6 +249,10 @@ void readKuruczLines(char *inputFile)
           for (int idl=0; idl<atmos.Nloggf; idl++){
             if (atmos.loggf_ids[idl]==line_index){
               rlk->Aji = C / SQ(lambda0) * POW10(atmos.loggf_values[idl]) / rlk->gj;
+              if (input.get_atomic_rfs){
+                rlk->get_loggf_rf = TRUE;
+                rlk->loggf_rf_ind = idl;
+              }
             }
           }
         }
@@ -476,7 +485,8 @@ void rlk_locate(int N, RLK_Line *lines, double lambda, int *low)
 /* ------- begin -------------------------- rlk_opacity.c ----------- */
 
 flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
-                  double *chi, double *eta, double *scatt, double *chip)
+                  double *chi, double *eta, double *scatt, double *chip,
+                  double **dchi, double **deta, double **dscatt)
 {
   register int k, n, kr;
 
@@ -570,6 +580,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
 
   for (n = Nblue;  n <= Nred;  n++) {
     rlk = &atmos.rlk_lines[n];
+    
     if (fabs(rlk->lambda0 - lambda) <= dlamb_char) {      
       element = &atmos.elements[rlk->pt_index - 1];
 
@@ -651,10 +662,17 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
               scatt[k] += (1.0 - epsilon) * chi_l * phi;
       	      chi_l    *= epsilon; 
               eta_l    *= epsilon;
+
+              if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LN10; // this was done from head, for log(gf) should be correct
       	    }
 
       	    chi[k] += chi_l * phi;
       	    eta[k] += eta_l * phi;
+
+            if (rlk->get_loggf_rf){
+              dchi[k][rlk->loggf_rf_ind] = chi[k] * LN10;
+              deta[k][rlk->loggf_rf_ind] = eta[k] * LN10;
+            }
 
       	    if (rlk->zm != NULL && rlk->Grad) {
       	      chi_Q[k] += chi_l * phi_Q;
@@ -932,6 +950,8 @@ void initRLK(RLK_Line *rlk)
 {
   rlk->polarizable = FALSE;
   rlk->zm = NULL; 
+  rlk->get_loggf_rf = FALSE;
+  rlk->get_dlam_rf = FALSE;
 }
 /* ------- end ---------------------------- initRLK.c --------------- */
 

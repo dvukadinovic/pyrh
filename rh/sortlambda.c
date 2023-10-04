@@ -610,14 +610,17 @@ void allocateOpacityEmissivityDer(){
   // derivative of continuum emissivity (including Kurucz lines)
   spectrum.deta_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
   
-  // spectrum.dchip_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars)
-  // spectrum.dsca_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars)
+  // derivative of continuum polarization contribution (?) (including Kurucz lines)
+  spectrum.dchip_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+
+  // derivative of the scattering in continuum(including Kurucz lines)
+  spectrum.dsca_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
 }
 
 void freeOpacityEmissivityDer(){
-  freeMatrix3d(spectrum.dchi_c_lam, spectrum.Nspect, atmos.Nspace);
-  freeMatrix3d(spectrum.deta_c_lam, spectrum.Nspect, atmos.Nspace);
-  // freeMatrix3d(spectrum.dchip_c_lam, spectrum.Nspect, atmos.Nspace);
-  // freeMatrix3d(spectrum.dsca_c_lam, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchi_c_lam);
+  freeMatrix3d(spectrum.deta_c_lam);
+  freeMatrix3d(spectrum.dchip_c_lam);
+  freeMatrix3d(spectrum.dsca_c_lam);
 
 }

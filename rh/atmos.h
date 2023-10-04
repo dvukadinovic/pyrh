@@ -80,7 +80,8 @@ flags passive_bb(double lambda, int nspect, int mu, bool_t to_obs,
 		 double *chi, double *eta, double *chip);
 
 flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
-                  double *chi, double *eta, double *scatt, double *chip);
+                  double *chi, double *eta, double *scatt, double *chip,
+                  double **dchi, double **deta, double **dscatt);
 
 flags MolecularOpacity(double lambda, int nspect, int mu, bool_t to_obs,
 		       double *chi, double *eta, double *chip);
