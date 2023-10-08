@@ -670,8 +670,8 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	    eta[k] += eta_l * phi;
 
             if (rlk->get_loggf_rf){
-              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi[k] * LN10;
-              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta[k] * LN10;
+              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LN10;
+              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LN10;
             }
 
       	    if (rlk->zm != NULL && rlk->Grad) {
