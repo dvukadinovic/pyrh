@@ -25,7 +25,7 @@ cdef convert_1d(double *arr, Py_ssize_t n):
 cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 	cdef Py_ssize_t i
 	cdef Py_ssize_t j
-	cdef cnp.ndarray[cnp.float64_t, ndim=2] pyarr = np.empty((nx, ny))
+	cdef cnp.ndarray[cnp.float64_t, ndim=2] pyarr = np.zeros((nx, ny))
 	for i in range(nx):
 		for j in range(ny):
 			pyarr[i,j] = arr[i][j]
@@ -237,6 +237,11 @@ cpdef compute1d(cwd,
 		sQ = convert_1d(spec.sQ, spec.nlw)
 		sU = convert_1d(spec.sU, spec.nlw)
 		sV = convert_1d(spec.sV, spec.nlw)
+
+	if (Nloggf!=0) or (Nlam!=0):
+		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
+
+		return sI, sQ, sU, sV, lam, rf
 
 	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 

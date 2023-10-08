@@ -5,6 +5,7 @@ typedef struct{
 	int nlw, Nrays, stokes;
 	double *lam, *sI, *sQ, *sU, *sV;
 	double **J, **J20;
+    double **rfs;
 } mySpectrum;
 
 typedef struct{

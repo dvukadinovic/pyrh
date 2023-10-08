@@ -141,6 +141,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   spec->sQ = (double *) malloc(Nlw * sizeof(double));
   spec->sU = (double *) malloc(Nlw * sizeof(double));
   spec->sV = (double *) malloc(Nlw * sizeof(double));
+  if (input.get_atomic_rfs) spec->rfs = matrix_double(Nlw, input.n_atomic_pars);
   // spec->J  = matrix_double(Nlw+1, atmos.Nspace);
 
   int index=0;
@@ -158,6 +159,11 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
       spec->sU[index] = spectrum.Stokes_U[idl][0];
       spec->sV[index] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
+    }
+    if (input.get_atomic_rfs){
+      for (int idp=0; idp<input.n_atomic_pars; idp++){
+        spec->rfs[index][idp] = atmos.atomic_rfs[idl][0][idp];
+      }
     }
     index += 1;
     // for (int idz=0; idz<atmos.Nspace; idz++)

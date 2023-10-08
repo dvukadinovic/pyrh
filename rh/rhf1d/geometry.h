@@ -61,7 +61,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
 void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 			  double *chi, double *S, double *I,
-			  double *Psi);
+			  double *Psi, double **dI);
 
 #endif /* !__GEOMETRY_H__ */
 

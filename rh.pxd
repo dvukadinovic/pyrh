@@ -73,6 +73,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sU
 		double *sV
 		double **J
+		double **rfs
 
 	ctypedef struct AtMol:
 		pass

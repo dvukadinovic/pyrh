@@ -51,10 +51,18 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
   enum     FeautrierOrder F_order;     
   int      Nspace = atmos.Nspace, Nrays = atmos.Nrays;
   double  *I, *chi, *S, **Ipol, **Spol, *Psi, *Jdag, wmu, dJmax, dJ,
-          *J20dag, musq, threemu1, threemu2, *J, *J20;
+          *J20dag, musq, threemu1, threemu2, *J, *J20, **dI;
   ActiveSet *as;
 
   /* --- Retrieve active set as of transitions at wavelength nspect - */
+
+  if (input.get_atomic_rfs){
+    for (int idp=0; idp<input.n_atomic_pars; idp++){
+      for (mu = 0;  mu < Nrays;  mu++) {
+        atmos.atomic_rfs[nspect][mu][idp] = 0.0;
+      }
+    }
+  }
 
   as = &spectrum.as[nspect];
   alloc_as(nspect, eval_operator);
@@ -111,6 +119,11 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
     S = (double *) malloc(Nspace * sizeof(double));
   }
   chi = (double *) malloc(Nspace * sizeof(double));
+
+  dI = NULL;
+  if (input.get_atomic_rfs){
+    dI = matrix_double(Nspace, input.n_atomic_pars);
+  }
 
   /* --- Store current mean intensity, initialize new one to zero - - */
 
@@ -217,7 +230,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	  } else if (input.S_interpolation == S_PARABOLIC) {
       	    Piecewise_1D(nspect, mu, to_obs, chi, S, I, Psi);
       	  } else if (input.S_interpolation == S_BEZIER3) {
-      	    Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi);
+      	    Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi, dI);
       	  } else {
       	    sprintf(messageStr,
       		    "Unknown radiation solver: %d",
@@ -255,6 +268,19 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	spectrum.Stokes_U[nspect][mu] = Ipol[2][0];
       	spectrum.Stokes_V[nspect][mu] = Ipol[3][0];
       }
+
+      // Store RFs
+      if (input.get_atomic_rfs){
+        for (int idp=0; idp<input.n_atomic_pars; idp++){
+          // if (isnan(dI[0][idp])){
+          //   atmos.atomic_rfs[nspect][mu][idp] = 0.0;
+          // } else{
+            atmos.atomic_rfs[nspect][mu][idp] = dI[0][idp];
+          // }
+        }
+        // printf("%d | %e\n", nspect, atmos.atomic_rfs[nspect][mu][0]);
+      }
+
     } // end of for(mu)
   } else {
    

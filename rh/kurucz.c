@@ -112,6 +112,7 @@ void             freePartitionFunction();
 
 extern Atmosphere atmos;
 extern InputData input;
+extern Spectrum spectrum;
 extern char messageStr[];
 
 
@@ -485,8 +486,7 @@ void rlk_locate(int N, RLK_Line *lines, double lambda, int *low)
 /* ------- begin -------------------------- rlk_opacity.c ----------- */
 
 flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
-                  double *chi, double *eta, double *scatt, double *chip,
-                  double **dchi, double **deta, double **dscatt)
+                  double *chi, double *eta, double *scatt, double *chip)
 {
   register int k, n, kr;
 
@@ -663,15 +663,15 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	      chi_l    *= epsilon; 
               eta_l    *= epsilon;
 
-              if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LN10; // this was done from head, for log(gf) should be correct
+              // if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LN10; // this was done from head, for log(gf) should be correct
       	    }
 
       	    chi[k] += chi_l * phi;
       	    eta[k] += eta_l * phi;
 
             if (rlk->get_loggf_rf){
-              dchi[k][rlk->loggf_rf_ind] = chi[k] * LN10;
-              deta[k][rlk->loggf_rf_ind] = eta[k] * LN10;
+              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi[k] * LN10;
+              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta[k] * LN10;
             }
 
       	    if (rlk->zm != NULL && rlk->Grad) {

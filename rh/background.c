@@ -518,9 +518,8 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
           /* --- Add opacity from Kurucz line list --  -------------- */
 
           if (atmos.Nrlk > 0) {
-      	    backgrflags = rlk_opacity(wavelength, nspect, mu, to_obs,
-      				      chi, eta, scatt, chip,
-                    spectrum.dchi_c_lam[nspect], spectrum.deta_c_lam[nspect], spectrum.dsca_c_lam[nspect]);
+        	   backgrflags = rlk_opacity(wavelength, nspect, mu, to_obs,
+        				      chi, eta, scatt, chip);
             if (backgrflags.hasline) {
       	      atmos.backgrflags[nspect].hasline = TRUE;
               if (backgrflags.ispolarized) {
@@ -600,21 +599,18 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
 
       if (atmos.Nrlk > 0) {
       	backgrflags = rlk_opacity(wavelength, nspect, 0, TRUE,
-                          chi, eta, scatt, NULL,
-                          spectrum.dchi_c_lam[nspect], spectrum.deta_c_lam[nspect], spectrum.dsca_c_lam[nspect]);
-        if (backgrflags.hasline) {
-      	  atmos.backgrflags[nspect].hasline = TRUE;
-      	  for (k = 0;  k < atmos.Nspace;  k++) {
-      	    chi_c[k] += chi[k];
-      	    eta_c[k] += eta[k];
-      	  }
-      	  if (input.rlkscatter) {
-      	    for (k = 0;  k < atmos.Nspace;  k++) {
-      	      sca_c[k] += scatt[k];
-      	      chi_c[k] += scatt[k];
-      	    }
-      	  }
-      	}
+                          chi, eta, scatt, NULL);
+    	  atmos.backgrflags[nspect].hasline = TRUE;
+    	  for (k = 0;  k < atmos.Nspace;  k++) {
+    	    chi_c[k] += chi[k];
+    	    eta_c[k] += eta[k];
+    	  }
+    	  if (input.rlkscatter) {
+    	    for (k = 0;  k < atmos.Nspace;  k++) {
+    	      sca_c[k] += scatt[k];
+    	      chi_c[k] += scatt[k];
+    	    }
+    	  }
       }
       /* --- Add opacity from molecular lines --       -------------- */
 

@@ -26,6 +26,8 @@
 #include "spectrum.h"
 #include "bezier.h"
 
+#include "inputs.h"
+
 
 /* --- Identity matrix --                              -------------- */
 
@@ -41,6 +43,7 @@ static const double ident[4][4] =
 extern Geometry geometry;
 extern Atmosphere atmos;
 extern Spectrum spectrum;
+extern InputData input;
 extern char messageStr[];
 
 
@@ -301,7 +304,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 /* ------- begin ----------------------- Piecewise_Bezier3_1D.c ----- */
 
 void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
-			  double *chi, double *S, double *I, double *Psi)
+			  double *chi, double *S, double *I, double *Psi, double **dI)
 {
   
   /* --- Cubic Bezier solver for unpolarized light
@@ -323,6 +326,8 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   double dtau_uw, dtau_dw, dS_uw, I_upw, c1, c2, w[3], zmu, Bnu[2];
   double dsup, dsdn, dt03, eps=0, alpha=0, beta=0, gamma=0, theta=0;
   double dS_up, dS_c, dchi_up, dchi_c, dchi_dn, dsdn2;
+  int idp;
+  double Zk, Zkm1, Zkp1, *dZk, dZkm1, *dZup, *dI_upw;
 
   zmu = 1.0 / geometry.muz[mu];
 
@@ -405,6 +410,24 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
   dS_up = (S[k] - S[k-dk]) / dtau_uw;
 
+  dI_upw = NULL;
+  dZup = NULL;
+  dZk = NULL;
+  if (input.get_atomic_rfs  && to_obs){
+    dZup = (double *) malloc(input.n_atomic_pars * sizeof(double));
+    dZk = (double *) malloc(input.n_atomic_pars * sizeof(double));
+    dI_upw = (double *) malloc(input.n_atomic_pars * sizeof(double));
+    for (idp=0; idp<input.n_atomic_pars; idp++){
+      dI[k_start][idp] = 0.0;
+      dI_upw[idp] = 0.0;
+
+      Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+      Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+      dZup[idp] = (Zk - Zkm1) / dtau_uw;
+    }
+  }
+
+  
   /* --- Solve transfer along ray --                   -------------- */
 
   for (k = k_start+dk;  k != k_end+dk;  k += dk) {
@@ -451,6 +474,22 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
        
        I[k]= I_upw*eps + alpha*S[k] + beta*S[k-dk] + gamma * c1 + theta * c2; 
 
+       if (input.get_atomic_rfs && to_obs){
+        for (idp=0; idp<input.n_atomic_pars; idp++){
+          if (spectrum.deta_c_lam[nspect][k][idp]==0){
+            dI[k][idp] = I[k];
+          } else {
+            Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+            Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+            Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp]/chi[k+dk] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp]/chi[k+dk];
+            dZk[idp]  = cent_deriv(dtau_uw, dtau_dw, Zkm1, Zk, Zkp1);
+            c1 = Zk - dt03 * dZk[idp];
+            c2 = Zkm1 + dt03 * dZup[idp];
+            dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
+          }
+        }
+       }
+
        /* --- Diagonal operator --                     -------------- */
 
        if (Psi) Psi[k] = alpha + gamma;
@@ -468,6 +507,19 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       
       I[k] = (1.0 - w[0])*I_upw + w[0]*S[k] + w[1]*dS_uw;
 
+      if (input.get_atomic_rfs && to_obs){
+        for (idp=0; idp<input.n_atomic_pars; idp++){
+          if (spectrum.deta_c_lam[nspect][k][idp]==0){
+            dI[k][idp] = 0.0;
+          } else {
+            Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+            Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+            dZk[idp] = -(Zk - Zkm1) / dtau_uw;
+            dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
+          }
+        }
+      }
+
       /* --- Diagonal operator --                      -------------- */
       
       if (Psi) Psi[k] = w[0] - w[1] / dtau_uw;
@@ -481,6 +533,15 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     dchi_c=dchi_dn;
     dtau_uw=dtau_dw;
     dS_up = dS_c;
+    if (input.get_atomic_rfs && to_obs){
+      for (idp=0; idp<input.n_atomic_pars; idp++){
+        dI_upw[idp] = dI[k][idp];
+        dZup[idp] = dZk[idp];
+      }
+    }
   }
+  if (dI_upw!=NULL) free(dI_upw);
+  if (dZup!=NULL) free(dZup);
+  if (dZk!=NULL) free(dZk);
 }
 /* ------- end ---------------------------- Piecewise_Bezier3_1D.c -- */

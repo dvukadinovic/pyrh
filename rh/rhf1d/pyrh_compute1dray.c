@@ -262,11 +262,15 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   readAtomicModels();
   readMolecularModels();
 
+  // printf("got all atoms and molecules\n");
+
   SortLambda(lam, Nwave);
+
+  // printf("initialized everything in SortLambda()\n");
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
-    atmos.atomic_rfs = matrix3d_double(4, spectrum.Nspect, input.n_atomic_pars);
+    atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, atmos.Nrays, input.n_atomic_pars);
   }
 
   getBoundary(&geometry);
@@ -274,6 +278,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
+
+  // printf("got background op\n");
 
   bool_t pyrh_io_flag = FALSE;
 
@@ -290,6 +296,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   /* --- Solve radiative transfer for active ingredients -- --------- */
 
   // Here we get the spectrum (IQUV and J)
+  // printf("wer iterate to solve RTE\n");
   Iterate(input.NmaxIter, input.iterLimit);
 
   adjustStokesMode();
@@ -310,6 +317,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
+  // printf("get spec for a given mu\n");
   _solveray(argv, mu, &spec);
 
   // revert units (since we pass pointers...)
@@ -322,6 +330,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   //--- free all the memory that we do not use anymore
+
+  // printf("free stuff\n");
 
   freeAtoms();
   freeMolecules();
