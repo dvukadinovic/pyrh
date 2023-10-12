@@ -193,7 +193,8 @@ cpdef compute1d(cwd,
 				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
 				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
 				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] lam_values):
+				cnp.ndarray[double, ndim=1, mode="c"] lam_values,
+				get_atomic_rfs):
 	cdef int Ndep = atmosphere.shape[1]
 	cdef int fudge_num = fudge_lam.shape[0]
 	cdef int Nwave = wave.shape[0]
@@ -207,6 +208,11 @@ cpdef compute1d(cwd,
 	if (Nlam!=lam_values.shape[0]):
 		print("\n  pyrh: Different number of lam_ids and lam_values.\n")
 		sys.exit()
+
+	if get_atomic_rfs:
+		rh_get_atomic_rfs = 1
+	else:
+		rh_get_atomic_rfs = 0
 
 	cdef char* argv[140]
 
@@ -226,6 +232,7 @@ cpdef compute1d(cwd,
 			 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
 			 Nloggf, &loggf_ids[0], &loggf_values[0],
 			 Nlam, &lam_ids[0], &lam_values[0],
+			 rh_get_atomic_rfs,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
@@ -238,7 +245,8 @@ cpdef compute1d(cwd,
 		sU = convert_1d(spec.sU, spec.nlw)
 		sV = convert_1d(spec.sV, spec.nlw)
 
-	if (Nloggf!=0) or (Nlam!=0):
+	# if (Nloggf!=0) or (Nlam!=0):
+	if get_atomic_rfs:
 		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
 
 		return sI, sQ, sU, sV, lam, rf

@@ -272,13 +272,8 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       // Store RFs
       if (input.get_atomic_rfs){
         for (int idp=0; idp<input.n_atomic_pars; idp++){
-          // if (isnan(dI[0][idp])){
-          //   atmos.atomic_rfs[nspect][mu][idp] = 0.0;
-          // } else{
             atmos.atomic_rfs[nspect][mu][idp] = dI[0][idp];
-          // }
         }
-        // printf("%d | %e\n", nspect, atmos.atomic_rfs[nspect][mu][0]);
       }
 
     } // end of for(mu)

@@ -476,17 +476,18 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
        if (input.get_atomic_rfs && to_obs){
         for (idp=0; idp<input.n_atomic_pars; idp++){
-          if (spectrum.deta_c_lam[nspect][k][idp]==0){
-            dI[k][idp] = I[k];
-          } else {
-            Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
-            Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
-            Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp]/chi[k+dk] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp]/chi[k+dk];
-            dZk[idp]  = cent_deriv(dtau_uw, dtau_dw, Zkm1, Zk, Zkp1);
-            c1 = Zk - dt03 * dZk[idp];
-            c2 = Zkm1 + dt03 * dZup[idp];
-            dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
-          }
+          Zk = spectrum.dchi_c_lam[nspect][k][idp] * I[k] - spectrum.deta_c_lam[nspect][k][idp];
+          Zk /= chi[k];
+          Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp];
+          Zkm1 /= chi[k-dk];
+          Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp];
+          Zkp1 /= chi[k+dk];
+          dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkp1, Zk, Zkm1);
+          c1 = MAX(Zk - dt03 * dZk[idp], 0.0);
+          c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
+          // c1 = Zk - dt03 * dZk[idp];
+          // c2 = Zkm1 + dt03 * dZup[idp];
+          dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
         }
        }
 
@@ -509,14 +510,10 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
       if (input.get_atomic_rfs && to_obs){
         for (idp=0; idp<input.n_atomic_pars; idp++){
-          if (spectrum.deta_c_lam[nspect][k][idp]==0){
-            dI[k][idp] = 0.0;
-          } else {
-            Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
-            Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
-            dZk[idp] = -(Zk - Zkm1) / dtau_uw;
-            dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
-          }
+          Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+          Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+          dZk[idp] = -(Zk - Zkm1) / dtau_uw;
+          dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
         }
       }
 

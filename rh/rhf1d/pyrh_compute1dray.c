@@ -107,6 +107,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
+              int get_atomic_rfs,
               int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
 {
@@ -177,7 +178,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
     atmos.loggf_values = loggf_values;
-    input.get_atomic_rfs = TRUE;
+    // input.get_atomic_rfs = TRUE;
     input.n_atomic_pars += Nloggf;
   }
 
@@ -189,9 +190,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
-    input.get_atomic_rfs = TRUE;
+    // input.get_atomic_rfs = TRUE;
     input.n_atomic_pars += Nlam;
   }
+
+  if (get_atomic_rfs!=0) input.get_atomic_rfs = TRUE;
 
   // if (pyrh_rlk_lines->Nrlk!=0){
   //   atmos.Nrlk = pyrh_rlk_lines->Nrlk;
