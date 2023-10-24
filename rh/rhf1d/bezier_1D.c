@@ -410,22 +410,22 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
   dS_up = (S[k] - S[k-dk]) / dtau_uw;
 
-  dI_upw = NULL;
-  dZup = NULL;
-  dZk = NULL;
-  if (input.get_atomic_rfs  && to_obs){
-    dZup = (double *) malloc(input.n_atomic_pars * sizeof(double));
-    dZk = (double *) malloc(input.n_atomic_pars * sizeof(double));
-    dI_upw = (double *) malloc(input.n_atomic_pars * sizeof(double));
-    for (idp=0; idp<input.n_atomic_pars; idp++){
-      dI[k_start][idp] = 0.0;
-      dI_upw[idp] = 0.0;
+  // dI_upw = NULL;
+  // dZup = NULL;
+  // dZk = NULL;
+  // if (input.get_atomic_rfs  && to_obs){
+  //   dZup = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  //   dZk = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  //   dI_upw = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  //   for (idp=0; idp<input.n_atomic_pars; idp++){
+  //     dI[k_start][idp] = 0.0;
+  //     dI_upw[idp] = 0.0;
 
-      Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
-      Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
-      dZup[idp] = (Zk - Zkm1) / dtau_uw;
-    }
-  }
+  //     Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+  //     Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+  //     dZup[idp] = (Zk - Zkm1) / dtau_uw;
+  //   }
+  // }
 
   
   /* --- Solve transfer along ray --                   -------------- */
@@ -474,22 +474,22 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
        
        I[k]= I_upw*eps + alpha*S[k] + beta*S[k-dk] + gamma * c1 + theta * c2; 
 
-       if (input.get_atomic_rfs && to_obs){
-        for (idp=0; idp<input.n_atomic_pars; idp++){
-          Zk = spectrum.dchi_c_lam[nspect][k][idp] * I[k] - spectrum.deta_c_lam[nspect][k][idp];
-          Zk /= chi[k];
-          Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp];
-          Zkm1 /= chi[k-dk];
-          Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp];
-          Zkp1 /= chi[k+dk];
-          dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkp1, Zk, Zkm1);
-          c1 = MAX(Zk - dt03 * dZk[idp], 0.0);
-          c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
-          // c1 = Zk - dt03 * dZk[idp];
-          // c2 = Zkm1 + dt03 * dZup[idp];
-          dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
-        }
-       }
+       // if (input.get_atomic_rfs && to_obs){
+       //  for (idp=0; idp<input.n_atomic_pars; idp++){
+       //    Zk = spectrum.dchi_c_lam[nspect][k][idp] * I[k] - spectrum.deta_c_lam[nspect][k][idp];
+       //    Zk /= chi[k];
+       //    Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp];
+       //    Zkm1 /= chi[k-dk];
+       //    Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp];
+       //    Zkp1 /= chi[k+dk];
+       //    dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkp1, Zk, Zkm1);
+       //    c1 = MAX(Zk - dt03 * dZk[idp], 0.0);
+       //    c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
+       //    // c1 = Zk - dt03 * dZk[idp];
+       //    // c2 = Zkm1 + dt03 * dZup[idp];
+       //    dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
+       //  }
+       // }
 
        /* --- Diagonal operator --                     -------------- */
 
@@ -508,14 +508,14 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       
       I[k] = (1.0 - w[0])*I_upw + w[0]*S[k] + w[1]*dS_uw;
 
-      if (input.get_atomic_rfs && to_obs){
-        for (idp=0; idp<input.n_atomic_pars; idp++){
-          Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
-          Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
-          dZk[idp] = -(Zk - Zkm1) / dtau_uw;
-          dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
-        }
-      }
+      // if (input.get_atomic_rfs && to_obs){
+      //   for (idp=0; idp<input.n_atomic_pars; idp++){
+      //     Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+      //     Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+      //     dZk[idp] = -(Zk - Zkm1) / dtau_uw;
+      //     dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
+      //   }
+      // }
 
       /* --- Diagonal operator --                      -------------- */
       
@@ -530,15 +530,169 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     dchi_c=dchi_dn;
     dtau_uw=dtau_dw;
     dS_up = dS_c;
-    if (input.get_atomic_rfs && to_obs){
+    // if (input.get_atomic_rfs && to_obs){
+    //   for (idp=0; idp<input.n_atomic_pars; idp++){
+    //     dI_upw[idp] = dI[k][idp];
+    //     dZup[idp] = dZk[idp];
+    //   }
+    // }
+  }
+  // if (dI_upw!=NULL) free(dI_upw);
+  // if (dZup!=NULL) free(dZup);
+  // if (dZk!=NULL) free(dZk);
+}
+/* ------- end ---------------------------- Piecewise_Bezier3_1D.c -- */
+
+void Piecewise_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
+        double *chi, double *Z, double *I, double **dI)
+{
+  
+  /* --- Cubic Bezier solver for unpolarized atomic RFs
+         Coded by D. Vukadinovic (copy-pasted from non RF function)
+         --                                            -------------- */
+  
+  register int k;
+  const char routineName[] = "Piecewise_Bezier3_1D_RFs";
+
+  int    k_start, k_end, dk, Ndep = geometry.Ndep;
+  double dtau_uw, dtau_dw, dS_uw, I_upw, c1, c2, w[3], zmu, Bnu[2];
+  double dsup, dsdn, dt03, eps=0, alpha=0, beta=0, gamma=0, theta=0;
+  double dchi_up, dchi_c, dchi_dn, dsdn2;
+  int idp;
+  double Zk, Zkm1, Zkp1, *dZk, dZkm1, *dZup, *dI_upw;
+
+  zmu = 1.0 / geometry.muz[mu];
+
+  /* --- Distinguish between rays going from BOTTOM to TOP
+         (to_obs == TRUE), and vice versa --           -------------- */
+
+  if (to_obs) {
+    dk      = -1;
+    k_start = Ndep-1;
+    k_end   = 0;
+  } else {
+    dk      = 1;
+    k_start = 0;
+    k_end   = Ndep-1;
+  }
+  
+  dtau_uw = 0.5 * zmu * (chi[k_start] + chi[k_start+dk]) *
+    fabs(geometry.height[k_start] - geometry.height[k_start+dk]);
+  
+  /* --- Set variables for first iteration to allow simple 
+         shift for all next iterations --              -------------- */
+
+  k = k_start+dk;
+  dsup = fabs(geometry.height[k] - geometry.height[k-dk]) * zmu;
+  dsdn = fabs(geometry.height[k+dk] - geometry.height[k]) * zmu;
+  dchi_up = (chi[k] - chi[k-dk]) / dsup;
+  
+  /* --- dchi/ds at central point --                   -------------- */
+
+  dchi_c = cent_deriv(dsup, dsdn, chi[k-dk], chi[k], chi[k+dk]);
+  
+  /* --- upwind path_length (Bezier3 integration) --   -------------- */
+
+  c1 = MAX(chi[k]    - (dsup/3.0) * dchi_c,   0.0);
+  c2 = MAX(chi[k-dk] + (dsup/3.0) * dchi_up,  0.0);
+  dtau_uw = dsup * (chi[k] + chi[k-dk] + c1 + c2) * 0.25;
+
+  /* dS/dtau at upwind point */
+
+  dZup = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  dZk = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  dI_upw = (double *) malloc(input.n_atomic_pars * sizeof(double));
+  for (idp=0; idp<input.n_atomic_pars; idp++){
+    dI[k_start][idp] = 0.0;
+    dI_upw[idp] = 0.0;
+
+    Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+    Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+    dZup[idp] = (Zk - Zkm1) / dtau_uw;
+  }
+  
+  
+  /* --- Solve transfer along ray --                   -------------- */
+
+  for (k = k_start+dk;  k != k_end+dk;  k += dk) {
+    
+    if (k != k_end) {
+
+      /* --- Downwind path length --                   -------------- */
+      
+       dsdn = fabs(geometry.height[k+dk] - geometry.height[k]) * zmu;
+       
+       /* --- dchi/ds at downwind point --             -------------- */
+       
+      if (fabs(k - k_end) > 1) {
+        dsdn2 = fabs(geometry.height[k+2*dk] - geometry.height[k+dk]) * zmu;
+        dchi_dn = cent_deriv(dsdn, dsdn2, chi[k], chi[k+dk], chi[k+2*dk]);       
+      } else {
+        dchi_dn=(chi[k+dk]-chi[k])/dsdn;
+      }
+       
+       /* --- Make sure that c1 and c2 don't go below zero -- ------- */
+    
+       c1 = MAX(chi[k]    + (dsdn/3.0) * dchi_c,  0.0);
+       c2 = MAX(chi[k+dk] - (dsdn/3.0) * dchi_dn, 0.0);
+
+       /* --- Downwind optical path length --          -------------- */
+
+       dtau_dw = dsdn * (chi[k] + chi[k+dk] + c1 + c2) * 0.25;
+       dt03    = dtau_uw / 3.0;
+      
+      /* --- Compute interpolation parameters --       -------------- */
+       
+       Bezier3_coeffs(dtau_uw, &alpha, &beta, &gamma, &theta, &eps);
+       
+       // printf("%e | %e | %e\n", I[k-dk], I[k], I[k+dk]);
+
       for (idp=0; idp<input.n_atomic_pars; idp++){
-        dI_upw[idp] = dI[k][idp];
-        dZup[idp] = dZk[idp];
+        Zk = spectrum.dchi_c_lam[nspect][k][idp] * I[k] - spectrum.deta_c_lam[nspect][k][idp];
+        Zk /= chi[k];
+        Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp];
+        Zkm1 /= chi[k-dk];
+        Zkp1 = spectrum.dchi_c_lam[nspect][k+dk][idp] * I[k+dk] - spectrum.deta_c_lam[nspect][k+dk][idp];
+        Zkp1 /= chi[k+dk];
+        dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkp1, Zk, Zkm1);
+        c1 = MAX(Zk - dt03 * dZk[idp], 0.0);
+        c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
+        // c1 = Zk - dt03 * dZk[idp];
+        // c2 = Zkm1 + dt03 * dZup[idp];
+        dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
+      }
+       
+    } else { 
+      
+      /* --- Piecewise linear integration at end of ray -- ---------- */
+      
+      dtau_uw = 0.5 * zmu * (chi[k] + chi[k-dk]) * fabs(geometry.height[k] - geometry.height[k-dk]);
+      
+      /* --- Defined negative in Han's implementation -- ------------ */
+      
+      w3(dtau_uw, w);
+      
+      for (idp=0; idp<input.n_atomic_pars; idp++){
+        Zk = spectrum.dchi_c_lam[nspect][k][idp]/chi[k] * I[k] - spectrum.deta_c_lam[nspect][k][idp]/chi[k];
+        Zkm1 = spectrum.dchi_c_lam[nspect][k-dk][idp]/chi[k-dk] * I[k-dk] - spectrum.deta_c_lam[nspect][k-dk][idp]/chi[k-dk];
+        dZk[idp] = -(Zk - Zkm1) / dtau_uw;
+        dI[k][idp] = (1.0 - w[0])*dI_upw[idp] + w[0]*Zk + w[1]*dZk[idp];
       }
     }
+    
+    /* --- Re-use downwind quantities for next upwind position -- --- */
+    dsup=dsdn;
+    dchi_up=dchi_c;
+    dchi_c=dchi_dn;
+    dtau_uw=dtau_dw;
+    for (idp=0; idp<input.n_atomic_pars; idp++){
+      dI_upw[idp] = dI[k][idp];
+      dZup[idp] = dZk[idp];
+    }
   }
-  if (dI_upw!=NULL) free(dI_upw);
-  if (dZup!=NULL) free(dZup);
-  if (dZk!=NULL) free(dZk);
+
+  free(dI_upw);
+  free(dZup);
+  free(dZk);
 }
 /* ------- end ---------------------------- Piecewise_Bezier3_1D.c -- */

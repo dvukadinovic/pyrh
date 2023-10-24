@@ -231,6 +231,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	    Piecewise_1D(nspect, mu, to_obs, chi, S, I, Psi);
       	  } else if (input.S_interpolation == S_BEZIER3) {
       	    Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi, dI);
+            if (input.get_atomic_rfs) Piecewise_Bezier3_1D_RFs(nspect, mu, to_obs, chi, S, I, dI);
       	  } else {
       	    sprintf(messageStr,
       		    "Unknown radiation solver: %d",
