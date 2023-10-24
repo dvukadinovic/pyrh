@@ -2,24 +2,22 @@
 
 The RH code uses bool_t defined in rpc/types.h and is dependent on the
 rpc/xdr.h IO (which is in pyrh obsolete; but is not removed from the code
-completely). Before installation, types.h and xdr.h, located in ./headers, must be copied into /usr/include/rpc for RH to include them.
+completely for safety reasons). Before installation, types.h and xdr.h,
+located in ./headers, must be copied into /usr/include/rpc for RH to include
+them.
 
-To install the package, do it as:
+To install the package:
 
-python setup.py install
+	python setup.py install
 
 On every change of the code, it needs to be recompiled since it is a shared
 library that needs to be changed are re-imported in the code in order to see
-change.
+a change.
 
 # Important notes
 
 We set the keyword LIMIT_MEMORY to be FALSE all the time. It is mannualy
 implemented inside the pyrh_comute1dray.c files.
-
-# Changes to done
-
-Added a keyword for a path to the Barklem table directory.
 
 # Changes
 
@@ -36,5 +34,4 @@ where are they needed based on the input to 'rhf1d()' function.
 
 # Issues
 
-argv[] list is not send to the rhf1d() in the format it should have as it is 
-constructed in __init__().
+Many...
