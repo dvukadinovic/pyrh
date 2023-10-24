@@ -14,6 +14,15 @@ On every change of the code, it needs to be recompiled since it is a shared
 library that needs to be changed are re-imported in the code in order to see
 a change.
 
+After installation, export the path to the `pyrh/rh` folder in variable
+`PYRH_PATH`. The best strategy is to set it directly in the `.\*rc` file as:
+
+	export PYRH_PATH="/absolte/path/to/the/pyrh/rh"
+
+This path is used to locate atomic and molecular models (assumed to be in
+pyrh/rh/Atoms and pyrh/rh/Molecules), abundance (in pyrh/rh/Atoms) and for
+ABO coefficients (in pyrh/rh/Atoms).
+
 # Important notes
 
 We set the keyword LIMIT_MEMORY to be FALSE all the time. It is mannualy
