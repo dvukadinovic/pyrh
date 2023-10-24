@@ -388,9 +388,9 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
@@ -404,8 +404,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   // clear HSE related parameters
   free(rho); rho = NULL;
@@ -540,9 +540,9 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
@@ -556,8 +556,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 }
 
 void get_ne_from_nH(char *cwd, 
@@ -662,9 +662,9 @@ void get_ne_from_nH(char *cwd,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   // free atmosphere related data
@@ -679,6 +679,6 @@ void get_ne_from_nH(char *cwd,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 }

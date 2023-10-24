@@ -341,9 +341,9 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
@@ -358,8 +358,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   return spec;
 }
