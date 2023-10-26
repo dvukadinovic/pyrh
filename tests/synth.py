@@ -3,13 +3,16 @@ import matplotlib.pyplot as plt
 import pyrh
 from scipy.interpolate import interp1d
 from astropy.io import fits
+from globin.atmos import write_multi_atmosphere
+from globin.atmos import distribute_hydrogen
+from globin.rh import write_wavs
 
 def spinor2multi(atm):
 	"""
 	Casting from SPINOR type atmosphere structure to MULTI type structure.
 	"""
 	from scipy.constants import k
-	new = np.empty(atm.shape, dtype=np.float64)
+	new = np.empty((14, atm.shape[-1]), dtype=np.float64)
 
 	# atmosphere scale: height [km] or optical depth @ 500nm
 	new[0] = atm[0]
@@ -54,7 +57,7 @@ def air_to_vacuum(wavelength, air2vacuum_limit=199.9352):
 
 atmos = np.loadtxt("falc.dat", skiprows=1)
 atmos = np.array(atmos.T, dtype=np.float64)
-atmos= spinor2multi(atmos)
+atmos = spinor2multi(atmos)
 
 # path to the *.input files
 cwd = "."
@@ -79,7 +82,7 @@ spec = pyrh.compute1d(cwd, mu, atm_scale, atmos,
 					  np.array([], dtype=np.int32), np.array([], dtype=np.float64),
 					  False)
 spec = np.array(spec, dtype=np.float64)
-#np.savetxt("hinode_falc_pyrh.spec", spec.T, fmt="%7.6e")
+# np.savetxt("hinode_falc_pyrh.spec", spec.T, fmt="%7.6e")
 
 #--- create figure
 fig, ax = plt.subplots(nrows=2, ncols=1, 
@@ -94,18 +97,25 @@ hinode_pyrh = np.loadtxt("hinode_falc_pyrh.spec").T
 hinode_pyrh[0] /= hinode_pyrh[0,0]
 ax[0].plot(wave, hinode_pyrh[0], label="pyrh benchamark", c="tab:red")
 
-spinor = fits.open("inverted_profs.1.fits")[0].data[0,0]
-spinor /= spinor[0,1]
-ax[0].plot(wave, spinor[0], label="SPINOR benchamark", c="tab:blue")
+hinode_rh = np.loadtxt("hinode_falc_rh.spec").T
+hinode_rh[0] /= hinode_rh[0,0]
+ax[0].plot(wave, hinode_rh[0], label="rh benchamark", c="tab:green")
+
+# spinor = fits.open("inverted_profs.1.fits")[0].data[0,0]
+# spinor /= spinor[0,1]
+# ax[0].plot(wave, spinor[0], label="SPINOR benchamark", c="tab:blue")
 
 #--- differences
 ax[1].plot(wave, spec[0] - hinode_pyrh[0], c="tab:red")
-ax[1].plot(wave, spec[0] - spinor[0], c="tab:blue")
+ax[1].plot(wave, spec[0] - hinode_rh[0], c="tab:green")
+# ax[1].plot(wave, spec[0] - spinor[0], c="tab:blue")
 
 ax[0].set_ylabel(r"Normalized intensity")
-ax[1].set_xlabel("Wavelength in vacuum [nm]")
+ax[1].set_xlabel("Wavelength in air [nm]")
 ax[1].set_xlim([wave[0], wave[-1]])
 
-ax[0].legend(frameon=True, ncols=3, bbox_to_anchor=(0, 1.01, 1, 0.2),)
+ax[0].legend(frameon=True, 
+	ncols=4, 
+	bbox_to_anchor=(0, 1.01, 1, 0.2),)
 
 plt.show()
