@@ -18,7 +18,6 @@
 
 #include <math.h>
 #include <string.h>    // memcpy, memset
-#include <stdlib.h>    // malloc
 
 #ifdef SIMDON
 #include <x86intrin.h> // Intrinsic SSE instructions
