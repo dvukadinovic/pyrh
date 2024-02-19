@@ -6,6 +6,7 @@ from astropy.io import fits
 from globin.atmos import write_multi_atmosphere
 from globin.atmos import distribute_hydrogen
 from globin.rh import write_wavs
+import globin
 
 def spinor2multi(atm):
 	"""
@@ -93,21 +94,26 @@ plt.subplots_adjust(hspace=0)
 spec[0] /= spec[0,0]
 ax[0].plot(wave, spec[0], label="synth", c="k")
 
-hinode_pyrh = np.loadtxt("hinode_falc_pyrh.spec").T
-hinode_pyrh[0] /= hinode_pyrh[0,0]
-ax[0].plot(wave, hinode_pyrh[0], label="pyrh benchamark", c="tab:red")
+# hinode_pyrh = np.loadtxt("hinode_falc_pyrh.spec").T
+# hinode_pyrh[0] /= hinode_pyrh[0,0]
+# ax[0].plot(wave, hinode_pyrh[0], label="pyrh benchamark", c="tab:red")
 
 hinode_rh = np.loadtxt("hinode_falc_rh.spec").T
 hinode_rh[0] /= hinode_rh[0,0]
 ax[0].plot(wave, hinode_rh[0], label="rh benchamark", c="tab:green")
+
+hinode_rh_globin = globin.Observation("hinode_falc_rh-globin.fits", verify=False)
+hinode_rh_globin.spec /= hinode_rh_globin.I[0,0,0]
+ax[0].plot(wave, hinode_rh_globin.I[0,0], label="rh-globin", c="magenta")
 
 # spinor = fits.open("inverted_profs.1.fits")[0].data[0,0]
 # spinor /= spinor[0,1]
 # ax[0].plot(wave, spinor[0], label="SPINOR benchamark", c="tab:blue")
 
 #--- differences
-ax[1].plot(wave, spec[0] - hinode_pyrh[0], c="tab:red")
+# ax[1].plot(wave, spec[0] - hinode_pyrh[0], c="tab:red")
 ax[1].plot(wave, spec[0] - hinode_rh[0], c="tab:green")
+ax[1].plot(wave, spec[0] - hinode_rh_globin.I[0,0], c="magenta")
 # ax[1].plot(wave, spec[0] - spinor[0], c="tab:blue")
 
 ax[0].set_ylabel(r"Normalized intensity")
