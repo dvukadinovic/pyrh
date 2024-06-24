@@ -255,10 +255,10 @@ void readInput()
   }
 
   // Kurucz Partition function input file
-  if (!theKeywords[37].set){
+  if (!theKeywords[36].set){
     concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
     concatenate(input.pfData, tmp, "pf_Kurucz.input");
-    theKeywords[37].set = TRUE;
+    theKeywords[36].set = TRUE;
   }
 
   /* --- Perform some sanity checks --                 -------------- */

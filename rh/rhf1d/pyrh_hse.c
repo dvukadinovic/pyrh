@@ -574,6 +574,10 @@ void get_ne_from_nH(char *cwd,
   // concatenate(keyword_input, cwd, "/keyword.input");
   char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
+
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
