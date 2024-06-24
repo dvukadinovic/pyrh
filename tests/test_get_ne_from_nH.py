@@ -1,5 +1,7 @@
-import pyrh
 import numpy as np
+import matplotlib.pyplot as plt
+
+import pyrh
 
 def spinor2multi(atm):
 	"""
@@ -29,8 +31,7 @@ def spinor2multi(atm):
 
 	return new
 
-atmos = np.loadtxt("falc.dat", skiprows=1)
-atmos = np.array(atmos.T, dtype=np.float64)
+atmos = np.loadtxt("falc.dat", skiprows=1).T
 atmos= spinor2multi(atmos)
 
 scale = atmos[0]
@@ -38,7 +39,12 @@ scale = atmos[0]
 cwd = "."
 atm_scale = 0 # tau
 
-print(atmos[2])
+old = atmos[2].copy()
+
 pyrh.get_ne_from_nH(cwd, atm_scale,
 					scale, atmos)
-print(atmos[2])
+
+plt.plot(scale, old)
+plt.plot(scale, atmos[2])
+plt.yscale("log")
+plt.show()
