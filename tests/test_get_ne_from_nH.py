@@ -1,6 +1,5 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import pyrh
+import numpy as np
 
 def spinor2multi(atm):
 	"""
@@ -34,28 +33,12 @@ atmos = np.loadtxt("falc.dat", skiprows=1)
 atmos = np.array(atmos.T, dtype=np.float64)
 atmos= spinor2multi(atmos)
 
-# path to the *.input files
+scale = atmos[0]
+
 cwd = "."
+atm_scale = 0 # tau
 
-# mu angle for which to compute the spectrum
-mu = 1.0
-
-# type of atmosphere stratification:
-# 0 -- optical depth @ 500nm
-# 1 -- mass density
-# 2 -- height [km]
-atm_scale = int(0)
-
-# wavelength samples for which to compute the spectrum (in nm) in vacuum
-wave = np.linspace(630.0, 630.35, num=251) + 0.2
-
-spec = pyrh.compute1d(cwd, mu, atm_scale, atmos,
-					  wave,
-					  int(0), np.empty(1, dtype=np.float64), np.empty((3,1), dtype=np.float64),
-					  np.array([], dtype=np.int32), np.array([], dtype=np.float64),
-					  np.array([], dtype=np.int32), np.array([], dtype=np.float64),
-					  False)
-spec = np.array(spec, dtype=np.float64)
-
-plt.plot(wave, spec[0])
-plt.show()
+print(atmos[2])
+pyrh.get_ne_from_nH(cwd, atm_scale,
+					scale, atmos)
+print(atmos[2])

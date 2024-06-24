@@ -42,25 +42,6 @@ cpdef Pystring2char(lists):
 
 	return N, argv
 
-class Spectrum(object):
-	def __init__(self, nlw=None, lam=None, sI=None, sQ=None, 
-				 sU=None, sV=None, J=None, Jrh=None, stokes=True):
-		self.nlw = nlw
-		self.lam = lam
-		self.I = sI
-		self.Q = None
-		self.U = None
-		self.V = None
-		self.J = J
-		self.Jrh = Jrh
-		self.stokes = False
-
-		if stokes:
-			self.stokes = True
-			self.Q = sQ
-			self.U = sU
-			self.V = sV
-		
 # add OF table as input to rhf1d()
 
 cdef void string2pointer(string, char* c_char_pointer):
@@ -112,9 +93,6 @@ cpdef get_ne_from_nH(cwd,
 			  atm_scale, Ndep, 
 			  &scale[0], &atmosphere[1,0], 
 			  &atmosphere[8,0], &atmosphere[2,0])
-
-	# cpdef dummy(self):
-	# 	rh.dummy()
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -255,7 +233,6 @@ cpdef compute1d(cwd,
 
 	# Nlam = len(lam)
 	return sI, sQ, sU, sV, lam
-	# return Spectrum(spec.nlw, lam, sI, sQ, sU, sV, None, None, spec.stokes)
 
 	# cpdef read_RLK_lines(self):
 	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
