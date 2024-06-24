@@ -80,13 +80,17 @@ typedef struct {
          coolingFile[MAX_VALUE_LENGTH],
          Itop[MAX_VALUE_LENGTH],
          rfs_output[MAX_VALUE_LENGTH]; // D.Vukadinovic
+  char*  pyrh_path; // D.Vukadinovic
   bool_t magneto_optical, PRD_angle_dep, XRD, Eddington,
          backgr_pol, limit_memory, allow_passive_bb, NonICE,
          rlkscatter, xdr_endian, old_background, accelerate_mols,
          // flag for applying OF [D.Vukadinovic]
          do_fudge, 
          // flag if we are performing HSE; then, all atoms/molecules are treated in LTE [D.Vukadinovic]
-         pyrhHSE; 
+         pyrhHSE,
+         // flag for computing semi-analytically the RFs for atomic line parameters
+         get_atomic_rfs,
+         LS_Lande; // flag for computing the Lande factors in LS
   enum   solution startJ;
   
   enum   StokesMode StokesMode;
@@ -97,7 +101,9 @@ typedef struct {
   enum   ne_solution solve_ne;
   int    isum, Ngdelay, Ngorder, Ngperiod, NmaxIter,
          PRD_NmaxIter, PRD_Ngdelay, PRD_Ngorder, PRD_Ngperiod,
-         NmaxScatter, Nthreads;
+         NmaxScatter, Nthreads,
+         // number of atomic line parameters for which we want to compute RFs
+         n_atomic_pars;
   double iterLimit, PRDiterLimit, metallicity;
 
   pthread_attr_t thread_attr;

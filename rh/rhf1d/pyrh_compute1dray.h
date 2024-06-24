@@ -5,6 +5,7 @@ typedef struct{
 	int nlw, Nrays, stokes;
 	double *lam, *sI, *sQ, *sU, *sV;
 	double **J, **J20;
+    double **rfs;
 } mySpectrum;
 
 typedef struct{
@@ -20,6 +21,7 @@ mySpectrum rhf1d(char *cwd, double mu, int Ndep,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
+              int get_atomic_rfs,
               int NKurucz_lists, char *Kurucz_lists);
               // myRLK_Line *pyrh_rlk_lines,
 

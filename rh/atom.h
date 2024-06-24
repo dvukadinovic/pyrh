@@ -155,8 +155,10 @@ struct Molecule {
 
 typedef struct {
   bool_t polarizable;
+  bool_t get_loggf_rf, get_dlam_rf;
   enum vdWaals vdwaals;
   int    pt_index, stage, isotope, Li, Lj, li, lj;
+  int    loggf_rf_ind, dlam_rf_ind;
   double lambda0, gi, gj, Ei, Ej, Bji, Aji, Bij, Si, Sj,
          Grad, GStark, GvdWaals, hyperfine_frac,
          isotope_frac, gL_i, gL_j, hfs_i, hfs_j, iso_dl,

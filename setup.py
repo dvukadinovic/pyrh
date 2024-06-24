@@ -1,7 +1,47 @@
 from setuptools import Extension, setup
 from Cython.Build import cythonize
+from distutils.sysconfig import get_config_vars as default_get_config_vars
+import distutils.sysconfig as dsc
+from platform import platform
+import sys
 import glob
 import numpy
+
+"""
+Only CFLAGS needs to be modified
+To Do:
+  -- remove duplicate flags from CFLAGS (scarry, will skip it)
+  -- if Mac OS X (with M1/M2 CPUs): remove the '-arch x86_64' flag from CFLAGS
+  -- add flag '-DSIMDON' to switch to SIMD matrix inversion (if on Intel arch)
+
+"""
+
+_platform = platform()
+
+def remove_intel_arch(x):
+    if type(x) is str:
+        x.replace(" -arch x86_64 ", " ")
+    return x
+
+def my_get_config_vars(*args):
+    result = default_get_config_vars(*args)
+    
+    # sometimes result is a list and sometimes a dict
+    if type(result) is list:
+        return [remove_intel_arch(x) for x in result]
+    elif type(result) is dict:
+        return {k : remove_intel_arch(x) for k, x in result.items()}
+    else:
+        raise Exception("cannot handle type " + type(result))
+
+    return result
+
+if "arm" in _platform: 
+    dsc.get_config_vars = my_get_config_vars
+
+extra_compile_args = None
+if "x86" in _platform:
+    extra_compile_args = ["-DSIMDON"]
 
 rh_c_files = glob.glob("rh/*.c")
 
@@ -29,8 +69,12 @@ setup(
 	name="pyrh",
 	version="0.2",
 	author="Dusan Vukadionvic",
-	ext_modules=cythonize([Extension("pyrh", rh_c_files,
-							runtime_library_dirs=["rh"])],
-							compiler_directives={"language_level" : "3"}),
+	ext_modules=cythonize([Extension(
+                            "pyrh", rh_c_files,
+							runtime_library_dirs=["rh"],
+                            extra_compile_args=extra_compile_args
+                            )
+                          ],
+						  compiler_directives={"language_level" : "3"}),
 	include_dirs=[numpy.get_include()]
 )

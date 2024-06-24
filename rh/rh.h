@@ -73,6 +73,8 @@ char **getWords(char *label, char *separator, int *count);
 char   **matrix_char(int Nrow, int Ncol);
 int    **matrix_int(int Nrow, int Ncol);
 double **matrix_double(int Nrow, int Ncol);
+double ***matrix3d_double(int Nrow, int Ncol, int Ndep);
+void freeMatrix3d(double ***matrix3d, int Nrow, int Ncol);
 void   freeMatrix(void **Matrix);
 void   SolveLinearEq(int N, double **A, double *b, bool_t improve);
 

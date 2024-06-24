@@ -18,10 +18,9 @@
 
        --                                              -------------- */
 
-// #include <stdlib.h>
+#include <stdlib.h>
 // #include <stdio.h>
 #include <string.h>
-#include <sys/sysinfo.h>
 
 #include "rh.h"
 #include "atom.h"
@@ -108,6 +107,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
+              int get_atomic_rfs,
               int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
 {
@@ -129,6 +129,15 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   SetFPEtraps();
 
   readInput();
+
+  // We are not performing HSE; atoms and molecules can be NLTE
+  input.pyrhHSE = FALSE;
+
+  // get info if we need to compute semin-analytical RFs for atomic parameters
+  input.get_atomic_rfs = FALSE;
+  input.n_atomic_pars = 0;
+
+  // input.solve_ne = ONCE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -180,6 +189,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
     atmos.loggf_values = loggf_values;
+    // input.get_atomic_rfs = TRUE;
+    input.n_atomic_pars += Nloggf;
   }
 
   // set lam0 indices and values if forwarded
@@ -190,7 +201,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
+    // input.get_atomic_rfs = TRUE;
+    input.n_atomic_pars += Nlam;
   }
+
+  if (get_atomic_rfs!=0) input.get_atomic_rfs = TRUE;
 
   // if (pyrh_rlk_lines->Nrlk!=0){
   //   atmos.Nrlk = pyrh_rlk_lines->Nrlk;
@@ -261,13 +276,24 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   readAtomicModels();
   readMolecularModels();
 
+  // printf("got all atoms and molecules\n");
+
   SortLambda(lam, Nwave);
+
+  // printf("initialized everything in SortLambda()\n");
+
+  // allocate space for atomic RFs if needed
+  if (input.get_atomic_rfs){
+    atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, atmos.Nrays, input.n_atomic_pars);
+  }
 
   getBoundary(&geometry);
   
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
+
+  // printf("got background op\n");
 
   bool_t pyrh_io_flag = FALSE;
 
@@ -284,6 +310,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   /* --- Solve radiative transfer for active ingredients -- --------- */
 
   // Here we get the spectrum (IQUV and J)
+  // printf("wer iterate to solve RTE\n");
   Iterate(input.NmaxIter, input.iterLimit);
 
   adjustStokesMode();
@@ -304,6 +331,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
+  // printf("get spec for a given mu\n");
   _solveray(argv, mu, &spec);
 
   // revert units (since we pass pointers...)
@@ -317,16 +345,20 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
+  // printf("free stuff\n");
+
   freeAtoms();
   freeMolecules();
 
+
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
+  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
 
   if (atmos.Nrlk!=0) {
     freePartitionFunction();
@@ -337,8 +369,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   return spec;
 }

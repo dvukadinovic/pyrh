@@ -18,7 +18,7 @@
 
 /* --- Matrix inversion Cramer method SSE instructions -- ----------- */
 
-void SIMD_MatInv(float* src);
+void MatInv(float *mat);
 
 /* --- Matrix inversion Shipley-Coleman (not used) --  -------------- */
 

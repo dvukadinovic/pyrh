@@ -94,6 +94,8 @@ void Solve_ne(double *ne, bool_t fromscratch)
       ne_old = ne[k];
     }
 
+    // printf(" k = %d | ne_old = %e \n", k, ne_old);
+
     niter = 0;
     while (niter < N_MAX_ELECTRON_ITERATIONS) {
       error = ne_old / atmos.nHtot[k];
@@ -118,7 +120,7 @@ void Solve_ne(double *ne, bool_t fromscratch)
 	atmos.nHtot[k] * error / (1.0 - atmos.nHtot[k] * sum);
       dne = fabs((ne[k] - ne_old)/ne_old);
       ne_old = ne[k];
-    
+
       if (dne <= MAX_ELECTRON_ERROR) break;
       niter++;
     }

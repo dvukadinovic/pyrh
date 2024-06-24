@@ -56,6 +56,8 @@ extern char messageStr[];
 
 void getCPU(int level, enum CPUaction action, char *label)
 {
+
+  return;
   register int n;
 
   int Nblanck, Nspace, Ndot;

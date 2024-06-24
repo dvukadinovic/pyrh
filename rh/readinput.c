@@ -46,12 +46,13 @@ void readInput()
 
   int   Nkeyword;
   FILE *fp_keyword;
+  char* tmp = malloc(160);
 
   Keyword theKeywords[] = {
     // DV: obsolete in pyrh
     // {"ATMOS_FILE", "", FALSE, KEYWORD_REQUIRED, input.atmos_input,
     //  setcharValue},
-    {"ABUND_FILE", "", FALSE, KEYWORD_REQUIRED, input.abund_input,
+    {"ABUND_FILE", "", FALSE, KEYWORD_OPTIONAL, input.abund_input,
      setcharValue},
 
     {"NRAYS",     "0", FALSE, KEYWORD_OPTIONAL, &atmos.Nrays, setintValue},
@@ -67,14 +68,19 @@ void readInput()
     //  setcharValue},
     {"ATOMS_FILE",  "", FALSE, KEYWORD_REQUIRED, input.atoms_input,
      setcharValue},
-    
-    // DV: path to Barklem tables
-    {"BARKLEM_SP_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_sp_data,
+
+    // D.Vukadinovic (03.05.2022.) -- path to Barklem tables (optional)
+    {"BARKLEM_SP_DATA",  "", FALSE, KEYWORD_OPTIONAL, input.barklem_sp_data,
      setcharValue},
-    {"BARKLEM_PD_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_pd_data,
+    {"BARKLEM_PD_DATA",  "", FALSE, KEYWORD_OPTIONAL, input.barklem_pd_data,
      setcharValue},
-    {"BARKLEM_DF_DATA",  "", FALSE, KEYWORD_REQUIRED, input.barklem_df_data,
+    {"BARKLEM_DF_DATA",  "", FALSE, KEYWORD_OPTIONAL, input.barklem_df_data,
      setcharValue},
+
+     // D.Vukadinovic (03.08.2023.) -- if Lande factors are to be computed in 
+     // the LS coupling or taken explicitly (LS coupled if value is -99)
+     {"LS_LANDE", "TRUE", FALSE, KEYWORD_DEFAULT, &input.LS_Lande,
+     setboolValue},
 
     {"MOLECULES_FILE",  "", FALSE, KEYWORD_REQUIRED, input.molecules_input,
      setcharValue},
@@ -128,7 +134,7 @@ void readInput()
     {"RLK_SCATTER", "FALSE", FALSE, KEYWORD_DEFAULT, &input.rlkscatter,
      setboolValue},
     {"KURUCZ_PF_DATA", "../../Atoms/pf_Kurucz.input", FALSE,
-     KEYWORD_REQUIRED, &input.pfData, setcharValue},
+     KEYWORD_OPTIONAL, &input.pfData, setcharValue},
     {"SOLVE_NE", "NONE", FALSE, KEYWORD_DEFAULT, &input.solve_ne,
      setnesolution},
     {"OPACITY_FUDGE", "none", FALSE, KEYWORD_OPTIONAL, &input.fudgeData,
@@ -214,6 +220,46 @@ void readInput()
 
   readValues(fp_keyword, Nkeyword, theKeywords);
   fclose(fp_keyword);
+
+  /* --- Set paths for abundance, ABO coeffs and PF data inputs ----- */
+
+  // path to pyrh module
+  input.pyrh_path = getenv("PYRH_PATH");
+
+  // abundance input file
+  if (!theKeywords[0].set){
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(input.abund_input, tmp, "abundance.input");
+    theKeywords[0].set = TRUE;
+  }
+
+  // ABO S-P data
+  if (!theKeywords[7].set){
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(input.barklem_sp_data, tmp, "Barklem_spdata.dat");
+    theKeywords[7].set = TRUE;
+  }
+
+  // ABO P-D data
+  if (!theKeywords[8].set){
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(input.barklem_pd_data, tmp, "Barklem_pddata.dat");
+    theKeywords[8].set = TRUE;
+  }
+
+  // ABO D-F data
+  if (!theKeywords[9].set){
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(input.barklem_df_data, tmp, "Barklem_dfdata.dat");
+    theKeywords[9].set = TRUE;
+  }
+
+  // Kurucz Partition function input file
+  if (!theKeywords[37].set){
+    concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
+    concatenate(input.pfData, tmp, "pf_Kurucz.input");
+    theKeywords[37].set = TRUE;
+  }
 
   /* --- Perform some sanity checks --                 -------------- */
 
@@ -336,6 +382,15 @@ void readInput()
             " in 1-D Cartesian geometry");
     break;
   }
+
+  /* --- Update the paths to abundance list and ABO coefficients ---  */
+
+  // input.abund_input
+  // input.barklem_sp_data
+  // input.barklem_pd_data
+  // input.barklem_df_data
+
+
   
   /* --- If called with -showkeywords commandline option -- --------- */
 

@@ -388,9 +388,9 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
@@ -404,8 +404,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   // clear HSE related parameters
   free(rho); rho = NULL;
@@ -428,10 +428,10 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   Molecule *molecule;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  int argc = 1;
+  // char* keyword_input = malloc(160);
+  // concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -498,7 +498,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
     geometry.vel[k] *= KM_TO_M;
     atmos.vturb[k]  *= KM_TO_M;
     atmos.ne[k]     /= CUBE(CM_TO_M);
-    atmos.nHtot[k] /= CUBE(CM_TO_M);
+    atmos.nHtot[k]  /= CUBE(CM_TO_M);
   }
 
   // check if atmosphere is non-static
@@ -515,8 +515,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   readMolecularModels();
 
   double* wavetable = (double *) malloc(1 * sizeof(double));
-  int Nwav = 0;
-  // wavetable[0] = 500;
+  int Nwav = 1;
+  wavetable[0] = lam_ref;
   SortLambda(wavetable, Nwav);
 
   getBoundary(&geometry);
@@ -540,9 +540,9 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   freeOpacityEmissivity();
@@ -556,8 +556,8 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 }
 
 void get_ne_from_nH(char *cwd, 
@@ -569,10 +569,10 @@ void get_ne_from_nH(char *cwd,
   int    niter, nact, index;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  int argc = 1;
+  // char* keyword_input = malloc(160);
+  // concatenate(keyword_input, cwd, "/keyword.input");
+  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -662,15 +662,13 @@ void get_ne_from_nH(char *cwd,
   freeMolecules();
 
   if (atmos.Stokes){
-    freeMatrix(atmos.cos_gamma);
-    freeMatrix(atmos.cos_2chi);
-    freeMatrix(atmos.sin_2chi);
+    freeMatrix((void **) atmos.cos_gamma);
+    freeMatrix((void **) atmos.cos_2chi);
+    freeMatrix((void **) atmos.sin_2chi);
   }
 
   // free atmosphere related data
   free(atmos.vturb);
-
-  freeOpacityEmissivity();
 
   if (atmos.Nrlk!=0) {
     freePartitionFunction();
@@ -681,7 +679,6 @@ void get_ne_from_nH(char *cwd,
   if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
   if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
 
-  if (geometry.Itop!=NULL) freeMatrix(geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix(geometry.Ibottom);
-
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 }

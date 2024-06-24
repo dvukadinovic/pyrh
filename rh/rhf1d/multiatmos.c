@@ -119,8 +119,9 @@ void convertScales(Atmosphere *atmos, Geometry *geometry)
   tau_ref = geometry->tau_ref;
 
   rho = (double *) malloc(Ndep * sizeof(double));
-  for (k = 0;  k < Ndep;  k++)
+  for (k = 0;  k < Ndep;  k++){
     rho[k] = (AMU * atmos->wght_per_H) * atmos->nHtot[k];
+  }
 
   /* --- Get opacity of reference wavelength --          ------------ */
 

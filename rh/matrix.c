@@ -16,6 +16,7 @@
        --                                              -------------- */
  
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "rh.h"
 #include "error.h"
@@ -83,6 +84,29 @@ double **matrix_double(int Nrow, int Ncol)
 }
 /* ------- end ---------------------------- matrix_double.c --------- */
 
+/* ------- begin -------------------------- matrix3d_double.c --------- */
+double ***matrix3d_double(int Nrow, int Ncol, int Ndep)
+{
+  int i, j;
+  int typeSize = sizeof(double), pointerSize = sizeof(double *);
+  double ***Matrix3d;
+
+  // double *all = (double *) malloc(Nrow * Ncol * Ndep * typeSize);
+
+  Matrix3d = (double ***) malloc(Nrow * pointerSize);
+  for (i=0; i<Nrow; i++){
+    Matrix3d[i] = (double **) malloc(Ncol * pointerSize);
+    for (j=0; j<Ncol; j++){
+      Matrix3d[i][j] = (double *) malloc(Ndep * typeSize);
+      // Matrix3d[i][j] = all + (i*Ncol*Ndep) + (j*Ndep);
+    } 
+  }
+
+  return Matrix3d;
+}
+/* ------- end ---------------------------- matrix3d_double.c --------- */
+
+
 /* ------- begin -------------------------- freeMatrix.c ------------ */
 
 void freeMatrix(void **matrix)
@@ -100,3 +124,15 @@ void freeMatrix(void **matrix)
   }
 }
 /* ------- end ---------------------------- freeMatrix.c ------------ */
+
+void freeMatrix3d(double ***matrix3d, int Nrow, int Ncol)
+{
+  int i, j;
+  for (i=0; i<Nrow; ++i){
+    for (j=0; j<Ncol; ++j){
+      free(matrix3d[i][j]);
+    }
+    free(matrix3d[i]);
+  }
+  free(matrix3d);
+}

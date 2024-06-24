@@ -91,6 +91,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 #define ANGSTROM_TO_NM           0.1
 #define MAX_GAUSS_DOPPLER        7.0
 #define USE_TABULATED_WAVELENGTH 1
+#define LN10                     log(10)
 
 
 /* --- Function prototypes --                          -------------- */
@@ -111,6 +112,7 @@ void             freePartitionFunction();
 
 extern Atmosphere atmos;
 extern InputData input;
+extern Spectrum spectrum;
 extern char messageStr[];
 
 
@@ -222,6 +224,10 @@ void readKuruczLines(char *inputFile)
           for (int idl=0; idl<atmos.Nlam; idl++){
             if (atmos.lam_ids[idl]==line_index){
               lambda_air += atmos.lam_values[idl];
+              if (input.get_atomic_rfs){
+                rlk->get_dlam_rf = TRUE;
+                rlk->dlam_rf_ind = idl;
+              }
             }
           }
         }  
@@ -239,11 +245,15 @@ void readKuruczLines(char *inputFile)
       	  lambda0 = (HPLANCK * CLIGHT) / (rlk->Ej - rlk->Ei);
       	}
 
-        rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj;  
+        rlk->Aji = C / SQ(lambda0) * POW10(gf) / rlk->gj; 
         if (atmos.Nloggf>=1){
           for (int idl=0; idl<atmos.Nloggf; idl++){
             if (atmos.loggf_ids[idl]==line_index){
               rlk->Aji = C / SQ(lambda0) * POW10(atmos.loggf_values[idl]) / rlk->gj;
+              if (input.get_atomic_rfs){
+                rlk->get_loggf_rf = TRUE;
+                rlk->loggf_rf_ind = idl;
+              }
             }
           }
         }
@@ -344,6 +354,15 @@ void readKuruczLines(char *inputFile)
       	  SWAPDOUBLE(rlk->hfs_i, rlk->hfs_j);
       	  SWAPDOUBLE(rlk->gL_i, rlk->gL_j);
       	}
+
+        // [D.V 11.08.2023] Even if SLJ number cannot be read, we can have polarizable line
+        //   because user has provided directly the Lande factors for each level.
+        //   Works only if LS_LANDE = FALSE (keyword.input file).
+        if (!input.LS_Lande){
+          if (rlk->gL_i!=-99*MILLI && rlk->gL_j!=-99*MILLI){
+            rlk->polarizable = TRUE;
+          }
+        }
 
       	/*      Nread += sscanf(inputLine+154, "%d", &iso_dl); */
       	iso_dl = 0;
@@ -561,6 +580,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
 
   for (n = Nblue;  n <= Nred;  n++) {
     rlk = &atmos.rlk_lines[n];
+    
     if (fabs(rlk->lambda0 - lambda) <= dlamb_char) {      
       element = &atmos.elements[rlk->pt_index - 1];
 
@@ -568,106 +588,112 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
 	     stage, and if abundance is set --         -------------- */
 
       if ((rlk->stage < element->Nstage - 1) && element->abundance_set) {
-	contributes = TRUE;
-	if ((metal = element->model) != NULL) {
+      	contributes = TRUE;
+      	if ((metal = element->model) != NULL) {
 
           /* --- If an explicit atomic model is present check that we
-	         do not already account for this line in this way - - */
+	        do not already account for this line in this way - - */
 
-	  for (kr = 0;  kr < metal->Nline;  kr++) {
-	    line = metal->line + kr;
-	    dlamb_wing = line->lambda0 * line->qwing *
-	      (atmos.vmicro_char / CLIGHT);
-	    if (fabs(lambda - line->lambda0) <= dlamb_wing &&
-		metal->stage[line->i] == rlk->stage) {
-	      contributes = FALSE;
-	      break;
-	    }
-	  }
-	}
+      	  for (kr = 0;  kr < metal->Nline;  kr++) {
+      	    line = metal->line + kr;
+      	    dlamb_wing = line->lambda0 * line->qwing *
+      	      (atmos.vmicro_char / CLIGHT);
+      	    if (fabs(lambda - line->lambda0) <= dlamb_wing &&
+      		    metal->stage[line->i] == rlk->stage) {
+      	      contributes = FALSE;
+      	      break;
+      	    }
+      	  }
+      	}
       } else
-	contributes = FALSE;
+        contributes = FALSE;
 
       /* --- Get opacity from line --                  -------------- */
 
       if (contributes) {
-	hc_la      = (HPLANCK * CLIGHT) / (rlk->lambda0 * NM_TO_M);
-	Bijhc_4PI  = hc_4PI * rlk->Bij * rlk->isotope_frac *
-	  rlk->hyperfine_frac * rlk->gi;
-	twohnu3_c2 = rlk->Aji / rlk->Bji;
+      	hc_la      = (HPLANCK * CLIGHT) / (rlk->lambda0 * NM_TO_M);
+      	Bijhc_4PI  = hc_4PI * rlk->Bij * rlk->isotope_frac * rlk->hyperfine_frac * rlk->gi;
+      	twohnu3_c2 = rlk->Aji / rlk->Bji;
 
-	if (input.rlkscatter) {
-	  if (rlk->stage == 0) {
-	    x  = 0.68;
-	    C3 = C / (C2_atom * SQ(rlk->lambda0 * NM_TO_M));
-	  } else {
-	    x  = 0.0;
-	    C3 = C / (C2_ion * SQ(rlk->lambda0 * NM_TO_M));
-	  }
+      	if (input.rlkscatter) {
+      	  if (rlk->stage == 0) {
+      	    x  = 0.68;
+      	    C3 = C / (C2_atom * SQ(rlk->lambda0 * NM_TO_M));
+      	  } else {
+      	    x  = 0.0;
+      	    C3 = C / (C2_ion * SQ(rlk->lambda0 * NM_TO_M));
+      	  }
 
-	  dE = rlk->Ej - rlk->Ei;
-	}
+      	  dE = rlk->Ej - rlk->Ei;
+      	}
+        
         /* --- Set flag that line is present at this wavelength -- -- */
 
-	backgrflags.hasline = TRUE;
-	if (rlk->polarizable) {
-	  backgrflags.ispolarized = TRUE;
-	  if (rlk->zm == NULL) rlk->zm = RLKZeeman(rlk);
-	}
+      	backgrflags.hasline = TRUE;
+      	if (rlk->polarizable) {
+      	  backgrflags.ispolarized = TRUE;
+      	  if (rlk->zm == NULL) rlk->zm = RLKZeeman(rlk);
+      	}
 
         if (element->n == NULL) {
-	  element->n = matrix_double(element->Nstage, atmos.Nspace);
-	  LTEpops_elem(element);
-	}
+      	  element->n = matrix_double(element->Nstage, atmos.Nspace);
+      	  LTEpops_elem(element);
+      	}
         Linear(atmos.Npf, atmos.Tpf, element->pf[rlk->stage],
-	       atmos.Nspace, atmos.T, pf, hunt=TRUE);
+         atmos.Nspace, atmos.T, pf, hunt=TRUE);
 
-	for (k = 0;  k < atmos.Nspace;  k++) {
-	  phi = RLKProfile(rlk, k, mu, to_obs, lambda,
-			   &phi_Q, &phi_U, &phi_V,
-			   &psi_Q, &psi_U, &psi_V);
+      	for (k = 0;  k < atmos.Nspace;  k++) {
+      	  phi = RLKProfile(rlk, k, mu, to_obs, lambda,
+      			   &phi_Q, &phi_U, &phi_V,
+      			   &psi_Q, &psi_U, &psi_V);
 
-	  if (phi){
-	    kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
-	    ni_gi = element->n[rlk->stage][k] * exp(-rlk->Ei*kT - pf[k]);
+      	  if (phi){
+      	    kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
+      	    ni_gi = element->n[rlk->stage][k] * exp(-rlk->Ei*kT - pf[k]);
             nj_gj = ni_gi * exp(-hc_la * kT);
 
-	    chi_l = Bijhc_4PI * (ni_gi - nj_gj);
-	    eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
+      	    chi_l = Bijhc_4PI * (ni_gi - nj_gj);
+      	    eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
 
-	    if (input.rlkscatter) {
-	      epsilon = 1.0 / (1.0 + C3 * pow(atmos.T[k], 1.5) /
-			       (atmos.ne[k] * 
-				pow(KBOLTZMANN * atmos.T[k] / dE, 1 + x)));
+      	    if (input.rlkscatter) {
+      	      epsilon = 1.0 / (1.0 + C3 * pow(atmos.T[k], 1.5) /
+      			       (atmos.ne[k] * pow(KBOLTZMANN * atmos.T[k] / dE, 1 + x)));
 
               scatt[k] += (1.0 - epsilon) * chi_l * phi;
-	      chi_l    *= epsilon;
+      	      chi_l    *= epsilon; 
               eta_l    *= epsilon;
-	    }
 
-	    chi[k] += chi_l * phi;
-	    eta[k] += eta_l * phi;
+              // if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LN10; // this was done from head, for log(gf) should be correct
+      	    }
 
-	    if (rlk->zm != NULL && rlk->Grad) {
-	      chi_Q[k] += chi_l * phi_Q;
-	      chi_U[k] += chi_l * phi_U;
-	      chi_V[k] += chi_l * phi_V;
+      	    chi[k] += chi_l * phi;
+      	    eta[k] += eta_l * phi;
 
-	      eta_Q[k] += eta_l * phi_Q;
-	      eta_U[k] += eta_l * phi_U;
-	      eta_V[k] += eta_l * phi_V;
+            if (rlk->get_loggf_rf){
+              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LN10;
+              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LN10;
+            }
 
-	      if (input.magneto_optical) {
-		chip_Q[k] += chi_l * psi_Q;
-		chip_U[k] += chi_l * psi_U;
-		chip_V[k] += chi_l * psi_V;
-	      }
-	    }
-	  }
-	}
-      }
-    }
-  }
+      	    if (rlk->zm != NULL && rlk->Grad) {
+      	      chi_Q[k] += chi_l * phi_Q;
+      	      chi_U[k] += chi_l * phi_U;
+      	      chi_V[k] += chi_l * phi_V;
+
+      	      eta_Q[k] += eta_l * phi_Q;
+      	      eta_U[k] += eta_l * phi_U;
+      	      eta_V[k] += eta_l * phi_V;
+
+      	      if (input.magneto_optical) {
+            		chip_Q[k] += chi_l * psi_Q;
+            		chip_U[k] += chi_l * psi_U;
+            		chip_V[k] += chi_l * psi_V;
+      	      }
+      	    }
+      	  } // end if(phi)
+      	} // end for loop over k
+      } // end if(contributes)
+    } // end if (lam <= dlamchar)
+  } // end for loop over n
 
   free(pf);
   return backgrflags;
@@ -740,16 +766,16 @@ double RLKProfile(RLK_Line *rlk, int k, int mu, bool_t to_obs,
 
       switch (rlk->zm->q[nz]) {
       case -1:
-	phi_sm += rlk->zm->strength[nz] * H;
-	psi_sm += rlk->zm->strength[nz] * F;
-	break;
+      	phi_sm += rlk->zm->strength[nz] * H;
+      	psi_sm += rlk->zm->strength[nz] * F;
+      	break;
       case  0:
-	phi_pi += rlk->zm->strength[nz] * H;
-	psi_pi += rlk->zm->strength[nz] * F;
-	break;
+      	phi_pi += rlk->zm->strength[nz] * H;
+      	psi_pi += rlk->zm->strength[nz] * F;
+      	break;
       case  1:
-	phi_sp += rlk->zm->strength[nz] * H;
-	psi_sp += rlk->zm->strength[nz] * F;
+      	phi_sp += rlk->zm->strength[nz] * H;
+      	psi_sp += rlk->zm->strength[nz] * F;
       }
     }
     phi_sigma = phi_sp + phi_sm;
@@ -815,6 +841,7 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
     for (Mu = -Ju;  Mu <= Ju;  Mu++)
       if (fabs(Mu - Ml) <= 1.0) zm->Ncomponent++;
   }
+
   zm->q        = (int *) malloc(zm->Ncomponent * sizeof(int));
   zm->strength = (double *) malloc(zm->Ncomponent * sizeof(double));
   zm->shift    = (double *) malloc(zm->Ncomponent * sizeof(double));
@@ -824,22 +851,39 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
 
   /* --- Fill the structure and normalize the strengths -- -------- */
 
-  gLl = Lande(rlk->Si, rlk->Li, Jl);
-  gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+  if (input.LS_Lande){
+    /* Lande factors in LS coupling */
+    gLl = Lande(rlk->Si, rlk->Li, Jl);
+    gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+  }
+  else{
+    /* Compute Lande factors for each level in the LS coupling 
+       if -99 values are provided in the Kurucz line list.
+    */
+    if (rlk->gL_i==-99*MILLI){
+      gLl = Lande(rlk->Si, rlk->Li, Jl);
+    } else {
+      gLl = rlk->gL_i;
+    }
 
-  // printf("gL_l = %f, gL_u = %f\n", gLl, gLu);
+    if (rlk->gL_j==-99*MILLI){
+      gLu = Lande(rlk->Sj, rlk->Lj, Ju);
+    } else {
+      gLu = rlk->gL_j;
+    }
+  }
 
   n = 0;
   for (Ml = -Jl;  Ml <= Jl;  Ml++) {
     for (Mu = -Ju;  Mu <= Ju;  Mu++) {
       if (fabs(Mu - Ml) <= 1.0) {
-	zm->q[n]        = (int) (Ml - Mu);
-	zm->shift[n]    = gLl*Ml - gLu*Mu;
-	zm->strength[n] = ZeemanStrength(Ju, Mu, Jl, Ml);
-	  
-	norm[zm->q[n]+1] += zm->strength[n];
+      	zm->q[n]        = (int) (Ml - Mu);
+      	zm->shift[n]    = gLl*Ml - gLu*Mu;
+      	zm->strength[n] = ZeemanStrength(Ju, Mu, Jl, Ml);
+      	  
+      	norm[zm->q[n]+1] += zm->strength[n];
         if (zm->q[n] == 1) g_eff += zm->shift[n] * zm->strength[n];
-	n++;
+      	n++;
       }
     }
   }
@@ -906,6 +950,8 @@ void initRLK(RLK_Line *rlk)
 {
   rlk->polarizable = FALSE;
   rlk->zm = NULL; 
+  rlk->get_loggf_rf = FALSE;
+  rlk->get_dlam_rf = FALSE;
 }
 /* ------- end ---------------------------- initRLK.c --------------- */
 
