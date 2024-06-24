@@ -110,7 +110,7 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 	cdef myPops hse(char* keyword_input, int Ndep, double pg_top,
 					double *rh_scale, double *rh_temp,
 					int atm_scale,
-					int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
+					int fudge_num, double *fudge_lam, double *fudge)
 
 	# cdef void dummy()
 

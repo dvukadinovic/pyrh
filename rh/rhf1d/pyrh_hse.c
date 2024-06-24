@@ -67,7 +67,7 @@ extern char messageStr[MAX_LINE_SIZE];
 myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
            double *pyrh_scale, double *pyrh_temp,
            int pyrh_atm_scale, 
-           int do_fudge, int fudge_num, double *fudge_lam, double *fudge)
+           int fudge_num, double *fudge_lam, double *fudge)
 {
   bool_t  equilibria_only, fromscratch;
   int     k, iter, index, layer;
@@ -77,14 +77,18 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   Atom *atom;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 3;
-  char* keyword_input = malloc(160);
-  concatenate(keyword_input, cwd, "/keyword.input");
-  char* argv[] = {"../rhf1d", "-i", keyword_input};
+  int argc = 1;
+  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
+  // char* keyword_input = malloc(160);
+  // concatenate(keyword_input, cwd, "/keyword.input");
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
   SetFPEtraps();
+
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
 
   /* --- Read input data and initialize --             -------------- */
 
@@ -121,7 +125,7 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   /* --- Setting up the atmosphere -- ------------------------------- */
 
   // set fudge factors
-  if (do_fudge==1){
+  if (fudge_lam!=NULL){
     input.do_fudge = TRUE;
     atmos.fudge_num = fudge_num;
     atmos.fudge_lam = fudge_lam;

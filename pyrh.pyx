@@ -2,6 +2,8 @@
 # distutils: sources = [rh/rhf1d/pyrh_compute1dray.c]
 # distutils: include_dirs = rh/
 
+__version__ = 0.21
+
 cimport rh
 import numpy as np
 cimport numpy as cnp
@@ -74,11 +76,13 @@ cdef class RH:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef get_ne_from_nH(cwd,
+def get_ne_from_nH(cwd,
 					 int atm_scale,
 					 cnp.ndarray[double, ndim=1, mode="c"] scale,
-					 cnp.ndarray[double, ndim=2, mode="c"] atmosphere):
-	cdef int Ndep = atmosphere.shape[1]
+					 cnp.ndarray[double, ndim=1, mode="c"] temperature,
+					 cnp.ndarray[double, ndim=1, mode="c"] nH,
+					 cnp.ndarray[double, ndim=1, mode="c"] ne):
+	cdef int Ndep = scale.size
 
 	cdef char* argv[140]
 
@@ -90,22 +94,25 @@ cpdef get_ne_from_nH(cwd,
 		argv[i_] = arr[i_]
 
 	rh.get_ne_from_nH(argv[0], 
-			  atm_scale, Ndep, 
-			  &scale[0], &atmosphere[1,0], 
-			  &atmosphere[8,0], &atmosphere[2,0])
+			  atm_scale, 
+			  Ndep, 
+			  &scale[0], 
+			  &temperature[0], 
+			  &nH[0], 
+			  &ne[0])
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef hse(cwd,
-		  int atm_scale,
-		  cnp.ndarray[double, ndim=1, mode="c"] scale,
-		  cnp.ndarray[double, ndim=1, mode="c"] temp,
-		  double pg_top,
-		  int do_fudge,
-		  cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
-		  cnp.ndarray[double, ndim=2, mode="c"] fudge):
-	cdef int Ndep = scale.shape[0]
-	cdef int fudge_num = fudge_lam.shape[0]
+def hse(cwd,
+		int atm_scale,
+		cnp.ndarray[double, ndim=1, mode="c"] scale,
+		cnp.ndarray[double, ndim=1, mode="c"] temp,
+		double pg_top,
+		cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
+		cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
+		full_output=False):
+	cdef int Ndep = scale.size
+	cdef int fudge_num
 
 	cdef char* argv[140]
 
@@ -116,18 +123,29 @@ cpdef hse(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	myPops = rh.hse(argv[0], Ndep, pg_top,
-				 &scale[0], &temp[0],
-				 atm_scale,
-				 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0])
+	if (fudge_wave is None) or (fudge_value is None):
+		myPops = rh.hse(argv[0], Ndep, pg_top,
+						&scale[0], &temp[0],
+						atm_scale,
+						0, NULL, NULL)
+	else:
+		fudge_num = fudge_wave.size
+		myPops = rh.hse(argv[0], Ndep, pg_top,
+					 &scale[0], &temp[0],
+					 atm_scale,
+					 fudge_num, &fudge_wave[0], &fudge_value[0,0])
 
 	ne = convert_1d(myPops.ne, Ndep)
 	nHtot = convert_1d(myPops.nHtot, Ndep)
-	nH = convert_2d(myPops.nH, 6, Ndep)
-	rho = convert_1d(myPops.rho, Ndep)
-	pg = convert_1d(myPops.pg, Ndep)
+	# nH = convert_2d(myPops.nH, 6, Ndep)
 
-	return ne, nH, nHtot, rho, pg
+	if full_output:
+		rho = convert_1d(myPops.rho, Ndep)
+		pg = convert_1d(myPops.pg, Ndep)
+
+		return ne, nHtot, rho, pg
+
+	return ne, nHtot
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
