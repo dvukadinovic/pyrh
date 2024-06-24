@@ -38,12 +38,13 @@ scale = atmos[0]
 
 cwd = "."
 atm_scale = 0 # tau
+pg_top = 0.1
 
 old = atmos[2].copy()
 
-pyrh.get_ne_from_nH(cwd, atm_scale, scale, atmos[1], atmos[8], atmos[2])
+ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1], pg_top)
 
 plt.plot(scale, old)
-plt.plot(scale, atmos[2])
+plt.plot(scale, ne/1e6)
 plt.yscale("log")
 plt.show()
