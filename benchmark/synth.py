@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 from astropy.io import fits
 from globin.atmos import write_multi_atmosphere
 from globin.atmos import distribute_hydrogen
-from globin.rh import write_wavs
+# from globin.rh import write_wavs
 import globin
 
 def spinor2multi(atm):
