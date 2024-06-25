@@ -104,7 +104,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale, 
               int Nwave, double *lam,
-              int do_fudge, int fudge_num, double *fudge_lam, double *fudge,
+              int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
               int get_atomic_rfs,
@@ -167,7 +167,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // --- DV --- this is where I stoped with reading the RH workflow.
 
   // set fudge factors
-  if (do_fudge==1){
+  if (fudge_lam!=NULL){
     input.do_fudge = TRUE;
     atmos.fudge_num = fudge_num;
     atmos.fudge_lam = fudge_lam;

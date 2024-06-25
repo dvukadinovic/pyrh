@@ -178,23 +178,22 @@ cpdef get_tau(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef compute1d(cwd,
+def compute1d(cwd,
 				double mu,
 				int atm_scale,
 				cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 				cnp.ndarray[double, ndim=1, mode="c"] wave,
-				int do_fudge,
-				cnp.ndarray[double, ndim=1, mode="c"] fudge_lam,
-				cnp.ndarray[double, ndim=2, mode="c"] fudge,
 				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
 				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
 				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values,
-				get_atomic_rfs):
+				cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
+				cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
+				get_atomic_rfs=False):
 	cdef int Ndep = atmosphere.shape[1]
-	cdef int fudge_num = fudge_lam.shape[0]
-	cdef int Nwave = wave.shape[0]
-	
+	cdef int Nwave = wave.size
+	cdef int fudge_num
+
 	cdef int Nloggf = loggf_ids.shape[0]
 	if (Nloggf!=loggf_values.shape[0]):
 		print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
@@ -219,18 +218,33 @@ cpdef compute1d(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	spec = rh.rhf1d(argv[0], mu, Ndep,
-			 &atmosphere[0,0], &atmosphere[1,0], 
-			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
-			 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
-			 &atmosphere[8,0], atm_scale,
-			 Nwave, &wave[0],
-			 do_fudge, fudge_num, &fudge_lam[0], &fudge[0,0],
-			 Nloggf, &loggf_ids[0], &loggf_values[0],
-			 Nlam, &lam_ids[0], &lam_values[0],
-			 rh_get_atomic_rfs,
-			 0, argv[0])
-			 # &self.wavetable[0], self.Nwave)
+	if (fudge_wave is None) or (fudge_value is None):
+		spec = rh.rhf1d(argv[0], mu, Ndep,
+				 &atmosphere[0,0], &atmosphere[1,0], 
+				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
+				 &atmosphere[8,0], atm_scale,
+				 Nwave, &wave[0],
+				 0, NULL, NULL,
+				 Nloggf, &loggf_ids[0], &loggf_values[0],
+				 Nlam, &lam_ids[0], &lam_values[0],
+				 rh_get_atomic_rfs,
+				 0, argv[0])
+	else:	
+		fudge_num = fudge_wave.size
+
+		spec = rh.rhf1d(argv[0], mu, Ndep,
+				 &atmosphere[0,0], &atmosphere[1,0], 
+				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
+				 &atmosphere[8,0], atm_scale,
+				 Nwave, &wave[0],
+				 fudge_num, &fudge_wave[0], &fudge_value[0,0],
+				 Nloggf, &loggf_ids[0], &loggf_values[0],
+				 Nlam, &lam_ids[0], &lam_values[0],
+				 rh_get_atomic_rfs,
+				 0, argv[0])
+				 # &self.wavetable[0], self.Nwave)
 
 	# spec.nlw -= 1
 	lam = convert_1d(spec.lam, spec.nlw)
