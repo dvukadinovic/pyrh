@@ -234,24 +234,24 @@ void readInput()
   }
 
   // ABO S-P data
-  if (!theKeywords[7].set){
+  if (!theKeywords[6].set){
     concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
     concatenate(input.barklem_sp_data, tmp, "Barklem_spdata.dat");
-    theKeywords[7].set = TRUE;
+    theKeywords[6].set = TRUE;
   }
 
   // ABO P-D data
-  if (!theKeywords[8].set){
+  if (!theKeywords[7].set){
     concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
     concatenate(input.barklem_pd_data, tmp, "Barklem_pddata.dat");
-    theKeywords[8].set = TRUE;
+    theKeywords[7].set = TRUE;
   }
 
   // ABO D-F data
-  if (!theKeywords[9].set){
+  if (!theKeywords[8].set){
     concatenate(tmp, input.pyrh_path, "/rh/Atoms/");
     concatenate(input.barklem_df_data, tmp, "Barklem_dfdata.dat");
-    theKeywords[9].set = TRUE;
+    theKeywords[8].set = TRUE;
   }
 
   // Kurucz Partition function input file

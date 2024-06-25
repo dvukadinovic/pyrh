@@ -68,8 +68,6 @@ bool_t readBarklemTable(enum Barklemtype type, Barklemstruct *bs)
   double  neff1_0, neff2_0;
   FILE   *fp_Barklem;
 
-
-
   switch (type) {
   case SP:
     strcpy(filename, input.barklem_sp_data);
