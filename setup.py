@@ -76,5 +76,6 @@ setup(
                             )
                           ],
 						  compiler_directives={"language_level" : "3"}),
+    headers=["headers/types.h", "headers/xdr.h"],
 	include_dirs=[numpy.get_include()]
 )
