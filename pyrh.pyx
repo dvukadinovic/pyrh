@@ -107,7 +107,7 @@ def hse(cwd,
 		int atm_scale,
 		cnp.ndarray[double, ndim=1, mode="c"] scale,
 		cnp.ndarray[double, ndim=1, mode="c"] temp,
-		double pg_top,
+		double pg_top=0.1,
 		cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 		cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
 		full_output=False):
