@@ -184,26 +184,51 @@ def compute1d(cwd,
 				int atm_scale,
 				cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 				cnp.ndarray[double, ndim=1, mode="c"] wave,
-				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] loggf_values,
-				cnp.ndarray[int, ndim=1, mode="c"] lam_ids,
-				cnp.ndarray[double, ndim=1, mode="c"] lam_values,
+				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids=None,
+				cnp.ndarray[double, ndim=1, mode="c"] loggf_values=None,
+				cnp.ndarray[int, ndim=1, mode="c"] lam_ids=None,
+				cnp.ndarray[double, ndim=1, mode="c"] lam_values=None,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
 				get_atomic_rfs=False):
 	cdef int Ndep = atmosphere.shape[1]
 	cdef int Nwave = wave.size
-	cdef int fudge_num
+	
+	#--- fudge pointers
+	cdef int fudge_num = 0
+	cdef double* fudge_wave_ptr = NULL
+	cdef double* fudge_value_ptr = NULL
+	
+	if (fudge_wave is not None) or (fudge_value is not None):
+		fudge_num = fudge_wave.size
+		fudge_wave_ptr = &fudge_wave[0]
+		fudge_value_ptr = &fudge_value[0,0]
 
-	cdef int Nloggf = loggf_ids.shape[0]
-	if (Nloggf!=loggf_values.shape[0]):
-		print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
-		sys.exit()
+	#--- log(gf) pointers
+	cdef int Nloggf = 0
+	cdef int* loggf_ids_ptr = NULL
+	cdef double* loggf_values_ptr = NULL
 
-	cdef int Nlam = lam_ids.shape[0]
-	if (Nlam!=lam_values.shape[0]):
-		print("\n  pyrh: Different number of lam_ids and lam_values.\n")
-		sys.exit()
+	if (loggf_ids is not None) and (loggf_values is not None):
+		Nloggf = loggf_ids.shape[0]
+		if (Nloggf!=loggf_values.shape[0]):
+			print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
+			sys.exit()
+		loggf_ids_ptr = &loggf_ids[0]
+		loggf_values_ptr = &loggf_values[0]
+
+	#--- lambda pointers
+	cdef int Nlam = 0
+	cdef int* lam_ids_ptr = NULL
+	cdef double* lam_values_ptr = NULL
+
+	if (lam_ids is not None) and (lam_values is not None):
+		Nlam = lam_ids.shape[0]
+		if (Nlam!=lam_values.shape[0]):
+			print("\n  pyrh: Different number of lam_ids and lam_values.\n")
+			sys.exit()
+		lam_ids_ptr = &lam_ids[0]
+		lam_values_ptr = &lam_values[0]
 
 	if get_atomic_rfs:
 		rh_get_atomic_rfs = 1
@@ -219,33 +244,18 @@ def compute1d(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	if (fudge_wave is None) or (fudge_value is None):
-		spec = rh.rhf1d(argv[0], mu, Ndep,
-				 &atmosphere[0,0], &atmosphere[1,0], 
-				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
-				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
-				 &atmosphere[8,0], atm_scale,
-				 Nwave, &wave[0],
-				 0, NULL, NULL,
-				 Nloggf, &loggf_ids[0], &loggf_values[0],
-				 Nlam, &lam_ids[0], &lam_values[0],
-				 rh_get_atomic_rfs,
-				 0, argv[0])
-	else:	
-		fudge_num = fudge_wave.size
-
-		spec = rh.rhf1d(argv[0], mu, Ndep,
-				 &atmosphere[0,0], &atmosphere[1,0], 
-				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
-				 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
-				 &atmosphere[8,0], atm_scale,
-				 Nwave, &wave[0],
-				 fudge_num, &fudge_wave[0], &fudge_value[0,0],
-				 Nloggf, &loggf_ids[0], &loggf_values[0],
-				 Nlam, &lam_ids[0], &lam_values[0],
-				 rh_get_atomic_rfs,
-				 0, argv[0])
-				 # &self.wavetable[0], self.Nwave)
+	spec = rh.rhf1d(argv[0], mu, Ndep,
+			 &atmosphere[0,0], &atmosphere[1,0], 
+			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+			 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
+			 &atmosphere[8,0], atm_scale,
+			 Nwave, &wave[0],
+			 fudge_num, fudge_wave_ptr, fudge_value_ptr,
+			 Nloggf, loggf_ids_ptr, loggf_values_ptr,
+			 Nlam, lam_ids_ptr, lam_values_ptr,
+			 rh_get_atomic_rfs,
+			 0, argv[0])
+			 # &self.wavetable[0], self.Nwave)
 
 	# spec.nlw -= 1
 	lam = convert_1d(spec.lam, spec.nlw)
@@ -256,7 +266,6 @@ def compute1d(cwd,
 		sU = convert_1d(spec.sU, spec.nlw)
 		sV = convert_1d(spec.sV, spec.nlw)
 
-	# if (Nloggf!=0) or (Nlam!=0):
 	if get_atomic_rfs:
 		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
 
