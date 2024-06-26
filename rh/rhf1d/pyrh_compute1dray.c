@@ -182,9 +182,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   // set log(gf) indices and values if forwarded
-  // atmos.Nloggf = 0;
-  // atmos.loggf_ids = NULL;
-  // atmos.loggf_values = NULL;
   if (Nloggf>=1){
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
@@ -194,9 +191,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   // set lam0 indices and values if forwarded
-  // atmos.Nlam = 0;
-  // atmos.lam_ids = NULL;
-  // atmos.lam_values = NULL;
   if (Nlam>=1){
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
