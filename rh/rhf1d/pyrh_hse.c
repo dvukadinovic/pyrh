@@ -64,8 +64,9 @@ extern char messageStr[MAX_LINE_SIZE];
 
 /* ------- begin -------------------------- pyrh_hse.c -------------- */
 
-myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
+void hse(char* cwd, int pyrh_Ndep,
            double *pyrh_scale, double *pyrh_temp,
+           double *pyrh_ne, double *pyrh_nHtot, double *pyrh_rho, double *pyrh_pg,
            int pyrh_atm_scale, 
            int fudge_num, double *fudge_lam, double *fudge)
 {
@@ -167,8 +168,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
 
   atmos.T = pyrh_temp;
   atmos.nH = matrix_double(atmos.NHydr, geometry.Ndep);
-  atmos.ne = (double *) malloc(geometry.Ndep * sizeof(double));
-  atmos.nHtot = (double *) malloc(geometry.Ndep * sizeof(double));
+  atmos.ne = pyrh_ne;
+  atmos.nHtot = pyrh_nHtot;
 
   // it is needed in some routines...
   atmos.vturb = (double *) calloc(geometry.Ndep, sizeof(double));
@@ -201,15 +202,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   
   /* --- define variables for HSE------------------------------------ */
 
-  myPops pops;
-  pops.nH = matrix_double(6, atmos.Nspace);
-  pops.ne = malloc(atmos.Nspace * sizeof(double));
-  pops.nHtot = malloc(atmos.Nspace * sizeof(double));
-  pops.rho = malloc(atmos.Nspace * sizeof(double));
-  pops.pg = malloc(atmos.Nspace * sizeof(double));
-
-  rho = (double *) malloc(atmos.Nspace * sizeof(double));
-  pg = (double *) malloc(atmos.Nspace * sizeof(double));
+  rho = pyrh_rho;
+  pg = pyrh_pg;
   double* total_opacity = (double*) malloc(atmos.Nspace * sizeof(double)); // total opacity @ 500nm
   double* Nm            = (double*) malloc(atmos.Nspace * sizeof(double)); // total number density of molecules
 
@@ -217,11 +211,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
 
   atmos.active_layer = 0;
   iter = 0;
-
-  // At the top boundary we specify gas pressure and obtain the electron pressure from it
-  // pg[0] = 1/10; // SI unit; assuming Pg@top of 1 dyn/cm2 -- STiC
-  pg[0] = pg_top; // SI unit
-  // pg[0] = 0.3/10; // SI unit; assuming Pg@top of 0.3 dyn/cm2 -- SNAPI
 
   // initial nH and ne
   atmos.ne[0] = 0;
@@ -377,13 +366,6 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
     // printf("k = %d | iter = %d\n ----------- \n", k, iter);
   }
 
-  // store the populations
-  pops.nH = atmos.atoms[0].nstar;
-  pops.ne = atmos.ne;
-  pops.nHtot = atmos.nHtot;
-  pops.rho = memcpy(pops.rho, rho, atmos.Nspace * sizeof(double));
-  pops.pg = memcpy(pops.pg, pg, atmos.Nspace * sizeof(double));
-
   // convertScales(&atmos, &geometry);
 
   //--- free all the memory that we do not use anymore
@@ -412,12 +394,8 @@ myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
   if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   // clear HSE related parameters
-  free(rho); rho = NULL;
-  free(pg); pg = NULL;
   free(Nm); Nm = NULL;
   free(total_opacity); total_opacity = NULL;
-  
-  return pops;
 }
 /* ------- end ---------------------------- pyrh_hse.c -------------- */
 

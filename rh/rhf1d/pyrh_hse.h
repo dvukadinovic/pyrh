@@ -4,8 +4,9 @@ typedef struct{
 	double **nH, *ne, *nHtot, *rho, *pg;
 } myPops;
 
-myPops hse(char* cwd, int pyrh_Ndep, double pg_top,
+void hse(char* cwd, int pyrh_Ndep,
            double *pyrh_scale, double *pyrh_temp, 
+           double *pyrh_ne, double *pyrh_nHtot, double *pyrh_rho, double *pyrh_pg,
            int pyrh_atm_scale, 
            int fudge_num, double *fudge_lam, double *fudge);
 

@@ -123,26 +123,27 @@ def hse(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
+	pg[0] = pg_top
+
 	if (fudge_wave is None) or (fudge_value is None):
-		myPops = rh.hse(argv[0], Ndep, pg_top,
-						&scale[0], &temp[0],
-						atm_scale,
-						0, NULL, NULL)
+		rh.hse(argv[0], Ndep,
+				&scale[0], &temp[0],
+				&ne[0], &nHtot[0], &rho[0], &pg[0],
+				atm_scale,
+				0, NULL, NULL)
 	else:
 		fudge_num = fudge_wave.size
-		myPops = rh.hse(argv[0], Ndep, pg_top,
-					 &scale[0], &temp[0],
-					 atm_scale,
-					 fudge_num, &fudge_wave[0], &fudge_value[0,0])
-
-	ne = convert_1d(myPops.ne, Ndep)
-	nHtot = convert_1d(myPops.nHtot, Ndep)
-	# nH = convert_2d(myPops.nH, 6, Ndep)
+		rh.hse(argv[0], Ndep,
+				&scale[0], &temp[0],
+				&ne[0], &nHtot[0], &rho[0], &pg[0],
+				atm_scale,
+				fudge_num, &fudge_wave[0], &fudge_value[0,0])
 
 	if full_output:
-		rho = convert_1d(myPops.rho, Ndep)
-		pg = convert_1d(myPops.pg, Ndep)
-
 		return ne, nHtot, rho, pg
 
 	return ne, nHtot
