@@ -36,7 +36,7 @@
 
 #include <features.h>
 #include <sys/types.h>
-#include <rpc/types.h>
+#include <./types.h>
 
 /* We need FILE.  */
 #include <stdio.h>

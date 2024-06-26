@@ -14,7 +14,7 @@
        --                                              -------------- */
 
 
-#include <rpc/xdr.h>
+#include <../headers/xdr.h>
 
 #include "atom.h"
 #include "atmos.h"
