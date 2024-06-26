@@ -43,6 +43,9 @@ extra_compile_args = None
 if "x86" in _platform:
     extra_compile_args = ["-DSIMDON"]
 
+# add path for types.h and xdr.h files
+extra_compile_args.append("-Iheaders")
+
 rh_c_files = glob.glob("rh/*.c")
 
 rhf1d = ["rh/rhf1d/anglequad.c", "rh/rhf1d/feautrier.c", "rh/rhf1d/multiatmos.c", \
@@ -76,6 +79,5 @@ setup(
                             )
                           ],
 						  compiler_directives={"language_level" : "3"}),
-    headers=["headers/types.h", "headers/xdr.h"],
 	include_dirs=[numpy.get_include()]
 )
