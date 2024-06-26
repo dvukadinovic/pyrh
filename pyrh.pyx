@@ -15,15 +15,6 @@ from libc.stdlib cimport malloc, free
 
 cnp.import_array()
 
-# cimport tools
-
-cdef convert_1d(double *arr, Py_ssize_t n):
-	cdef Py_ssize_t i
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] pyarr = np.empty(n)
-	for i in range(n):
-		pyarr[i] = arr[i]
-	return pyarr
-
 cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 	cdef Py_ssize_t i
 	cdef Py_ssize_t j
@@ -257,14 +248,14 @@ def compute1d(cwd,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
-	# spec.nlw -= 1
-	lam = convert_1d(spec.lam, spec.nlw)
-	sI = convert_1d(spec.sI, spec.nlw)
+	lam = np.asarray(<cnp.float64_t[:spec.nlw]> spec.lam)
+	sI = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sI)
+
 	sQ, sU, sV = None, None, None
 	if spec.stokes:
-		sQ = convert_1d(spec.sQ, spec.nlw)
-		sU = convert_1d(spec.sU, spec.nlw)
-		sV = convert_1d(spec.sV, spec.nlw)
+		sQ = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sQ)
+		sU = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sU)
+		sV = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sV)
 
 	if get_atomic_rfs:
 		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
@@ -273,13 +264,4 @@ def compute1d(cwd,
 
 	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-	# Nlam = len(lam)
 	return sI, sQ, sU, sV, lam
-
-	# cpdef read_RLK_lines(self):
-	# 	self.rlk_lines = rh.get_RLK_lines(self.argc, self.argv)
-	# 	self.Nrlk = self.rlk_lines.Nrlk
-
-	# def get_Nrlk(self):
-	# 	return self.Nrlk
-
