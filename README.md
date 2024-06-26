@@ -9,7 +9,7 @@ library that needs to be changed are re-imported in the code in order to see
 a change.
 
 After installation, export the path to the `pyrh/rh` folder in variable
-`PYRH_PATH`. The best strategy is to set it directly in the `.\*rc` file as:
+`PYRH_PATH`. The best strategy is to set it directly in the `~/.*rc` file as:
 
 	export PYRH_PATH="/absolte/path/to/the/pyrh/rh"
 
