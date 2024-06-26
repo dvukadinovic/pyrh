@@ -1,12 +1,6 @@
 # Installation
 
-The RH code uses bool_t defined in rpc/types.h and is dependent on the
-rpc/xdr.h IO (which is in pyrh obsolete; but is not removed from the code
-completely for safety reasons). Before installation, types.h and xdr.h,
-located in ./headers, must be copied into /usr/include/rpc for RH to include
-them.
-
-To install the package:
+To install the package, simply run:
 
 	python setup.py install
 
