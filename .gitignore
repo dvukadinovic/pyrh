@@ -3,7 +3,6 @@ dist/*
 pyrh.egg-info
 pyrh.egg-info/*
 pyrh.c
-tools.c
 /*.html
 *.o
 pyrh.html
