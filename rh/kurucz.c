@@ -269,7 +269,7 @@ void readKuruczLines(char *inputFile)
         // DV: read orbital quantum numbers of levels 
         int Nread_l, li=-1, lj=-1;
         bool_t got_orbital_numbers = FALSE;
-        Nread_l = sscanf(inputLine+160, "%2d %2d", &li, &lj);
+        Nread_l = sscanf(inputLine+160, "%1d %1d", &li, &lj);
         if (Nread_l!=-1){
           got_orbital_numbers = TRUE;
           if (swap_levels){
