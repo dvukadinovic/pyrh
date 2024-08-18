@@ -42,20 +42,18 @@ mu = 1.0
 
 # type of atmosphere stratification:
 # 0 -- optical depth @ 500nm
-# 1 -- mass density
+# 1 -- mass density [cm2/g]
 # 2 -- height [km]
 atm_scale = int(0)
 
 # wavelength samples for which to compute the spectrum (in nm) in vacuum
 wave = np.linspace(630.0, 630.35, num=251) + 0.2
 
-spec = pyrh.compute1d(cwd, mu, atm_scale, atmos,
-					  wave,
-					  int(0), np.empty(1, dtype=np.float64), np.empty((3,1), dtype=np.float64),
-					  np.array([], dtype=np.int32), np.array([], dtype=np.float64),
-					  np.array([], dtype=np.int32), np.array([], dtype=np.float64),
-					  False)
+spec = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave)
 spec = np.array(spec, dtype=np.float64)
 
-plt.plot(wave, spec[0])
+plt.plot(wave, spec[0]*1e8)
+plt.xlabel("Wavelength in vacuum [nm]")
+plt.ylabel(r"Intensity [10$^{-8}$ W/Hz/srad/m$^2$]")
+plt.xlim([wave[0], wave[-1]])
 plt.show()
