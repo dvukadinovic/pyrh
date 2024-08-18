@@ -38,11 +38,10 @@ scale = atmos[0]
 
 cwd = "."
 atm_scale = 0 # tau
-pg_top = 0.1
 
 old = atmos[2].copy()
 
-ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1], pg_top)
+ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1])
 
 plt.plot(scale, old)
 plt.plot(scale, ne/1e6)
