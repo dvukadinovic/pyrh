@@ -71,11 +71,13 @@ def get_ne_from_nH(cwd,
 					 int atm_scale,
 					 cnp.ndarray[double, ndim=1, mode="c"] scale,
 					 cnp.ndarray[double, ndim=1, mode="c"] temperature,
-					 cnp.ndarray[double, ndim=1, mode="c"] nH,
-					 cnp.ndarray[double, ndim=1, mode="c"] ne):
+					 cnp.ndarray[double, ndim=1, mode="c"] nH):
+					 # cnp.ndarray[double, ndim=1, mode="c"] ne):
 	cdef int Ndep = scale.size
 
 	cdef char* argv[140]
+
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
 
 	py_list = cwd.split(" ")
 	argc = len(py_list)
@@ -91,6 +93,8 @@ def get_ne_from_nH(cwd,
 			  &temperature[0], 
 			  &nH[0], 
 			  &ne[0])
+
+	return ne
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

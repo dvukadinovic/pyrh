@@ -41,9 +41,9 @@ atm_scale = 0 # tau
 
 old = atmos[2].copy()
 
-pyrh.get_ne_from_nH(cwd, atm_scale, scale, atmos[1], atmos[8], atmos[2])
+ne = pyrh.get_ne_from_nH(cwd, atm_scale, scale, atmos[1], atmos[8])
 
 plt.plot(scale, old)
-plt.plot(scale, atmos[2])
+plt.plot(scale, ne)
 plt.yscale("log")
 plt.show()
