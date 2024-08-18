@@ -1,6 +1,6 @@
 # Introduction
 
-*pyrh* module is the Cython wrapper around [RH][https://github.com/han-uitenbroek/RH] synthesis code (Uitenbroek 2001). It allows access from Python environment to all RH methods to synthesise a spectrum in (non-)LTE, just like running RH code from a shell. The input parameters for RH rely still on standard `*.input` files. The user is suggested to consult the RH documentation for detailed overview of the code and usage of the input files.
+*pyrh* module is the Cython wrapper around [RH](https://github.com/han-uitenbroek/RH) synthesis code (Uitenbroek 2001). It allows access from Python environment to all RH methods to synthesise a spectrum in (non-)LTE, just like running RH code from a shell. The input parameters for RH rely still on standard `*.input` files. The user is suggested to consult the RH documentation for detailed overview of the code and usage of the input files.
 
 # Installation
 
