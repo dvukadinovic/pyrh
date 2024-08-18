@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quick start examples" href="quick_start.html" />
-    <link rel="prev" title="Welcome to pyrh’s documentation!" href="index.html" />
+    <link rel="prev" title="pyrh documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,13 +34,25 @@
             
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
-<p>For Unix based systems:</p>
-<ol class="arabic simple">
-<li><p>Install Cython module: <a class="reference external" href="https://cython.readthedocs.io/en/stable/src/quickstart/install.html">https://cython.readthedocs.io/en/stable/src/quickstart/install.html</a>. You would also need <code class="docutils literal notranslate"><span class="pre">numpy</span></code> module for <cite>pyrh</cite>.</p></li>
-<li><p>Define an environment variable <cite>CC</cite> and <cite>CXX</cite> to point to the GCC compiler that is compatible for CPU architecture.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> and check for any possible errors.</p></li>
-</ol>
-<p>If everything went without any error, you have functional <cite>pyrh</cite> module! Now, lets compute some spectra!</p>
+<section id="unix-systems">
+<h2>Unix systems<a class="headerlink" href="#unix-systems" title="Permalink to this heading">¶</a></h2>
+<p>To install the code you need to have Cython==0.29.33 and numpy==1.24.2 installed. Also, define an environment variable <code class="docutils literal notranslate"><span class="pre">CC</span></code> and <code class="docutils literal notranslate"><span class="pre">CXX</span></code> to point to the GCC compiler that is compatible for CPU architecture you have.</p>
+<p>To install <em>pyrh</em>, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>On every change of the source code, it needs to be recompiled since it is a shared library that needs to be updated are re-imported in the Python environment.</p>
+<p>After installation, export the path to the <em>pyrh/rh</em> folder in the variable <code class="docutils literal notranslate"><span class="pre">PYRH_PATH</span></code>. The best strategy is to set it directly in the <em>~/.*rc</em> file as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYRH_PATH</span><span class="o">=</span><span class="s2">&quot;/absolte/path/to/the/pyrh/rh&quot;</span>
+</pre></div>
+</div>
+<p>This path is used to locate atomic and molecular models (assumed to be in directories <em>pyrh/rh/Atoms</em> and <em>pyrh/rh/Molecules</em>), abundance (in <em>pyrh/rh/Atoms/abundance.input</em>) and the ABO coefficients (in directory <em>pyrh/rh/Atoms/abo</em>).</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>The instalation is tested also on a Mac PC with M1 chip. However, under the hood, RH uses SIMD instructions to compute a fast inversion of a 4x4 matrix, which is only available for x86_64 architectures. Therefore, expect 20-40% reduction in speed when using <em>pyrh</em> on Mac PCs with M1 chip (since it runs in arm64 architecture).</p>
+</div>
+<p>If everything passed without any errors, you have functional <em>pyrh</em> module! Now, lets compute some spectra!</p>
+</section>
 </section>
 
 
@@ -62,15 +74,20 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unix-systems">Unix systems</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Input parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyrh_api.html">pyrh API</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to pyrh’s documentation!</a></li>
+      <li>Previous: <a href="index.html" title="previous chapter"><em>pyrh</em> documentation</a></li>
       <li>Next: <a href="quick_start.html" title="next chapter">Quick start examples</a></li>
   </ul></li>
 </ul>
