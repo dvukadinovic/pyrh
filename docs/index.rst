@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyrh's documentation!
+*pyrh* documentation
 ================================
 
 *pyrh* module is the Cython wrapper around [RH](https://github.com/han-uitenbroek/RH) NLTE synthesis code (Uitenbroek 2001). It allows access from Python environment to all RH methods to synthesise a spectrum in (non-)LTE, just like running RH code from a shell. The input parameters for RH rely still on standard `*.input` files. The user is suggested to consult the RH documentation for detailed overview of the code and usage of the input files.
@@ -12,6 +12,7 @@ Here, we will describe and show how to call the *pyrh* methods. Currently we can
 
 Indices and tables
 ==================
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
