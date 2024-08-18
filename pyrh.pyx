@@ -107,18 +107,18 @@ def hse(cwd,
 
 	cdef char* argv[140]
 
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
+	cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
+	pg[0] = pg_top
+
 	py_list = cwd.split(" ")
 	argc = len(py_list)
 	py_string = [item.encode("utf-8") for item in py_list]
 	arr = (ctypes.c_char_p * argc)(*py_string)
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
-
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
-	pg[0] = pg_top
 
 	if (fudge_wave is None) or (fudge_value is None):
 		rh.hse(argv[0], Ndep,
@@ -151,14 +151,14 @@ cpdef get_tau(cwd,
 
 	cdef char* argv[140]
 
+	cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.empty(Ndep)
+
 	py_list = cwd.split(" ")
 	argc = len(py_list)
 	py_string = [item.encode("utf-8") for item in py_list]
 	arr = (ctypes.c_char_p * argc)(*py_string)
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
-
-	cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.empty(Ndep)
 
 	rh.get_tau(argv[0], mu, Ndep, &tau[0],
 			 &scale[0], &atmosphere[1,0], 
