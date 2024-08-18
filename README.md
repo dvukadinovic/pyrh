@@ -18,6 +18,8 @@ After installation, export the path to the `pyrh/rh` folder in the variable `PYR
 
 This path is used to locate atomic and molecular models (assumed to be in `pyrh/rh/Atoms` and `pyrh/rh/Molecules`), abundance (in `pyrh/rh/Atoms/abundance.input`) and the ABO coefficients (in `pyrh/rh/Atoms/abo`).
 
+The instalation is tested also on Mac PC with M1 chip. However, under the hood, RH uses SIMD instructions to compute a fast inversion of a 4x4 matrix, which is only available for x86_64 architectures. Therefore, expect 20-40% reduction in speed when using *pyrh* on Mac PC with M1 chip (since it runs in arm64 architecture).
+
 # Examples and test scripts
 
 In directory `examples` you can find a simple script that shows how you can synthesise a spectrum using *pyrh*. 
