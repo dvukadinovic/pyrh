@@ -208,7 +208,7 @@ void initSolution(bool_t pyrh_io_flag)
 
       for (nspect = 0;  nspect < spectrum.Nspect;  nspect++)
 	       readJlambda(nspect, spectrum.J[nspect]);
-    
+
       close(spectrum.fd_J);
       spectrum.fd_J = -1;
 

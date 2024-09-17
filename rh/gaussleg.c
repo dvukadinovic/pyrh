@@ -45,9 +45,9 @@ void GaussLeg(double x1, double x2, double *x, double *w, int n)
       p1 = 1.0;
       p2 = 0.0;
       for (j=1; j<=n; j++) {
-	p3 = p2;
-	p2 = p1;
-	p1 = (2.0*(j - 0.5)*zz*p2 - (j - 1.0)*p3) / j;
+      	p3 = p2;
+      	p2 = p1;
+      	p1 = (2.0*(j - 0.5)*zz*p2 - (j - 1.0)*p3) / j;
       }
       pp = n * (zz*p1 - p2) / (zz*zz - 1.0);
       z1 = zz;

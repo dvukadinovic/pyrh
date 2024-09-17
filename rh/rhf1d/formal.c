@@ -66,7 +66,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 
   as = &spectrum.as[nspect];
   alloc_as(nspect, eval_operator);
-  
+
   /* --- Check whether current active set includes a bound-bound
          and/or polarized transition and/or angle-dependent PRD
          transition, and/or polarization through background scattering.
@@ -147,8 +147,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       readJ20lambda(nspect, J20dag);
     } else {
       J20 = spectrum.J20[nspect];
-      for (k = 0;  k < Nspace;  k++)
-	J20dag[k] = J20[k];
+      for (k = 0;  k < Nspace;  k++) J20dag[k] = J20[k];
     }
     if (spectrum.updateJ)
       for (k = 0;  k < Nspace;  k++) J20[k] = 0.0;
@@ -206,6 +205,8 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	    for (k = 0;  k < Nspace;  k++)
       	      Spol[n][k] /= chi[k];
       	  }
+
+          // if (nspect==3 && to_obs==0) printf("%e | %e | %e | %e \n", J[41], S[41], chi[41], as->sca_c[41]);
 
       	  /* --- Polarized transfer --                 -------------- */
       	  if (input.S_interpolation_stokes == DELO_BEZIER3) {

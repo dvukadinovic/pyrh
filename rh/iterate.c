@@ -198,9 +198,9 @@ double solveSpectrum(bool_t eval_operator, bool_t redistribute)
 
     for (nspect = 0;  nspect < spectrum.Nspect;  nspect += input.Nthreads) {
       if (nspect + input.Nthreads <= spectrum.Nspect)
-	Nthreads = input.Nthreads;
+        Nthreads = input.Nthreads;
       else
-	Nthreads = (spectrum.Nspect % input.Nthreads);
+        Nthreads = (spectrum.Nspect % input.Nthreads);
 
       /* --- Start batch of concurrent threads --      -------------- */
 
@@ -232,12 +232,12 @@ double solveSpectrum(bool_t eval_operator, bool_t redistribute)
     /* --- Else call the solution for wavelengths sequentially -- --- */
     for (nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
       if (!redistribute ||
-	  (redistribute && containsPRDline(&spectrum.as[nspect]))) {
-	dJ = Formal(nspect, eval_operator, redistribute);
-	if (dJ > dJmax) {
-	  dJmax = dJ;
-	  lambda_max = nspect;
-	}
+	         (redistribute && containsPRDline(&spectrum.as[nspect]))) {
+        dJ = Formal(nspect, eval_operator, redistribute);
+      	if (dJ > dJmax) {
+      	  dJmax = dJ;
+      	  lambda_max = nspect;
+      	}
       }
     }
   }

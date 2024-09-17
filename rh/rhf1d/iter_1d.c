@@ -79,67 +79,69 @@ void Iterate(int NmaxIter, double iterLimit)
     }
     if (shortchar) {
       for (la = 0;  la < Nlambda;  la++) {
-	for (k = 0;  k < Nspace;  k++)
-	  chi_la[k] = phi[la] * chi[k];
+				for (k = 0;  k < Nspace;  k++)
+				  chi_la[k] = phi[la] * chi[k];
 
-	/* --- Solve transfer equation for all angles -- -------------- */
+					/* --- Solve transfer equation for all angles -- -------------- */
 
-	for (mu = 0;  mu < Nrays;  mu++) {
-	  for (to_obs = 0;  to_obs <= 1;  to_obs++) {
-	    lamu = 2*mu + to_obs;
+					for (mu = 0;  mu < Nrays;  mu++) {
+					  for (to_obs = 0;  to_obs <= 1;  to_obs++) {
+					    lamu = 2*mu + to_obs;
 
-	    if (input.S_interpolation == S_LINEAR) {
-	      Piecewise_Linear_1D(la, mu, to_obs, chi_la, Sny,
-				  I[lamu], Psi_sc[lamu]);
-	    } else if (input.S_interpolation == S_PARABOLIC) {
-	      Piecewise_1D(la, mu, to_obs, chi_la, Sny, I[lamu],
-			   Psi_sc[lamu]);
-	    } else if (input.S_interpolation == S_BEZIER3) {
-	      Piecewise_Bezier3_1D(la, mu, to_obs, chi_la, Sny,
-				   I[lamu], Psi_sc[lamu]);
-	    } else {
-	      sprintf(messageStr,
-		      "Unknown radiation solver: %d",
-		      input.S_interpolation);
-	      Error(ERROR_LEVEL_1, routineName, messageStr);
-	    }
-	    if (to_obs) Iemerge[mu][la] = I[lamu][0];
-	  }
-	}
-	/* --- Fill lambda operator --                   -------------- */
+					    if (input.S_interpolation == S_LINEAR) {
+					      Piecewise_Linear_1D(la, mu, to_obs, chi_la, Sny,
+								  I[lamu], Psi_sc[lamu]);
+					    } else if (input.S_interpolation == S_PARABOLIC) {
+					      Piecewise_1D(la, mu, to_obs, chi_la, Sny, I[lamu],
+							   Psi_sc[lamu]);
+					    } else if (input.S_interpolation == S_BEZIER3) {
+					      Piecewise_Bezier3_1D(la, mu, to_obs, chi_la, Sny,
+								   I[lamu], Psi_sc[lamu]);
+					    } else {
+					      sprintf(messageStr,
+						      "Unknown radiation solver: %d",
+						      input.S_interpolation);
+					      Error(ERROR_LEVEL_1, routineName, messageStr);
+					    }
+					    if (to_obs) Iemerge[mu][la] = I[lamu][0];
+					  }
+					}
 
-	for (mu = 0, lamu = mu;  mu < Nrays;  mu++) {
-	  wqmu = 0.5*geometry.wmu[mu] * phi[la]*wlamb[la];
-	  for (to_obs = 0;  to_obs <= 1;  to_obs++, lamu++) {
-	    for (k = 0;  k < Nspace;  k++) {
-	      dJny[k]     += wqmu * I[lamu][k];
-	      diagonal[k] += wqmu * Psi_sc[lamu][k];
-	    }
-	  }
-	}
-      }
-    } else {
+					/* --- Fill lambda operator --                   -------------- */
+
+					for (mu = 0, lamu = mu;  mu < Nrays;  mu++) {
+					  wqmu = 0.5*geometry.wmu[mu] * phi[la]*wlamb[la];
+					  for (to_obs = 0;  to_obs <= 1;  to_obs++, lamu++) {
+					    for (k = 0;  k < Nspace;  k++) {
+					      dJny[k]     += wqmu * I[lamu][k];
+					      diagonal[k] += wqmu * Psi_sc[lamu][k];
+					    }
+					  }
+					}
+			}
+		} else {
       for (mu = 0;  mu < Nrays;  mu++) {
-	for (la = 0;  la < Nlambda;  la++) {
-	  for (l = 0;  l < Ndep;  l++) {
-	    chi_la[l] = phi[la] * chi[l];
-	  }
+				for (la = 0;  la < Nlambda;  la++) {
+				  for (l = 0;  l < Ndep;  l++) {
+				    chi_la[l] = phi[la] * chi[l];
+				  }
 
-	  /* --- Formal solution and diagonal operator - ------------ */
+				  /* --- Formal solution and diagonal operator - ------------ */
 
-	  Iemerge[mu][la] =
-	    Feautrier(la, mu, chi_la, Sny, F_order=STANDARD, P, Psi);
+				  Iemerge[mu][la] =
+				    Feautrier(la, mu, chi_la, Sny, F_order=STANDARD, P, Psi);
 
-	  /* --- Angle and wavelength integration --    ------------- */
+				  /* --- Angle and wavelength integration --    ------------- */
 
-	  wqmu = geometry.wmu[mu] * phi[la]*wlamb[la];
-	  for (l = 0;  l < Ndep;  l++) {
-	    dJny[l]     += wqmu*P[l];
-	    diagonal[l] += wqmu*Psi[l];
-	  }
-	}
-      }
-    }
+				  wqmu = geometry.wmu[mu] * phi[la]*wlamb[la];
+				  for (l = 0;  l < Ndep;  l++) {
+				    dJny[l]     += wqmu*P[l];
+				    diagonal[l] += wqmu*Psi[l];
+				  }
+				} // end for (la = 0)
+		  } // end for(mu = 0)
+    } // end else
+
     /* --- Accelerated lambda iteration --              ------------- */
 
     for (l = 0;  l < Ndep;  l++) {

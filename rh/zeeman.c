@@ -327,17 +327,17 @@ void adjustStokesMode()
       /* --- Recalculate the profiles of polarized lines in this case */
 
       for (kr = 0;  kr < atom->Nline;  kr++) {
-	line = &atom->line[kr];
-	if (line->polarizable) {
+        line = &atom->line[kr];
+        if (line->polarizable) {
 
-	  /* --- First free up the space used in field-free
-                 calculation --                        -------------- */
-	  
-	  if (!input.limit_memory) freeMatrix((void **) line->phi);
-	  free(line->wphi);
+      	  /* --- First free up the space used in field-free
+                       calculation --                        -------------- */
+      	  
+      	  if (!input.limit_memory) freeMatrix((void **) line->phi);
+      	  free(line->wphi);
 
-	  Profile(line);
-	}
+      	  Profile(line);
+      	}
       }
     }
     getCPU(2, TIME_POLL, "adjustStokesMode");
