@@ -22,7 +22,8 @@ mySpectrum rhf1d(char *cwd, double mu, int Ndep,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
               int get_atomic_rfs,
-              int NKurucz_lists, char *Kurucz_lists);
+              int NKurucz_lists, char *Kurucz_lists,
+              int NLTE);
               // myRLK_Line *pyrh_rlk_lines,
 
 myRLK_Line get_RLK_lines(int argc, char *argv[]);

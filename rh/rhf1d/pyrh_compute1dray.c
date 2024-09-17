@@ -108,7 +108,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
               int get_atomic_rfs,
-              int NKurucz_lists, char *Kurucz_lists)
+              int NKurucz_lists, char *Kurucz_lists,
+              int NLTE)
               // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
@@ -125,7 +126,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // = {"../rhf1d", "-i", keyword_input};
 
   setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
+  // getCPU(0, TIME_START, NULL);
   SetFPEtraps();
 
   readInput();
@@ -159,10 +160,13 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   input.solve_ne = FALSE;
   // we have to recompute J
   spectrum.updateJ = TRUE;
-  // 
+  // do not print J in a file
   input.limit_memory = FALSE;
   // treatment of Hydrogen in the background. In LTE case it should be TRUE
-  // atmos.H_LTE = TRUE;
+  // atmos.H_LTE = TRUE; // --> move it after we check all atoms/molecules if they are active/passive?
+  // if we need to solve NLTE problem
+  input.solve_NLTE = FALSE;
+  if (NLTE!=0) input.solve_NLTE = TRUE;
   
   // --- DV --- this is where I stoped with reading the RH workflow.
 
@@ -186,7 +190,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
     atmos.loggf_values = loggf_values;
-    // input.get_atomic_rfs = TRUE;
     input.n_atomic_pars += Nloggf;
   }
 
@@ -195,7 +198,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
-    // input.get_atomic_rfs = TRUE;
     input.n_atomic_pars += Nlam;
   }
 
@@ -265,16 +267,28 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     }
   }
 
+  if (!input.solve_NLTE){
+    atmos.Nrays = geometry.Nrays = 1;
+    geometry.muz[0] = mu;
+    geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
+    geometry.muy[0] = 0.0;
+    geometry.wmu[0] = 1.0;
+  }
   if (atmos.Stokes) Bproject();
-  
+
   readAtomicModels();
   readMolecularModels();
 
-  // printf("got all atoms and molecules\n");
+  // // check if we can avoid NLTE computations
+  // for (int n = 0;  n < atmos.Natom;  n++){
+  //   if (atmos.atoms[n].active){
+  //     input.solve_NLTE = TRUE;
+  //     break;
+  //   }
+  // }
+  // input.solve_NLTE = TRUE;
 
   SortLambda(lam, Nwave);
-
-  // printf("initialized everything in SortLambda()\n");
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
@@ -287,25 +301,26 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
 
-  // printf("got background op\n");
 
-  bool_t pyrh_io_flag = FALSE;
-
-  getProfiles();
-  // here it initializes the spectrum 
-  // and reads the J computed in rhf1d();
-  // not only that, but takes PRD data also;
+  // call in NLTE
+  if (input.solve_NLTE) getProfiles();
+  // here it initializes the spectrum and J;
+  // it reads the J computed in previous run;
+  // it also takes PRD data for lines from Active atoms;
   // watch it! J is connected with LIMIT_MEMORY keyword
+  // call in NLTE
+  bool_t pyrh_io_flag = FALSE;
   initSolution(pyrh_io_flag);
-  initScatter();
+  if (input.solve_NLTE) initScatter();
 
   getCPU(1, TIME_POLL, "Total Initialize");
 
   /* --- Solve radiative transfer for active ingredients -- --------- */
 
   // Here we get the spectrum (IQUV and J)
-  // printf("wer iterate to solve RTE\n");
   Iterate(input.NmaxIter, input.iterLimit);
+  // printf("%e\n", spectrum.J[3][41]);
+  // printf(" --- Iteration done! --- \n");
 
   adjustStokesMode();
   niter = 0;
@@ -319,13 +334,10 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     convertScales(&atmos, &geometry);
   }
 
-  getCPU(1, TIME_START, NULL);
-
   mySpectrum spec;
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
-  // printf("get spec for a given mu\n");
   _solveray(argv, mu, &spec);
 
   // revert units (since we pass pointers...)
@@ -339,11 +351,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
-  // printf("free stuff\n");
-
   freeAtoms();
   freeMolecules();
-
 
   if (atmos.Stokes){
     freeMatrix((void **) atmos.cos_gamma);

@@ -74,57 +74,46 @@ int _getnumber(int* z)
 
 void _solveray(char *argv[], double muz, mySpectrum *spec)
 {
-  register int n, k, la;
-
-  char    rayFileName[14], inputLine[MAX_LINE_SIZE], ascFilename[18];
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
-  int     Nspect, Nread, Nrequired, checkPoint, *wave_index = NULL;
-  double  *S, *chi;
-  FILE   *fp_out, *fp_ray, *fp_stokes, *fp_out_asc;
-  XDR     xdrs;
-  ActiveSet *as;
+  // int     Nspect, Nread, Nrequired, checkPoint, *wave_index = NULL;
+  // double  *S, *chi;
+  // FILE   *fp_out, *fp_ray, *fp_stokes, *fp_out_asc;
+  // XDR     xdrs;
+  // ActiveSet *as;
 
-  /* --- Read input data and initialize --             -------------- */
+  // /* --- Read input data and initialize --             -------------- */
 
-  input.startJ = OLD_J;
-  spectrum.updateJ = FALSE;
-  input.limit_memory = FALSE;
-
-  /* --- Read input data for atmosphere --             -------------- */
-
-  getCPU(1, TIME_START, NULL);
-  
-  atmos.Nrays = geometry.Nrays = 1;
-  geometry.muz[0] = muz;
-  geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
-  geometry.muy[0] = 0.0;
-  geometry.wmu[0] = 1.0;
-  if (atmos.Stokes) Bproject();
-
-  /* --- Open file with background opacities --        -------------- */
-
-  if (atmos.moving || input.StokesMode) {
-    // strcpy(input.background_File, input.background_ray_File);
-    Background(analyze_output=FALSE, equilibria_only=FALSE);
-  } else {
-    Background(analyze_output=FALSE, equilibria_only=TRUE);
-  }
-
-  getProfiles();
-  // spectrum.J is already filled with correct values; do we need this initSolution() here? 
-  // It seems not (tested on H in ACTIVE state; everything was exactly the same as from original RH)
-  // bool_t pyrh_io_flag = FALSE;
-  // initSolution(pyrh_io_flag);
-  // spectrum.J = J;
-  // if (input.backgr_pol) spectrum.J20 = J20;
-  initScatter();
-
-  getCPU(1, TIME_POLL, "Total initialize");
 
   /* --- Solve radiative transfer equations --         -------------- */
 
-  solveSpectrum(FALSE, FALSE);
+  if (input.solve_NLTE){
+    input.startJ = OLD_J;
+    spectrum.updateJ = FALSE;
+    input.limit_memory = FALSE;
+
+    atmos.Nrays = geometry.Nrays = 1;
+    geometry.muz[0] = muz;
+    geometry.mux[0] = sqrt(1.0 - SQ(geometry.muz[0]));
+    geometry.muy[0] = 0.0;
+    geometry.wmu[0] = 1.0;
+    if (atmos.Stokes) Bproject();
+
+    if (atmos.moving || input.StokesMode) {
+      Background(analyze_output=FALSE, equilibria_only=FALSE);
+    } else {
+      Background(analyze_output=FALSE, equilibria_only=TRUE);
+    }
+
+    getProfiles();
+    // spectrum.J is already filled with correct values; do we need this initSolution() here? 
+    // It seems not (tested on H in ACTIVE state; everything was exactly the same as from original RH)
+    // bool_t pyrh_io_flag = FALSE;
+    initSolution(pyrh_io_flag);
+    initScatter();
+    
+    solveSpectrum(FALSE, FALSE);
+  }
   
   spec->sQ = NULL;
   spec->sU = NULL;

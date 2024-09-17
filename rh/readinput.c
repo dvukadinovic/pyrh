@@ -382,15 +382,6 @@ void readInput()
             " in 1-D Cartesian geometry");
     break;
   }
-
-  /* --- Update the paths to abundance list and ABO coefficients ---  */
-
-  // input.abund_input
-  // input.barklem_sp_data
-  // input.barklem_pd_data
-  // input.barklem_df_data
-
-
   
   /* --- If called with -showkeywords commandline option -- --------- */
 

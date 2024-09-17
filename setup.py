@@ -11,9 +11,6 @@ import numpy
 Only CFLAGS needs to be modified
 To Do:
   -- remove duplicate flags from CFLAGS (scarry, will skip it)
-  -- if Mac OS X (with M1/M2 CPUs): remove the '-arch x86_64' flag from CFLAGS
-  -- add flag '-DSIMDON' to switch to SIMD matrix inversion (if on Intel arch)
-
 """
 
 _platform = platform()

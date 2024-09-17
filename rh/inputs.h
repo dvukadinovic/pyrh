@@ -90,7 +90,8 @@ typedef struct {
          pyrhHSE,
          // flag for computing semi-analytically the RFs for atomic line parameters
          get_atomic_rfs,
-         LS_Lande; // flag for computing the Lande factors in LS
+         LS_Lande, // flag for computing the Lande factors in LS
+         solve_NLTE; // flag if the solution is NLTE; its LTE for False
   enum   solution startJ;
   
   enum   StokesMode StokesMode;
