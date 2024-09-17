@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pyrh
+import time
 
 def spinor2multi(atm):
 	"""
@@ -32,7 +33,7 @@ def spinor2multi(atm):
 
 atmos = np.loadtxt("falc.dat", skiprows=1)
 atmos = np.array(atmos.T, dtype=np.float64)
-atmos= spinor2multi(atmos)
+atmos = spinor2multi(atmos)
 
 # path to the *.input files
 cwd = "."
@@ -49,11 +50,32 @@ atm_scale = int(0)
 # wavelength samples for which to compute the spectrum (in nm) in vacuum
 wave = np.linspace(630.0, 630.35, num=251) + 0.2
 
-spec = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave)
-spec = np.array(spec, dtype=np.float64)
+fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True, height_ratios=[4,1])
+fig.subplots_adjust(hspace=0)
 
-plt.plot(wave, spec[0]*1e8)
-plt.xlabel("Wavelength in vacuum [nm]")
-plt.ylabel(r"Intensity [10$^{-8}$ W/Hz/srad/m$^2$]")
-plt.xlim([wave[0], wave[-1]])
+ids = 0
+
+old = None
+flag = [False, True]
+for idr in range(2):
+	# print("NLTE: ", flag[idr])
+	start = time.time()
+	spec = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, NLTE=flag[idr])
+	spec = np.array(spec, dtype=np.float64)
+	print(f"{time.time() - start:.3f}")
+	# print("===============================")
+
+	axs[0].plot(wave, spec[ids]*1e8, label=idr+1, color=f"C{idr}")
+	if idr>0:
+		axs[1].plot(wave, (spec[ids] - old[ids])/spec[ids]*100, label=idr+1, color=f"C{idr}")
+	old = spec.copy()
+	# plt.plot(wave, (spec[0] - old[0])/spec[0]*100, label="new")
+	# plt.plot(old[-1], old[0]*1e8, label="old")
+
+axs[0].legend()
+axs[1].set_xlabel("Wavelength in vacuum [nm]")
+axs[0].set_ylabel(r"Intensity [10$^{-8}$ W/Hz/srad/m$^2$]")
+axs[1].set_ylabel(r"diff [\%]")
+axs[1].set_xlim([wave[0], wave[-1]])
+
 plt.show()
