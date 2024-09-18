@@ -1,3 +1,8 @@
+Version 0.30:
+-------------
+
+* LTE synthesis now requires only single call to the RTE solver. This includes removing the scattering from the opacity and emissivity in `background.c` and from the source function in `rhf1d/formal.c`. By default we compute spectrum in LTE, unless some of the atoms is in `ACTIVE` state.
+
 Version 0.21:
 -------------
 

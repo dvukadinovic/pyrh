@@ -108,8 +108,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
               int get_atomic_rfs,
-              int NKurucz_lists, char *Kurucz_lists,
-              int NLTE)
+              int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
 {
   bool_t write_analyze_output, equilibria_only;
@@ -166,7 +165,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // atmos.H_LTE = TRUE; // --> move it after we check all atoms/molecules if they are active/passive?
   // if we need to solve NLTE problem
   input.solve_NLTE = FALSE;
-  // if (NLTE!=0) input.solve_NLTE = TRUE;
   
   // --- DV --- this is where I stoped with reading the RH workflow.
 

@@ -64,7 +64,7 @@ rh_c_files.remove("rh/collision_Oslo.c")
 
 setup(
 	name="pyrh",
-	version="0.21",
+	version="0.30",
 	author="Dusan Vukadionvic",
 	ext_modules=cythonize([Extension(
                             "pyrh", rh_c_files,

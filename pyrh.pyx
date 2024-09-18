@@ -185,8 +185,7 @@ def compute1d(cwd,
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values=None,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
-				get_atomic_rfs=False,
-				NLTE=False):
+				get_atomic_rfs=False):
 	cdef int Ndep = atmosphere.shape[1]
 	cdef int Nwave = wave.size
 	
@@ -231,10 +230,6 @@ def compute1d(cwd,
 	else:
 		rh_get_atomic_rfs = 0
 
-	rh_NLTE = 0
-	if NLTE:
-		rh_NLTE = 1
-
 	cdef char* argv[140]
 
 	py_list = cwd.split(" ")
@@ -254,7 +249,7 @@ def compute1d(cwd,
 			 Nloggf, loggf_ids_ptr, loggf_values_ptr,
 			 Nlam, lam_ids_ptr, lam_values_ptr,
 			 rh_get_atomic_rfs,
-			 0, argv[0], rh_NLTE)
+			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
 	lam = np.asarray(<cnp.float64_t[:spec.nlw]> spec.lam)

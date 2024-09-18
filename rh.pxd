@@ -90,8 +90,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int Nloggf, int *loggf_ids, double* loggf_values,
 			int Nlam, int *lam_ids, double *lam_values,
 			int get_atomic_rfs,
-			int NKurucz_lists, char *Kurucz_lists,
-			int NLTE)
+			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
 
 	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
