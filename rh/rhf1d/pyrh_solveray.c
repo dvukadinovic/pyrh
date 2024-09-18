@@ -108,8 +108,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
     getProfiles();
     // spectrum.J is already filled with correct values; do we need this initSolution() here? 
     // It seems not (tested on H in ACTIVE state; everything was exactly the same as from original RH)
-    // bool_t pyrh_io_flag = FALSE;
-    initSolution(pyrh_io_flag);
+    // initSolution(FALSE);
     initScatter();
     
     solveSpectrum(FALSE, FALSE);

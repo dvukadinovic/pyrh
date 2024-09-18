@@ -462,7 +462,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
     }
     for (k = 0;  k < atmos.Nspace;  k++) {
       sca_ai[k] *= scatt_fudge; // * total_sasha_fudge; // D.Vukadinovic
-      chi_ai[k] += sca_ai[k];
+      if (input.solve_NLTE) chi_ai[k] += sca_ai[k];
     }
 
     /* --- Now the contributions that may be angle-dependent due to the

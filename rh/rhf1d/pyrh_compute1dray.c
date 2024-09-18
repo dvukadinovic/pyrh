@@ -166,7 +166,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // atmos.H_LTE = TRUE; // --> move it after we check all atoms/molecules if they are active/passive?
   // if we need to solve NLTE problem
   input.solve_NLTE = FALSE;
-  if (NLTE!=0) input.solve_NLTE = TRUE;
+  // if (NLTE!=0) input.solve_NLTE = TRUE;
   
   // --- DV --- this is where I stoped with reading the RH workflow.
 
@@ -267,6 +267,18 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     }
   }
 
+  readAtomicModels();
+  readMolecularModels();
+
+  // check if we can avoid NLTE computations
+  // (2 calls for LTE solution are needed instead of only one)
+  for (int n = 0;  n < atmos.Natom;  n++){
+    if (atmos.atoms[n].active){
+      input.solve_NLTE = TRUE;
+      break;
+    }
+  }
+  
   if (!input.solve_NLTE){
     atmos.Nrays = geometry.Nrays = 1;
     geometry.muz[0] = mu;
@@ -275,18 +287,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     geometry.wmu[0] = 1.0;
   }
   if (atmos.Stokes) Bproject();
-
-  readAtomicModels();
-  readMolecularModels();
-
-  // // check if we can avoid NLTE computations
-  // for (int n = 0;  n < atmos.Natom;  n++){
-  //   if (atmos.atoms[n].active){
-  //     input.solve_NLTE = TRUE;
-  //     break;
-  //   }
-  // }
-  // input.solve_NLTE = TRUE;
 
   SortLambda(lam, Nwave);
 
@@ -300,7 +300,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
-
 
   // call in NLTE
   if (input.solve_NLTE) getProfiles();
