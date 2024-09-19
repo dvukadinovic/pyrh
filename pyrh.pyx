@@ -2,7 +2,7 @@
 # distutils: sources = [rh/rhf1d/pyrh_compute1dray.c]
 # distutils: include_dirs = rh/
 
-__version__ = 0.21
+__version__ = 0.30
 
 cimport rh
 import numpy as np
