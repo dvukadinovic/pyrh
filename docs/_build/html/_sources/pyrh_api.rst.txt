@@ -31,6 +31,28 @@ pyrh API
 
 	:return: Electron and total hydrogen density. If ``full_output=True``, then it returns electron density, total hydrogen density, mass density and gas pressure.
 
+.. py:function:: pyrh.get_scales(cwd, atm_scale, scale, atmosphere, lam_ref)
+
+	Compute the atmospheric scales: optical depth, height and column mass density at a given reference wavelength. From the provided scale, method computes opacity and converts it to the other two scales.
+
+	:param cwd: Relative path to directory containing RH input files.
+	:type cwd: str
+
+	:param atm_scale: Type of an atmosphere scale. ``atm_scale=0`` for the optical depth, ``atm_scale=1`` for the column mass density and ``atm_scale=2`` for the height.
+	:type atm_scale: int
+
+	:param scale: Array containing the atmosphere scale.
+	:type scale: C contiguouse float64 numpy.ndarray
+
+	:param atmosphere: MULTI type atmosphere (check ... for more details).
+	:type atmosphere: C contiguouse float64 numpy.ndarray
+
+	:param lam_ref: Reference wavelength in vacuum in nanometer units for which we give scales (optical depth and column mass) or at which we want to compute them.
+	:type lam_ref: double
+
+	:return: The scales in this order: optical depth, height in meters and column mass in kg/m2.
+	:return type: C contiguouse float64 numpy.ndarray
+
 .. py:function:: pyrh.get_ne_from_nH(cwd, atm_scale, scale, temperature, nH)
 
 	Compute the LTE electron density from given temperature and total hydrogen density. 
