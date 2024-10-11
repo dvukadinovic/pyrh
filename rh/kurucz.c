@@ -52,8 +52,8 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 28 lande g for first level times 1000   I5
 29 lande g for second level times 1000   I5
 30 isotope shift of wavelength in mA
-31 [DV] (optional) orbital quantum number of first level I2
-32 [DV] (optional) orbital quantum number of second level I2
+31 [DV] (optional) orbital quantum number of the first level I2
+32 [DV] (optional) orbital quantum number of the second level I2
 
 
  Note: The periodic table index of Kurucz starts at 1 (for Hydrogen).
@@ -62,7 +62,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
        calculation (rlk_opacity.c).
  Note: [DV] we added two more values to Kurucz line that contain information
        on the orbital quantum numbers of levels that is used to compute the
-       broadening of a spectral line by ABO theory. The original implementation
+       broadening of a spectral line by the ABO theory. The original implementation
        does not read these numbers, it only reads the total angular momentum
        (term state). Do not give these numbers if you do not know the levels
        configuration.
@@ -358,7 +358,7 @@ void readKuruczLines(char *inputFile)
         // [D.V 11.08.2023] Even if SLJ number cannot be read, we can have polarizable line
         //   because user has provided directly the Lande factors for each level.
         //   Works only if LS_LANDE = FALSE (keyword.input file).
-        if (!input.LS_Lande){
+        if (!input.LS_Lande && atmos.Stokes){
           if (rlk->gL_i!=-99*MILLI && rlk->gL_j!=-99*MILLI){
             rlk->polarizable = TRUE;
           }
@@ -576,6 +576,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       for (k = 0;  k < atmos.Nspace;  k++) scatt[k] = 0.0;
     }
   }
+
   /* --- Add opacities from lines at this wavelength -- ------------- */
 
   for (n = Nblue;  n <= Nred;  n++) {
@@ -728,6 +729,7 @@ double RLKProfile(RLK_Line *rlk, int k, int mu, bool_t to_obs,
     else
       v -= vproject(k, mu) / vbroad;
   }
+
   sv = 1.0 / (SQRTPI * vbroad);
 
   if (rlk->Grad) {
