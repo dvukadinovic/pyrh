@@ -10,6 +10,7 @@ cimport numpy as cnp
 import cython
 import ctypes
 import sys
+import time
 
 from libc.stdlib cimport malloc, free
 
@@ -145,8 +146,7 @@ def hse(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef get_tau(cwd,
-			  double mu,
+cpdef get_scales(cwd,
 			  int atm_scale,
 			  cnp.ndarray[double, ndim=1, mode="c"] scale,
 			  cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
@@ -156,6 +156,8 @@ cpdef get_tau(cwd,
 	cdef char* argv[140]
 
 	cdef cnp.ndarray[double, ndim=1, mode="c"] tau = np.empty(Ndep)
+	cdef cnp.ndarray[double, ndim=1, mode="c"] height = np.empty(Ndep)
+	cdef cnp.ndarray[double, ndim=1, mode="c"] cmass = np.empty(Ndep)
 
 	py_list = cwd.split(" ")
 	argc = len(py_list)
@@ -164,13 +166,13 @@ cpdef get_tau(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	rh.get_tau(argv[0], mu, Ndep, &tau[0],
-			 &scale[0], &atmosphere[1,0], 
-			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
-			 &atmosphere[8,0], atm_scale,
-			 lam_ref)
+	rh.get_scales(argv[0], Ndep,
+				 &scale[0], &atmosphere[1,0], 
+				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
+				 &atmosphere[8,0], atm_scale,
+				 lam_ref, &tau[0], &height[0], &cmass[0])
 
-	return tau
+	return tau, height, cmass
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

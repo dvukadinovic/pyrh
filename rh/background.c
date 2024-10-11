@@ -288,7 +288,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   if (atmos.Nrlk==0 && !input.pyrhHSE){
     readKuruczLines(input.KuruczData);
   }
-  
+
   if (atmos.Nrlk > 0) {
     qsort(atmos.rlk_lines, atmos.Nrlk, sizeof(RLK_Line), rlk_ascend);
   }
@@ -397,7 +397,6 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
       chi_ai[k] += chi[k];
       eta_ai[k] += chi[k] * Bnu[k];
     }
-    
     /* --- Rayleigh scattering by neutral hydrogen --  -------------- */
 
     if (Rayleigh(wavelength, atmos.H, scatt)) {

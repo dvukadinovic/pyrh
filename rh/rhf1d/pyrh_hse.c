@@ -399,21 +399,18 @@ void hse(char* cwd, int pyrh_Ndep,
 }
 /* ------- end ---------------------------- pyrh_hse.c -------------- */
 
-void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
-             double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
-             double *pyrh_nH, int pyrh_atm_scale, 
-             double lam_ref)
+void get_scales(char *cwd, int pyrh_Ndep,
+               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
+               double *pyrh_nH, int pyrh_atm_scale, 
+               double lam_ref, double *tau, double *height, double *cmass)
 {
-  bool_t equilibria_only;
-  int    niter, nact, index;
-
-  Molecule *molecule;
-
   /* --- Read input data and initialize --             -------------- */
   int argc = 1;
-  // char* keyword_input = malloc(160);
-  // concatenate(keyword_input, cwd, "/keyword.input");
   char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
+
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -422,7 +419,7 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   readInput();
   
   // We are performing 'HSE'; atoms and molecules are in LTE
-  input.pyrhHSE = TRUE;
+  input.pyrhHSE = FALSE;
   
   /*--- Overwrite values for ATOMS, MOLECULES and KURUCZ files ------ */
   char* tmp = malloc(160);
@@ -433,10 +430,16 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   // molecules list file
   concatenate(tmp, "/", input.molecules_input);
   concatenate(input.molecules_input, cwd, tmp);
+  // Kurucz list file
+  concatenate(tmp, "/", input.KuruczData);
+  concatenate(input.KuruczData, cwd, tmp);
+
+  input.StokesMode = NO_STOKES;
 
   atmos.Nrlk = 0;
 
   spectrum.updateJ = TRUE;
+  input.startJ = NEW_J;
   input.limit_memory = FALSE;
   // For now, we only allow for H in LTE state
   atmos.H_LTE = TRUE;
@@ -445,25 +448,24 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry);
-    
+
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
-    for (int k=0; k<geometry.Ndep; k++) 
-      geometry.tau_ref[k] = POW10(pyrh_scale[k]);
+    for (int k=0; k<geometry.Ndep; k++) geometry.tau_ref[k] = POW10(pyrh_scale[k]);
+    geometry.height = height;
+    geometry.cmass = cmass;
   }
-  free(geometry.tau_ref);
-  geometry.tau_ref = tau_ref;
   if (pyrh_atm_scale==1){
     geometry.scale = COLUMN_MASS;
-    for (int k=0; k<geometry.Ndep; k++){
-      geometry.cmass[k] = POW10(pyrh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
-    }
+    for (int k=0; k<geometry.Ndep; k++) geometry.cmass[k] = POW10(pyrh_scale[k]) * (G_TO_KG / SQ(CM_TO_M));
+    geometry.height = height;
+    geometry.tau_ref = tau;
   }
   if (pyrh_atm_scale==2){
     geometry.scale = GEOMETRIC;
-    for (int k=0; k<geometry.Ndep; k++){
-      geometry.height[k] = pyrh_scale[k] * KM_TO_M;
-    }
+    for (int k=0; k<geometry.Ndep; k++) geometry.height[k] = pyrh_scale[k] * KM_TO_M;
+    geometry.cmass = cmass;
+    geometry.tau_ref = tau;
   }
 
   atmos.T = pyrh_temp;
@@ -499,12 +501,14 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
   double* wavetable = (double *) malloc(1 * sizeof(double));
   int Nwav = 1;
   wavetable[0] = lam_ref;
+  atmos.lambda_ref = lam_ref;
   SortLambda(wavetable, Nwav);
 
   getBoundary(&geometry);
 
   atmos.active_layer = -1;
   input.solve_ne = NONE;
+
   Background(FALSE, FALSE);
   convertScales(&atmos, &geometry);
 
@@ -535,8 +539,14 @@ void get_tau(char *cwd, double mu, int pyrh_Ndep, double *tau_ref,
 
   // free geometry related data
   // if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
-  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
-  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+  // if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
+  // if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
+
+  if (spectrum.lambda!=NULL){
+    free(spectrum.lambda); 
+    spectrum.lambda = NULL;
+    spectrum.Nspect = 0;
+  }
 
   if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
   if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
@@ -547,13 +557,8 @@ void get_ne_from_nH(char *cwd,
                     double *pyrh_scale, double *pyrh_temp, 
                     double *pyrh_nH, double *pyrh_ne)
 {
-  bool_t equilibria_only;
-  int    niter, nact, index;
-
   /* --- Read input data and initialize --             -------------- */
   int argc = 1;
-  // char* keyword_input = malloc(160);
-  // concatenate(keyword_input, cwd, "/keyword.input");
   char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   char* keyword_input = malloc(160);
