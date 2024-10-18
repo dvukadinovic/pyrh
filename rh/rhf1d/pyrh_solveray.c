@@ -76,15 +76,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
 {
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
-  // int     Nspect, Nread, Nrequired, checkPoint, *wave_index = NULL;
-  // double  *S, *chi;
-  // FILE   *fp_out, *fp_ray, *fp_stokes, *fp_out_asc;
-  // XDR     xdrs;
-  // ActiveSet *as;
-
-  // /* --- Read input data and initialize --             -------------- */
-
-
+  
   /* --- Solve radiative transfer equations --         -------------- */
 
   if (input.solve_NLTE){
