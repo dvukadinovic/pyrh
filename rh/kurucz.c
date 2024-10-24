@@ -158,6 +158,7 @@ void readKuruczLines(char *inputFile)
 
   while (getLine(fp_Kurucz, commentChar, listName, FALSE) != EOF) {
     Nread = sscanf(listName, "%s", filename);
+    // update the path to filename?
     if ((fp_linelist = fopen(filename, "r")) == NULL) {
       sprintf(messageStr, "Unable to open input file %s", filename);
       Error(ERROR_LEVEL_1, routineName, messageStr);
