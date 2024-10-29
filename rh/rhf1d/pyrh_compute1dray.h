@@ -25,4 +25,6 @@ mySpectrum rhf1d(char *cwd, double mu, int Ndep,
               int NKurucz_lists, char *Kurucz_lists);
               // myRLK_Line *pyrh_rlk_lines,
 
-myRLK_Line get_RLK_lines(int argc, char *argv[]);
+myRLK_Line get_RLK_lines(char *cwd);
+
+void dummy(myRLK_Line pyrh_lines);

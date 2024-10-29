@@ -25,46 +25,56 @@ cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 			pyarr[i,j] = arr[i][j]
 	return pyarr
 
-cpdef Pystring2char(lists):
-	cdef int N = len(lists)
-	cdef char* argv[140]
-
-	py_string = [item.encode("utf-8") for item in lists]
-	arr = (ctypes.c_char_p * N)(*py_string)
-	for i_ in range(N):
-		argv[i_] = arr[i_]
-
-	return N, argv
-
 # add OF table as input to rhf1d()
 
-cdef void string2pointer(string, char* c_char_pointer):
-	py_list = string.split(" ")
-	argc = len(py_list)
-	py_string = [item.encode("utf-8") for item in py_list]
-	arr = (ctypes.c_char_p * argc)(*py_string)
-	for i_ in range(argc):
-		c_char_pointer[i_] = arr[i_]
-
 cdef class RH:
-	cdef char* cwd[160]
+	cdef char* argv[140]
 
-	# cdef int Nrlk
-	# cdef rh.myRLK_Line rlk_lines
+	cdef rh.myRLK_Line lines
 
-	# cdef Py_ssize_t Nwave
-	# cdef array[double] wavetable
-	# cdef double[::1] wavetable
+	cdef public int Nwave
+	cdef public double wavelength_min
+	cdef public double wavelength_max
+	cdef double* wavelength_vacuum
 
-	def __init__(self, cwd):
+	def __init__(self):
+		pass
+
+	def convert_cwd(self, cwd):
 		# convert cwd to the c char pointer
 		py_list = cwd.split(" ")
 		argc = len(py_list)
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * argc)(*py_string)
 		for i_ in range(argc):
-			self.cwd[i_] = arr[i_]
-		# string2pointer(cwd, self.cwd[0])
+			self.argv[i_] = arr[i_]
+
+	def get_Kurucz_lines(self):
+		out = rh.get_RLK_lines(self.argv[0])
+
+		self.lines.Nrlk = out.Nrlk
+		self.lines.rlk_lines = out.rlk_lines
+
+		# expose RLK lines to Python env
+		# _lines = []
+		# for idl in range(out.Nrlk):
+		# 	_lines.append(out.rlk_lines[idl])
+
+		# return _lines
+
+	def set_wavelength(self, cnp.ndarray[double, ndim=1, mode="c"] wavelength):
+		self.Nwave = len(wavelength)
+		self.wavelength_min = wavelength[0]
+		self.wavelength_max = wavelength[self.Nwave-1]
+		self.wavelength_vacuum = <double *> wavelength.data
+
+	def call_dummy(self):
+		rh.dummy(self.lines)
+
+cpdef set_InputData():
+	cdef rh.InputData input_data
+
+	return input_data
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

@@ -37,6 +37,7 @@ cdef extern from "rh/atom.h":
 
 	ctypedef struct RLK_Line:
 		pass
+		#int loggf_rf_ind;
 		# bint polarizable
 		# vdWaals vdwaals;
 		# int pt_index
@@ -93,8 +94,8 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
 
-	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
-	# cdef void dummy(myRLK_Line *rlk_lines)
+	cdef myRLK_Line get_RLK_lines(char *cwd)
+	cdef void dummy(myRLK_Line pyrh_lines)
 
 	cdef void read_inputs(char *cwd, InputData *pyrh_input_data, Atmosphere *pyrh_atmos)
 	cdef void check_inputs(InputData ID, Atmosphere a)

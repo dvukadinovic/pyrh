@@ -81,21 +81,44 @@ void concatenate(char* dest, char* str1, char* str2){
   strcat(dest, str2);
 }
 
-myRLK_Line get_RLK_lines(int argc, char *argv[])
+myRLK_Line get_RLK_lines(char *cwd)
 {
   myRLK_Line output;
 
   atmos.Stokes = TRUE;
   atmos.Nrlk = 0;
+
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
+
+  int argc = 1;
+  char* argv[] = {};
+
   setOptions(argc, argv);
   readInput();
+
+  char* tmp = malloc(160);
+  concatenate(tmp, "/", input.KuruczData);
+  concatenate(input.KuruczData, cwd, tmp);
+
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+
   readAbundance(&atmos);
+  // need H atom to be read; H.weight needed for ABO coeffs
+  readAtomicModels();
   readKuruczLines(input.KuruczData);
 
-  output.rlk_lines = atmos.rlk_lines;
   output.Nrlk = atmos.Nrlk;
+  output.rlk_lines = atmos.rlk_lines;
 
   return output;
+}
+
+void dummy(myRLK_Line pyrh_lines){
+  printf("Nlines = %d\n", pyrh_lines.Nrlk);
+  printf("Ej = %e\n", pyrh_lines.rlk_lines[0].GStark);
 }
 
 // int argc, char *argv[], 
