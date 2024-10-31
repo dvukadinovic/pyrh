@@ -85,7 +85,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 
 #define COMMENT_CHAR             "#"
 // #define RLK_RECORD_LENGTH        160
-#define RLK_RECORD_LENGTH        164
+#define RLK_RECORD_LENGTH        171
 #define Q_WING                   20.0
 #define MILLI                    1.0E-03
 #define ANGSTROM_TO_NM           0.1
@@ -269,15 +269,27 @@ void readKuruczLines(char *inputFile)
 
         // DV: read orbital quantum numbers of levels 
         int Nread_l, li=-1, lj=-1;
-        bool_t got_orbital_numbers = FALSE;
-        Nread_l = sscanf(inputLine+160, "%1d %1d", &li, &lj);
+        double alpha, sigma;
+        // bool_t got_orbital_numbers = FALSE;
+        bool_t got_ABO_coeffs = FALSE;
+        Nread_l = sscanf(inputLine+160, "%lf %lf", &alpha, &sigma);
         if (Nread_l!=-1){
-          got_orbital_numbers = TRUE;
-          if (swap_levels){
-            SWAPDOUBLE(li, lj);
+          if (((alpha==0.0) || (alpha==1.0) || (alpha==2.0) || (alpha==3.0)) || ((sigma==0.0) || (sigma==1.0) || (sigma==2.0) || (sigma==3.0))){
+            // got_orbital_numbers = TRUE;
+            li = (int)alpha;
+            lj = (int)sigma;
+            if (swap_levels){
+              SWAPDOUBLE(li, lj);
+            }
+            rlk->li = li;
+            rlk->lj = lj;
           }
-          rlk->li = li;
-          rlk->lj = lj;
+          else{
+            got_ABO_coeffs = TRUE;
+            rlk->alpha = alpha;
+            rlk->cross = sigma;
+            getABOcross(rlk);
+          }
         }
 
         /* --- Get quantum numbers for angular momentum and spin -- - */
@@ -302,11 +314,12 @@ void readKuruczLines(char *inputFile)
 
         /* --- If possible use Barklem formalism --    -------------- */
 
-        useBarklem = FALSE;
+        // useBarklem = FALSE;
+        useBarklem = got_ABO_coeffs;
 
         // [DV] we use orbital quantum number (l) to determine the ABO cross section,
         // not the total angular momentum (L) from the term symbol.
-        if (got_orbital_numbers){
+        if (!got_ABO_coeffs){
           if ((rlk->li==0 && rlk->lj==1) || (rlk->li==1 && rlk->lj==0)){
             useBarklem = getBarklemcross(&bs_SP, rlk);
           }
