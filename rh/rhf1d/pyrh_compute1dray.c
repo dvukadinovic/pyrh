@@ -119,6 +119,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
   int argc = 1;
   char* argv[] = {};
@@ -151,6 +152,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // Kurucz list file
   concatenate(tmp, "/", input.KuruczData);
   concatenate(input.KuruczData, cwd, tmp);
+  free(tmp);
 
   // DV: override/set some parameters 
   // atoms and molecules can be NLTE (if HSE=TRUE, than everything is LTE)

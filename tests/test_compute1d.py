@@ -1,5 +1,4 @@
 import numpy as np
-# import matplotlib.pyplot as plt
 
 import pyrh
 
@@ -35,9 +34,14 @@ def get_spectra():
 	spec = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave)
 	# print(spec[0]/spec[0][0])
 	# print(spec[1]/spec[0][0])
+	# import matplotlib.pyplot as plt
+	# plt.plot(spec[0])
+	# plt.show()
+	# del spec
 
 atmos = np.loadtxt("falc.dat", skiprows=1).T
 atmos = spinor2multi(atmos)
+atmos[5] = 500
 
 scale = atmos[0]
 
@@ -46,12 +50,12 @@ atm_scale = 0 # tau
 
 old = atmos[2].copy()
 
-wave = np.linspace(630.25, 630.5, num=201)
+wave = np.linspace(630.25, 630.5, num=100)
 
 # 6.772 MB for 100it in 201 nw
 # it increases more with iterations than with wavelengths
 
-for _ in range(100):
+for _ in range(50):
 	get_spectra()
 
 # plt.plot(spec[-1], spec[0])

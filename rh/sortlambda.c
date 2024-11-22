@@ -216,8 +216,7 @@ void SortLambda(double* wavetable, int Nwave)
   }
   /* --- Allocate space for wavelength array and active sets -- ----- */
 
-  spectrum.lambda = (double *) realloc(spectrum.lambda,
-				       spectrum.Nspect*sizeof(double));
+  spectrum.lambda = (double *) realloc(spectrum.lambda, spectrum.Nspect*sizeof(double));
   spectrum.as = (ActiveSet *) malloc(spectrum.Nspect * sizeof(ActiveSet));
 
   /* --- Allocate space for wavelength dependendent opacities and 

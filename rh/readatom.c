@@ -895,6 +895,8 @@ void readAtomicModels(void)
   for (n = 0;  n < atmos.Natom;  n++)
     atmos.elements[atmos.atoms[n].periodic_table].model = &atmos.atoms[n];
 
+  free(tmp); free(tmp2);
+
   /* --- Redistribute the hydrogen populations read in with the
          atmosphere over the atmospheric Hydrogen model -- ---------- */
 

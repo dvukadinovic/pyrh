@@ -261,6 +261,8 @@ void readInput()
     theKeywords[36].set = TRUE;
   }
 
+  // free(tmp);
+
   /* --- Perform some sanity checks --                 -------------- */
 
   switch (topology) {

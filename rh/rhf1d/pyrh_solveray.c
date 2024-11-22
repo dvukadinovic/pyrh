@@ -147,14 +147,20 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
     }
     index += 1;
   }
+  for (int idl=0; idl<spectrum.Nspect-1; idl++) free_as(idl, FALSE);
+
   spec->nlw = Nlw;
 
-  // deallocate arrays
+  printf("Done!\n");
+
+  // deallocate Stokes spectrum
+  if (spectrum.lambda!=NULL) free(spectrum.lambda);
   if (spectrum.I!=NULL) freeMatrix((void **) spectrum.I);
   if (spectrum.Stokes_Q!=NULL) freeMatrix((void **) spectrum.Stokes_Q);
   if (spectrum.Stokes_U!=NULL) freeMatrix((void **) spectrum.Stokes_U);
   if (spectrum.Stokes_V!=NULL) freeMatrix((void **) spectrum.Stokes_V);
 
+  // deallocate J and J20
   if (spectrum.J!=NULL) freeMatrix((void **) spectrum.J);
   if (input.backgr_pol){
     if (spectrum.J20!=NULL) freeMatrix((void **) spectrum.J20);

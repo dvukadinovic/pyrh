@@ -968,6 +968,7 @@ void readMolecularModels(void)
 
     concatenate(tmp, input.pyrh_path, "/rh/Molecules/");
     concatenate(tmp2, tmp, filename);
+    // concatenate(filename, tmp2, "");
     strcpy(filename, tmp2);
 
     moleculeID = getMoleculeID(filename);
@@ -1031,6 +1032,7 @@ void readMolecularModels(void)
     } 
 
   }
+
   fclose(fp_molecules);
   
   /* --- Figure out for each element in which molecule it may be
@@ -1060,6 +1062,8 @@ void readMolecularModels(void)
   /* --- Allocate memory for H^- --                    -------------- */
 
   atmos.nHmin = (double *) malloc(atmos.Nspace * sizeof(double));
+
+  free(tmp); free(tmp2);
 
   getCPU(2, TIME_POLL, "Read molecular input");
 }
