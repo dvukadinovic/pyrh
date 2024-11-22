@@ -146,10 +146,17 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
       }
     }
     index += 1;
-    // for (int idz=0; idz<atmos.Nspace; idz++)
-    //   spec->J[idl,idz] = &spectrum.J[idz][idl];
   }
-  spec->J = spectrum.J;
   spec->nlw = Nlw;
-  // memcpy(spec->J, spectrum.J, (Nlw+1)*atmos.Nspace * sizeof(double));
+
+  // deallocate arrays
+  if (spectrum.I!=NULL) freeMatrix((void **) spectrum.I);
+  if (spectrum.Stokes_Q!=NULL) freeMatrix((void **) spectrum.Stokes_Q);
+  if (spectrum.Stokes_U!=NULL) freeMatrix((void **) spectrum.Stokes_U);
+  if (spectrum.Stokes_V!=NULL) freeMatrix((void **) spectrum.Stokes_V);
+
+  if (spectrum.J!=NULL) freeMatrix((void **) spectrum.J);
+  if (input.backgr_pol){
+    if (spectrum.J20!=NULL) freeMatrix((void **) spectrum.J20);
+  }
 }
