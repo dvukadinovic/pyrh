@@ -701,7 +701,7 @@ void freeAtom(Atom *atom)
          the case of LTE populations (see readAtom.c) -- ------------ */ 
 
   if (atom->n != atom->nstar)
-    if (atom->n != NULL) freeMatrix((void **) atom->n);
+  if (atom->n != NULL) freeMatrix((void **) atom->n);
   if (atom->nstar != NULL)  freeMatrix((void **) atom->nstar);
   if (atom->ntotal != NULL) free(atom->ntotal);
 

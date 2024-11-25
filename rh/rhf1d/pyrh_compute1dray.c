@@ -350,6 +350,10 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
+  if (atmos.Nrlk!=0) {
+    freePartitionFunction();
+  }
+
   freeAtoms();
   freeMolecules();
 
@@ -362,9 +366,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   freeOpacityEmissivity();
   if (input.get_atomic_rfs) freeOpacityEmissivityDer();
 
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
+  free(atmos.N);
+  free(atmos.nHmin);
 
   // free geometry related data
   if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;

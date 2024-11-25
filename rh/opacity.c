@@ -507,16 +507,8 @@ void free_as(int nspect, bool_t crosscoupling)
   as = &spectrum.as[nspect];
   nt = nspect % input.Nthreads;
 
-  // printf("To free! 1\n");
-  free(as->chi_c);
-  // printf("To free! 2\n");
-  free(as->eta_c);
-  // printf("To free! 3\n");
-  free(as->sca_c);
-  // printf("To free! 4\n");
+  // printf("%d\n", nspect);
   free(as->chi);
-  // printf("To free! 5\n");
-  printf("%d\n", nspect);
   free(as->eta);
 
   if (input.StokesMode == FULL_STOKES && input.magneto_optical) {
@@ -557,6 +549,11 @@ void free_as(int nspect, bool_t crosscoupling)
       }
     }
   }
+
+  free(as->Nlower);
+  free(as->Nupper);
+  // freeMatrix((void **) as->lower_levels);
+  // freeMatrix((void **) as->upper_levels);
   
   for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
     molecule = atmos.activemols[nact];

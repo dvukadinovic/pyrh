@@ -1027,6 +1027,7 @@ void freePartitionFunction()
 {
   free(atmos.Tpf);  atmos.Tpf = NULL;
   for (int n = 0;  n < atmos.Nelem;  n++) {
+    free(atmos.elements[n].mol_index);
     free(atmos.elements[n].ionpot);
     freeMatrix((void **) atmos.elements[n].pf);
     if (atmos.elements[n].n) freeMatrix((void **) atmos.elements[n].n);

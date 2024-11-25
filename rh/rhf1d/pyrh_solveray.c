@@ -140,6 +140,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
       spec->sV[index] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
     }
+    // free_as(idl, FALSE);
     if (input.get_atomic_rfs){
       for (int idp=0; idp<input.n_atomic_pars; idp++){
         spec->rfs[index][idp] = atmos.atomic_rfs[idl][0][idp];
@@ -147,11 +148,12 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
     }
     index += 1;
   }
-  for (int idl=0; idl<spectrum.Nspect-1; idl++) free_as(idl, FALSE);
+  // for (int idl=0; idl<spectrum.Nspect-3; idl++){
+  //   printf(" -- %d :: ", idl);
+  //   // free_as(idl, FALSE);
+  // }
 
   spec->nlw = Nlw;
-
-  printf("Done!\n");
 
   // deallocate Stokes spectrum
   if (spectrum.lambda!=NULL) free(spectrum.lambda);

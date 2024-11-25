@@ -453,6 +453,7 @@ void freeMolecules()
         input.solve_ne < ITERATION)
       freeMolecule(&atmos.molecules[n]);
     }
+    free(atmos.molecules);
 }
 
 /* ------- begin -------------------------- initMolLine.c ----------- */
