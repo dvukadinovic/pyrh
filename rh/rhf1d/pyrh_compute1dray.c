@@ -81,19 +81,27 @@ void concatenate(char* dest, char* str1, char* str2){
   strcat(dest, str2);
 }
 
-myRLK_Line get_RLK_lines(int argc, char *argv[])
+myRLK_Line get_RLK_lines()
 {
   myRLK_Line output;
+
+  int argc = 1;
+  char* argv[] = {};
+
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, ".", "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
   atmos.Stokes = TRUE;
   atmos.Nrlk = 0;
   setOptions(argc, argv);
   readInput();
-  readAbundance(&atmos);
-  readKuruczLines(input.KuruczData);
+  // readAbundance(&atmos);
+  // readKuruczLines(input.KuruczData);
 
-  output.rlk_lines = atmos.rlk_lines;
-  output.Nrlk = atmos.Nrlk;
+  // output.rlk_lines = atmos.rlk_lines;
+  // output.Nrlk = atmos.Nrlk;
 
   return output;
 }

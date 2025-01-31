@@ -564,6 +564,7 @@ void get_ne_from_nH(char *cwd,
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
   setOptions(argc, argv);
   getCPU(0, TIME_START, NULL);
@@ -587,6 +588,9 @@ void get_ne_from_nH(char *cwd,
   concatenate(tmp, "/", input.KuruczData);
   concatenate(input.KuruczData, cwd, tmp);
   // input.KuruczData = NULL;
+
+  free(tmp);
+
   atmos.Nrlk = 0;
 
   spectrum.updateJ = TRUE;

@@ -68,6 +68,11 @@ cdef class RH:
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+def test_me():
+	rh.get_RLK_lines()
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def get_ne_from_nH(cwd,
 					 int atm_scale,
 					 cnp.ndarray[double, ndim=1, mode="c"] scale,
