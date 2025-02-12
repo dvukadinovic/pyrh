@@ -91,7 +91,8 @@ typedef struct {
          // flag for computing semi-analytically the RFs for atomic line parameters
          get_atomic_rfs,
          LS_Lande, // flag for computing the Lande factors in LS
-         solve_NLTE; // flag if the solution is NLTE; its LTE for False
+         solve_NLTE, // flag if the solution is NLTE; its LTE for False
+         verbose; // flag to verbose if needed some information on reading Kurucz lines
   enum   solution startJ;
   
   enum   StokesMode StokesMode;

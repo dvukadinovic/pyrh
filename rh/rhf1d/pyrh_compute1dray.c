@@ -81,15 +81,36 @@ void concatenate(char* dest, char* str1, char* str2){
   strcat(dest, str2);
 }
 
-myRLK_Line get_RLK_lines(int argc, char *argv[])
+myRLK_Line get_RLK_lines(char *cwd)
 {
   myRLK_Line output;
 
+  char* keyword_input = malloc(160);
+  concatenate(keyword_input, cwd, "/keyword.input");
+  strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
+
   atmos.Stokes = TRUE;
   atmos.Nrlk = 0;
+
+  int argc = 1;
+  char* argv[] = {};
   setOptions(argc, argv);
+  
   readInput();
+
+  char* tmp = malloc(160);
+  concatenate(tmp, "/", input.atoms_input);
+  concatenate(input.atoms_input, cwd, tmp);
+  free(tmp);
+
+  // print out if we have ABO coeffs for each Kurucz line
+  input.verbose = TRUE;
+
   readAbundance(&atmos);
+  // needs H atomic weight to compute ABO coeffs...
+  readAtomicModels(); 
+
   readKuruczLines(input.KuruczData);
 
   output.rlk_lines = atmos.rlk_lines;
@@ -130,6 +151,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   SetFPEtraps();
 
   readInput();
+
+  input.verbose = FALSE;
 
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;

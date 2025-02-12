@@ -66,6 +66,10 @@ cdef class RH:
 			self.cwd[i_] = arr[i_]
 		# string2pointer(cwd, self.cwd[0])
 
+	def get_RLK_lines(self):
+		cdef rh.myRLK_Line lines
+		lines = rh.get_RLK_lines(self.cwd[0])
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def get_ne_from_nH(cwd,

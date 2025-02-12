@@ -184,7 +184,7 @@ void readKuruczLines(char *inputFile)
 
         initRLK(rlk);
 
-      	Nread = sscanf(inputLine, "%lf %lf %s %lf",
+        Nread = sscanf(inputLine, "%lf %lf %s %lf",
       		       &lambda_air, &gf, (char *) &elem_code, &Ei);
 
         /* --- Ionization stage and periodic table index -- --------- */
@@ -193,7 +193,7 @@ void readKuruczLines(char *inputFile)
 
         Nread += sscanf(inputLine+53, "%lf", &Ej);
 
-      	Ei = fabs(Ei) * (HPLANCK * CLIGHT) / CM_TO_M;
+        Ei = fabs(Ei) * (HPLANCK * CLIGHT) / CM_TO_M;
       	Ej = fabs(Ej) * (HPLANCK * CLIGHT) / CM_TO_M;
 
         /* --- Beware: the Kurucz linelist has upper and lower levels
@@ -260,8 +260,6 @@ void readKuruczLines(char *inputFile)
         }
       	rlk->Bji = CUBE(lambda0) / (2.0 * HPLANCK * CLIGHT) * rlk->Aji;
       	rlk->Bij = (rlk->gj / rlk->gi) * rlk->Bji;
-
-        line_index++;
 
         /* --- Store in nm --                          -------------- */
 
@@ -330,6 +328,17 @@ void readKuruczLines(char *inputFile)
             useBarklem = getBarklemcross(&bs_DF, rlk);
           }
         }
+
+        if (input.verbose) {
+          if (useBarklem)
+          {
+            printf(" Using ABO broadening for line -- %d @ %f\n", line_index+1, lambda_air);
+          } else {
+            printf(" No ABO broadening for line    -- %d @ %f\n", line_index+1, lambda_air);
+          }
+        }
+
+        line_index++;
 
       	/* --- Else use good old Unsoeld --            -------------- */
 

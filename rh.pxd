@@ -93,7 +93,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
 
-	cdef myRLK_Line get_RLK_lines(int argc, char *argv[])
+	cdef myRLK_Line get_RLK_lines(char *cwd)
 	# cdef void dummy(myRLK_Line *rlk_lines)
 
 	cdef void read_inputs(char *cwd, InputData *pyrh_input_data, Atmosphere *pyrh_atmos)
