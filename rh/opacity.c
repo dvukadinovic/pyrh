@@ -514,8 +514,7 @@ void free_as(int nspect, bool_t crosscoupling)
   if (input.StokesMode == FULL_STOKES && input.magneto_optical) {
     // if (atmos.backgrflags[nspect].ispolarized)
     //   free(as->chip_c);
-    if (containsPolarized(as))
-      free(as->chip);
+    if (containsPolarized(as)) free(as->chip);
   }
 
   for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
@@ -550,8 +549,10 @@ void free_as(int nspect, bool_t crosscoupling)
     }
   }
 
-  free(as->Nlower);
-  free(as->Nupper);
+  // DV: cannot free() these in NLTE mode...
+  // free(as->Nlower);
+  // free(as->Nupper);
+
   // freeMatrix((void **) as->lower_levels);
   // freeMatrix((void **) as->upper_levels);
   

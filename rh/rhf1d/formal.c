@@ -325,7 +325,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
   free_as(nspect, eval_operator);
   if (eval_operator) free(Psi);
 
-  free(chi); 
+  free(chi);
   if (solveStokes) {
     freeMatrix((void **) Ipol);
     freeMatrix((void **) Spol);
