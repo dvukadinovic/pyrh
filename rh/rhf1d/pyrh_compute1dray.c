@@ -113,8 +113,8 @@ myRLK_Line get_RLK_lines(char *cwd)
 
   readKuruczLines(input.KuruczData);
 
-  output.rlk_lines = atmos.rlk_lines;
-  output.Nrlk = atmos.Nrlk;
+  // output.rlk_lines = atmos.rlk_lines;
+  // output.Nrlk = atmos.Nrlk;
 
   return output;
 }

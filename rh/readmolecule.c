@@ -441,6 +441,9 @@ void freeMolecule(Molecule *molecule)
       freeMolLine(molecule->mrt + kr);
     free(molecule->mrt);
   }
+  // molecule->Nelement = NULL;
+  // free(molecule->qNelement);
+  // molecule->N = NULL;
 }
 /* ------- end ---------------------------- freeMolecule.c ---------- */
 

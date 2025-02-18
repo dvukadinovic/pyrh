@@ -261,7 +261,7 @@ void readInput()
     theKeywords[36].set = TRUE;
   }
 
-  // free(tmp);
+  free(tmp);
 
   /* --- Perform some sanity checks --                 -------------- */
 

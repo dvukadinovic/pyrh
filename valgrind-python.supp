@@ -55,7 +55,7 @@
 }
 
 {
-   Suppress leaking the autoTLSkey.  This looks like it shouldn't leak though.
+   Suppress leaking the autoTLSkey.  This looks like it should not leak though.
    Memcheck:Leak
    fun:malloc
    fun:PyThread_create_key
