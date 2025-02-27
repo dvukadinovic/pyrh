@@ -46,6 +46,14 @@ cdef void string2pointer(string, char* c_char_pointer):
 	for i_ in range(argc):
 		c_char_pointer[i_] = arr[i_]
 
+class Populations(object):
+	def __init__(self, ID, nlevel, nz, n, nstar):
+		self.ID = ID
+		self.nlevel = nlevel
+		self.nz = nz
+		self.n = n
+		self.nstar = nstar
+
 cdef class RH:
 	cdef char* cwd[160]
 
@@ -191,7 +199,8 @@ def compute1d(cwd,
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values=None,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
-				get_atomic_rfs=False):
+				get_atomic_rfs=False,
+				get_populations=False):
 	cdef int Ndep = atmosphere.shape[1]
 	cdef int Nwave = wave.size
 	
@@ -231,11 +240,14 @@ def compute1d(cwd,
 		lam_ids_ptr = &lam_ids[0]
 		lam_values_ptr = &lam_values[0]
 
+	rh_get_atomic_rfs = 0
 	if get_atomic_rfs:
 		rh_get_atomic_rfs = 1
-	else:
-		rh_get_atomic_rfs = 0
-
+	
+	rh_get_populations = 0
+	if get_populations:
+		rh_get_populations = 1
+	
 	cdef char* argv[140]
 
 	py_list = cwd.split(" ")
@@ -254,7 +266,7 @@ def compute1d(cwd,
 			 fudge_num, fudge_wave_ptr, fudge_value_ptr,
 			 Nloggf, loggf_ids_ptr, loggf_values_ptr,
 			 Nlam, lam_ids_ptr, lam_values_ptr,
-			 rh_get_atomic_rfs,
+			 rh_get_atomic_rfs, rh_get_populations,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
@@ -267,11 +279,28 @@ def compute1d(cwd,
 		sU = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sU)
 		sV = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sV)
 
+	output = sI, sQ, sU, sV, lam
+
+	if get_populations:
+		populations = ()#[None]*spec.Nactive_atoms
+		for ida in range(spec.Nactive_atoms):
+			n = convert_2d(spec.atom_pops[ida].n, spec.atom_pops[ida].Nlevel, spec.atom_pops[ida].Nz)
+			nstar = convert_2d(spec.atom_pops[ida].nstar, spec.atom_pops[ida].Nlevel, spec.atom_pops[ida].Nz)
+			populations += Populations(
+									ID=spec.atom_pops[ida].ID,
+									nlevel=spec.atom_pops[ida].Nlevel,
+									nz=spec.atom_pops[ida].Nz,
+									n=n,
+									nstar=nstar
+									)
+
 	if get_atomic_rfs:
 		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
+		output += rf
 
-		return sI, sQ, sU, sV, lam, rf
+	if get_populations:
+		output += populations
 
 	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
-	return sI, sQ, sU, sV, lam
+	return output

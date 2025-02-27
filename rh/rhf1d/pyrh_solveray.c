@@ -167,4 +167,21 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   if (input.backgr_pol){
     if (spectrum.J20!=NULL) freeMatrix((void **) spectrum.J20);
   }
+
+  Atom *atom;
+
+  if (input.get_populations){
+    spec->atom_pops = malloc(atmos.Nactiveatom * sizeof(AtomPops));
+    spec->Nactive_atoms = atmos.Nactiveatom;
+    for (int nact = 0;  nact < atmos.Nactiveatom;  nact++) {
+      atom = atmos.activeatoms[nact];
+
+      // spec->atom_pops[nact].ID = atom->ID;
+      strcpy(&spec->atom_pops[nact].ID[0], &atom->ID[0]);
+      spec->atom_pops[nact].Nlevel = atom->Nlevel;
+      spec->atom_pops[nact].Nz = atmos.Nspace;
+      spec->atom_pops[nact].n = atom->n;
+      spec->atom_pops[nact].nstar = atom->nstar;
+    } 
+  }
 }

@@ -92,7 +92,8 @@ typedef struct {
          get_atomic_rfs,
          LS_Lande, // flag for computing the Lande factors in LS
          solve_NLTE, // flag if the solution is NLTE; its LTE for False
-         verbose; // flag to verbose if needed some information on reading Kurucz lines
+         verbose, // flag to verbose if needed some information on reading Kurucz lines
+         get_populations; // flag if need to retrieve also the level populations of Active atoms
   enum   solution startJ;
   
   enum   StokesMode StokesMode;

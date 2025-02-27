@@ -128,7 +128,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
-              int get_atomic_rfs,
+              int get_atomic_rfs, int get_populations,
               int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
 {
@@ -153,6 +153,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   readInput();
 
   input.verbose = FALSE;
+
+  input.get_populations = get_populations;
 
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;

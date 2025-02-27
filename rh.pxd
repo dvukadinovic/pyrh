@@ -63,10 +63,18 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		int Nrlk
 		RLK_Line *rlk_lines
 
+	ctypedef struct AtomPops:
+		char ID[10]
+		int Nlevel
+		int Nz
+		double **n
+		double **nstar
+
 	ctypedef struct mySpectrum:
 		int nlw
 		int Nrays
 		int stokes
+		int Nactive_atoms
 		double *lam
 		double *sI
 		double *sQ
@@ -74,6 +82,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sV
 		double **J
 		double **rfs
+		AtomPops *atom_pops
 
 	ctypedef struct AtMol:
 		pass
@@ -89,7 +98,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int fudge_num, double *fudge_lam, double *fudge,
 			int Nloggf, int *loggf_ids, double* loggf_values,
 			int Nlam, int *lam_ids, double *lam_values,
-			int get_atomic_rfs,
+			int get_atomic_rfs, int get_populations,
 			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
 
