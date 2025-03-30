@@ -1,0 +1,1 @@
+void read_atom_model(char *cwd, char *filename);

@@ -260,8 +260,10 @@ void readInput()
     concatenate(input.pfData, tmp, "pf_Kurucz.input");
     theKeywords[36].set = TRUE;
   }
-
+  
   free(tmp);
+
+  input.read_atom_model = FALSE;
 
   /* --- Perform some sanity checks --                 -------------- */
 

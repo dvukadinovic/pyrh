@@ -133,3 +133,6 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 					int pyrh_atm_scale, int pyrh_Ndep, 
                     double *pyrh_scale, double *pyrh_temp, 
                     double *pyrh_nH, double *pyrh_ne)
+
+cdef extern from "rh/rhf1d/pyrh_read_input.h":
+	cdef void read_atom_model(char *cwd, char *filename)

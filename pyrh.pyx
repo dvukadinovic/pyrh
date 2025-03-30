@@ -78,6 +78,18 @@ cdef class RH:
 		cdef rh.myRLK_Line lines
 		lines = rh.get_RLK_lines(self.cwd[0])
 
+	def read_atom(self, atom_file_name):
+		cdef char* pyrh_atom_file_name[100]
+		
+		py_list = atom_file_name.split(" ")
+		argc = len(py_list)
+		py_string = [item.encode("utf-8") for item in py_list]
+		arr = (ctypes.c_char_p * argc)(*py_string)
+		for i_ in range(argc):
+			pyrh_atom_file_name[i_] = arr[i_]
+
+		rh.read_atom_model(self.cwd[0], pyrh_atom_file_name[0])
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def get_ne_from_nH(cwd,

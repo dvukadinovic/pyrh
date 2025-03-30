@@ -68,7 +68,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
           symmStr[20], optionStr[20], labelStr[MAX_LINE_SIZE];
   bool_t  Debeye, exit_on_EOF, match;
   int     i, j, Nlevel, Nrad, Nline, Ncont, Nfixed, dummy, // HNS: rh change
-          Nspace = atmos.Nspace,
+          Nspace,
           Nread, Nrequired, checkPoint, L, nq, status;
   double  f, C, lambda0, lambdamin, vtherm, S, Ju, Jl,
     c_sum, waveratio, lambda_air;
@@ -77,24 +77,31 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   AtomicContinuum *continuum;
   FixedTransition *fixed;
 
+  if (!input.read_atom_model) Nspace = atmos.Nspace;
+
   getCPU(3, TIME_START, NULL);
 
   C = 2*PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
+
 
   /* --- Open the data file for current model atom --  -------------- */
 
   // If we are performing HSE, we set all atoms to LTE (PASSIVE state)
   if (input.pyrhHSE) active = FALSE;
+  
+  if (input.read_atom_model) printf("  Reading atomic model --> %s\n", atom_file);
 
   initAtom(atom);
-  if ((atom->fp_input = fopen(atom_file, "r")) == NULL) {
-    sprintf(messageStr, "Unable to open input file %s", atom_file);
-    Error(ERROR_LEVEL_2, routineName, atom_file);
-  } else {
-    sprintf(messageStr, " -- reading input file: %s %s",
-	    atom_file, (active) ? "(active)\n\n" : "(passive)\n");
-    Error(MESSAGE, routineName, messageStr);
-  }
+  // if ((atom->fp_input = fopen(atom_file, "r")) == NULL) {
+  //   sprintf(messageStr, "Unable to open input file %s", atom_file);
+  //   Error(ERROR_LEVEL_2, routineName, atom_file);
+  // } else {
+  //   sprintf(messageStr, " -- reading input file: %s %s",
+	//     atom_file, (active) ? "(active)\n\n" : "(passive)\n");
+  //   Error(MESSAGE, routineName, messageStr);
+  // }
+  return ;
+  atom->fp_input = fopen(atom_file, "r");
   atom->active = active;
 
   /* --- Read atom ID and convert to uppercase --     -------------- */
@@ -105,7 +112,8 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   for (n = 0;  n < (int) strlen(atom->ID);  n++)
     atom->ID[n] = toupper(atom->ID[n]);
   if (strlen(atom->ID) == 1) strcat(atom->ID, " ");
- 
+
+
   /* --- NOTE: atomic weight and abundance are read from the 
          abundance input file (abundance.input by default).
  
@@ -117,10 +125,10 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   for (n = 0;  n < atmos.Nelem;  n++) {
     if (strstr(atmos.elements[n].ID, atom->ID)) {
       if (atmos.elements[n].abundance_set) {
-	atom->periodic_table = n;
-	atom->abundance = atmos.elements[n].abund;
-	atom->weight    = atmos.elements[n].weight;
-	match = TRUE;
+      	atom->periodic_table = n;
+      	atom->abundance = atmos.elements[n].abund;
+      	atom->weight    = atmos.elements[n].weight;
+      	match = TRUE;
       }
       break;
     }
@@ -132,6 +140,8 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
     Error(ERROR_LEVEL_2, routineName, messageStr);
   }
 
+  printf("Got it\n");
+
   /* --- Get Number of levels, lines fixed transitions, and continua  */
  
   getLine(atom->fp_input, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
@@ -141,6 +151,8 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   Nlevel = atom->Nlevel;
   Nline  = atom->Nline;  Ncont  = atom->Ncont;  Nrad = Nline + Ncont;
   Nfixed = atom->Nfixed;
+
+    printf("Got it\n");
 
   atom->E = (double *) malloc(Nlevel * sizeof(double));
   atom->g = (double *) malloc(Nlevel * sizeof(double));
@@ -167,6 +179,9 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
     atom->E[i] *= (HPLANCK * CLIGHT) / CM_TO_M;
   }
+
+    printf("Got it\n");
+
   if (atom->stage[Nlevel-1] != (atom->stage[Nlevel-2] + 1)) {
     sprintf(messageStr,
 	    "Atomic model %s in file %s does not have overlying continuum",
@@ -174,20 +189,24 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
     Error(ERROR_LEVEL_2, routineName, messageStr);
   }
 
-  atom->nstar  = matrix_double(Nlevel, Nspace);
-  atom->ntotal = (double *) malloc(Nspace * sizeof(double));
+  if (!input.read_atom_model){
+    atom->nstar  = matrix_double(Nlevel, Nspace);
+    atom->ntotal = (double *) malloc(Nspace * sizeof(double));
 
-  for (k = 0;  k < Nspace;  k++)
-    atom->ntotal[k] = atom->abundance * atmos.nHtot[k];
+    for (k = 0;  k < Nspace;  k++)
+      atom->ntotal[k] = atom->abundance * atmos.nHtot[k];
+  }
 
   /* --- Ratio of thermal velocity and speed of light for use in
          Doppler width for this particular atomic weight --  -------- */
 
-  if (atom->Nline > 0) {
-    atom->vbroad = (double *) malloc(Nspace * sizeof(double));
-    vtherm = 2.0*KBOLTZMANN/(AMU * atom->weight);
-    for (k = 0;  k < Nspace;  k++)
-      atom->vbroad[k] = sqrt(vtherm*atmos.T[k] + SQ(atmos.vturb[k]));
+  if (!input.read_atom_model){
+    if (atom->Nline > 0) {
+      atom->vbroad = (double *) malloc(Nspace * sizeof(double));
+      vtherm = 2.0*KBOLTZMANN/(AMU * atom->weight);
+      for (k = 0;  k < Nspace;  k++)
+        atom->vbroad[k] = sqrt(vtherm*atmos.T[k] + SQ(atmos.vturb[k]));
+    }
   }
 
   /* --- Check validity of input.isum for active atom -- ------------ */
@@ -318,8 +337,10 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
       /* --- Allocate space for up- and downward radiative rates -- - */
 
-      line->Rij = (double *) malloc(Nspace * sizeof(double));
-      line->Rji = (double *) malloc(Nspace * sizeof(double));
+      if (!input.read_atom_model){
+        line->Rij = (double *) malloc(Nspace * sizeof(double));
+        line->Rji = (double *) malloc(Nspace * sizeof(double));
+      }
 
       /* --- Initialize the mutex lock for the radiative rates if there
              is more than one thread --                -------------- */
@@ -354,6 +375,8 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
+  printf("Got lines\n");
+  
   /* --- Go through the bound-free transitions --      -------------- */
 
   atom->continuum =
@@ -415,8 +438,10 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
       /* --- Allocate space for up- and downward radiative rates -- - */
 
-      continuum->Rij = (double *) malloc(Nspace * sizeof(double));
-      continuum->Rji = (double *) malloc(Nspace * sizeof(double));
+      if (!input.read_atom_model){
+        continuum->Rij = (double *) malloc(Nspace * sizeof(double));
+        continuum->Rji = (double *) malloc(Nspace * sizeof(double));
+      }
 
       /* --- Initialize the mutex lock for the radiative rates if there
              is more than one thread --                -------------- */
@@ -430,6 +455,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
+  printf("Got contiuum \n");
 
   /* --- Go through fixed transitions --               -------------- */
 
@@ -488,7 +514,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
-
+    printf("Got fixed\n");
   if (atom->active) {
 
       atom->popsoutFile = (char *) malloc(12 * sizeof(char));
@@ -547,7 +573,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
            for populations --                          -------------- */
 
     for (kr = 0;  kr < Nline;  kr++) getLambda(atom->line + kr);
-    atom->n = matrix_double(Nlevel, Nspace);
+    if (!input.read_atom_model) atom->n = matrix_double(Nlevel, Nspace);
 
     /* --- Allocate space for thread dependent quantities -- -------- */
 
@@ -558,7 +584,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
            space for rate coefficients --               ------------- */
 
     atom->offset_coll = ftell(atom->fp_input);
-    atom->C = matrix_double(SQ(Nlevel), Nspace);
+    if (!input.read_atom_model) atom->C = matrix_double(SQ(Nlevel), Nspace);
 
   } else {
 
@@ -592,9 +618,11 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
     fclose(atom->fp_input);
   }
 
-  sprintf(labelStr, "Read %s %2s",
-	  (atom->active) ? "Active" : "Atom", atom->ID);
-  getCPU(3, TIME_POLL, labelStr);
+    printf("Got active\n");
+
+  // sprintf(labelStr, "Read %s %2s",
+	//   (atom->active) ? "Active" : "Atom", atom->ID);
+  // getCPU(3, TIME_POLL, labelStr);
 } 
 /* ------- end ---------------------------- readAtom.c -------------- */
 
