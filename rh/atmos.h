@@ -29,6 +29,19 @@
 enum angleset  {SET_VERTICAL, SET_GL, SET_A2, SET_A4, SET_A6, SET_A8,
 		SET_B4,	SET_B6, SET_B8, NO_SET};
 
+// enum PERIODIC_SYSTEM_OF_ELEMENTS {"H",  "HE",
+//                      "LI", "BE", "B",  "C",  "N",  "O",  "F",  "NE", \
+//                      "NA", "MG", "AL", "SI", "P",  "S",  "CL", "AR", \
+//                      "K",  "CA", "SC", "TI", "V",  "CR", "MN", "FE", "CO", "NI", "CU", "ZN", \
+//                      "GA", "GE", "AS", "SE", "BR", "KR", \
+//                      "RB", "SR", "Y",  "ZR", "NB", "MO", "TC", "RU", "RH", "PD", "AG", "CD", \
+//                      "IN", "SN", "SB", "TE", "I",  "XE", \
+//                      "CS", "BA", \
+//                      "LA", "CE", "PR", "ND", "PM", "SM", "EU", "GD", "TB", "DY", "HO", "ER", "TM", "YB", "LU", \
+//                      "HF", "TA", "W",  "RE", "OS", "IR", "PT", "AU", "HG", "TL", "PB", "BI", "PO", "AT", "RN", \
+//                      "FR", "RA", \
+//                      "AC", "TH", "PA", "U", "NP", "PU", "AM", "CM", "BK", "CF", "ES", "FM"};
+
 typedef struct {
   bool_t hasline;
   bool_t ispolarized;
@@ -68,7 +81,7 @@ typedef struct {
 /* --- Associated function prototypes --               -------------- */
 
 void  freeAtmos(Atmosphere *atmos);
-void  readAbundance(Atmosphere *atmos);
+void  readAbundance(Atmosphere *atmos, int Nabun, int *atomic_id, double *atomic_abundance);
 void  writeAtmos(Atmosphere *atmos);
 void  Solve_ne(double *ne, bool_t fromscratch);
 void  initAngleSet(AngleSet *angleSet);

@@ -22,17 +22,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "statistics.h"
-#include "inputs.h"
-#include "error.h"
-#include "xdr.h"
+#include "../spectrum.h"
+#include "../statistics.h"
+#include "../inputs.h"
+#include "../error.h"
+#include "../../headers/xdr.h"
 
-#include "constant.h"
+#include "../constant.h"
 
 #include "pyrh_hse.h"
 #include "pyrh_background.h"
@@ -68,7 +68,8 @@ void hse(char* cwd, int pyrh_Ndep,
            double *pyrh_scale, double *pyrh_temp,
            double *pyrh_ne, double *pyrh_nHtot, double *pyrh_rho, double *pyrh_pg,
            int pyrh_atm_scale, 
-           int fudge_num, double *fudge_lam, double *fudge)
+           int fudge_num, double *fudge_lam, double *fudge,
+           int Nabun, int *abundance_id, double *abundance_value)
 {
   bool_t  equilibria_only, fromscratch;
   int     k, iter, index, layer;
@@ -146,7 +147,7 @@ void hse(char* cwd, int pyrh_Ndep,
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  MULTIatmos(&atmos, &geometry, Nabun, abundance_id, abundance_value);
   
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
@@ -402,7 +403,8 @@ void hse(char* cwd, int pyrh_Ndep,
 void get_scales(char *cwd, int pyrh_Ndep,
                double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
                double *pyrh_nH, int pyrh_atm_scale, 
-               double lam_ref, double *tau, double *height, double *cmass)
+               double lam_ref, double *tau, double *height, double *cmass,
+               int Nabun, int *abundance_id, double *abundance_value)
 {
   /* --- Read input data and initialize --             -------------- */
   int argc = 1;
@@ -447,7 +449,7 @@ void get_scales(char *cwd, int pyrh_Ndep,
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  MULTIatmos(&atmos, &geometry, Nabun, abundance_id, abundance_value);
 
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
@@ -601,7 +603,7 @@ void get_ne_from_nH(char *cwd,
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  MULTIatmos(&atmos, &geometry, 0, NULL, NULL);
 
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;

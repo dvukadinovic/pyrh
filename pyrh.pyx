@@ -130,9 +130,10 @@ def hse(cwd,
 		double pg_top=0.1,
 		cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 		cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
+		cnp.ndarray[int, ndim=1, mode="c"] atomic_number=None,
+		cnp.ndarray[double, ndim=1, mode="c"] atomic_abundance=None,
 		full_output=False):
 	cdef int Ndep = scale.size
-	cdef int fudge_num
 
 	cdef char* argv[140]
 
@@ -149,19 +150,35 @@ def hse(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	if (fudge_wave is None) or (fudge_value is None):
-		rh.hse(argv[0], Ndep,
-				&scale[0], &temp[0],
-				&ne[0], &nHtot[0], &rho[0], &pg[0],
-				atm_scale,
-				0, NULL, NULL)
-	else:
+	#--- fudge pointers
+	cdef int fudge_num = 0
+	cdef double* fudge_wave_ptr = NULL
+	cdef double* fudge_value_ptr = NULL
+	
+	if (fudge_wave is not None) or (fudge_value is not None):
 		fudge_num = fudge_wave.size
-		rh.hse(argv[0], Ndep,
-				&scale[0], &temp[0],
-				&ne[0], &nHtot[0], &rho[0], &pg[0],
-				atm_scale,
-				fudge_num, &fudge_wave[0], &fudge_value[0,0])
+		fudge_wave_ptr = &fudge_wave[0]
+		fudge_value_ptr = &fudge_value[0,0]
+
+	#--- abundance pointers
+	cdef int Nabun = 0
+	cdef int* abundance_id_ptr = NULL
+	cdef double* abundance_value_ptr = NULL
+
+	if (atomic_number is not None) and (atomic_abundance is not None):
+		Nabun = atomic_number.shape[0]
+		if (Nabun!=atomic_abundance.shape[0]):
+			print("\n  pyrh: Different number of 'atomic_number' and 'atomic_abundance'.\n")
+			sys.exit()
+		abundance_id_ptr = &atomic_number[0]
+		abundance_value_ptr = &atomic_abundance[0]
+
+	rh.hse(argv[0], Ndep,
+			&scale[0], &temp[0],
+			&ne[0], &nHtot[0], &rho[0], &pg[0],
+			atm_scale,
+			fudge_num, fudge_wave_ptr, fudge_value_ptr,
+			Nabun, abundance_id_ptr, abundance_value_ptr)
 
 	if full_output:
 		return ne, nHtot, rho, pg
@@ -170,11 +187,13 @@ def hse(cwd,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef get_scales(cwd,
+def get_scales(cwd,
 			  int atm_scale,
 			  cnp.ndarray[double, ndim=1, mode="c"] scale,
 			  cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
-			  double lam_ref):
+			  double lam_ref,
+			  cnp.ndarray[int, ndim=1, mode="c"] atomic_number=None,
+			  cnp.ndarray[double, ndim=1, mode="c"] atomic_abundance=None):
 	cdef int Ndep = atmosphere.shape[1]
 
 	cdef char* argv[140]
@@ -190,11 +209,25 @@ cpdef get_scales(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
+	#--- abundance pointers
+	cdef int Nabun = 0
+	cdef int* abundance_id_ptr = NULL
+	cdef double* abundance_value_ptr = NULL
+
+	if (atomic_number is not None) and (atomic_abundance is not None):
+		Nabun = atomic_number.shape[0]
+		if (Nabun!=atomic_abundance.shape[0]):
+			print("\n  pyrh: Different number of 'atomic_number' and 'atomic_abundance'.\n")
+			sys.exit()
+		abundance_id_ptr = &atomic_number[0]
+		abundance_value_ptr = &atomic_abundance[0]
+
 	rh.get_scales(argv[0], Ndep,
 				 &scale[0], &atmosphere[1,0], 
 				 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
 				 &atmosphere[8,0], atm_scale,
-				 lam_ref, &tau[0], &height[0], &cmass[0])
+				 lam_ref, &tau[0], &height[0], &cmass[0],
+				 Nabun, abundance_id_ptr, abundance_value_ptr)
 
 	return tau, height, cmass
 
@@ -211,6 +244,8 @@ def compute1d(cwd,
 				cnp.ndarray[double, ndim=1, mode="c"] lam_values=None,
 				cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 				cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
+				cnp.ndarray[int, ndim=1, mode="c"] atomic_number=None,
+				cnp.ndarray[double, ndim=1, mode="c"] atomic_abundance=None,
 				get_atomic_rfs=False,
 				get_populations=False):
 	cdef int Ndep = atmosphere.shape[1]
@@ -234,7 +269,7 @@ def compute1d(cwd,
 	if (loggf_ids is not None) and (loggf_values is not None):
 		Nloggf = loggf_ids.shape[0]
 		if (Nloggf!=loggf_values.shape[0]):
-			print("\n  pyrh: Different number of loggf_ids and loggf_values.\n")
+			print("\n  pyrh: Different number of 'loggf_ids' and 'loggf_values'.\n")
 			sys.exit()
 		loggf_ids_ptr = &loggf_ids[0]
 		loggf_values_ptr = &loggf_values[0]
@@ -247,10 +282,23 @@ def compute1d(cwd,
 	if (lam_ids is not None) and (lam_values is not None):
 		Nlam = lam_ids.shape[0]
 		if (Nlam!=lam_values.shape[0]):
-			print("\n  pyrh: Different number of lam_ids and lam_values.\n")
+			print("\n  pyrh: Different number of 'lam_ids' and 'lam_values'.\n")
 			sys.exit()
 		lam_ids_ptr = &lam_ids[0]
 		lam_values_ptr = &lam_values[0]
+
+	#--- abundance pointers
+	cdef int Nabun = 0
+	cdef int* abundance_id_ptr = NULL
+	cdef double* abundance_value_ptr = NULL
+
+	if (atomic_number is not None) and (atomic_abundance is not None):
+		Nabun = atomic_number.shape[0]
+		if (Nabun!=atomic_abundance.shape[0]):
+			print("\n  pyrh: Different number of 'atomic_number' and 'atomic_abundance'.\n")
+			sys.exit()
+		abundance_id_ptr = &atomic_number[0]
+		abundance_value_ptr = &atomic_abundance[0]
 
 	rh_get_atomic_rfs = 0
 	if get_atomic_rfs:
@@ -278,6 +326,7 @@ def compute1d(cwd,
 			 fudge_num, fudge_wave_ptr, fudge_value_ptr,
 			 Nloggf, loggf_ids_ptr, loggf_values_ptr,
 			 Nlam, lam_ids_ptr, lam_values_ptr,
+			 Nabun, abundance_id_ptr, abundance_value_ptr,
 			 rh_get_atomic_rfs, rh_get_populations,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)

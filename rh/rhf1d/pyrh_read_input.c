@@ -39,7 +39,7 @@ void read_atom_model(char *cwd, char *filename){
   input.pyrhHSE = FALSE;
   input.read_atom_model = TRUE;
 
-  readAbundance(&atmos);
+  readAbundance(&atmos, 0, NULL, NULL);
   
   concatenate(tmp, "/rh/Atoms/", filename);
   concatenate(absolute_path, input.pyrh_path, tmp);

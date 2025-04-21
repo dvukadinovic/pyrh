@@ -98,6 +98,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 			int fudge_num, double *fudge_lam, double *fudge,
 			int Nloggf, int *loggf_ids, double* loggf_values,
 			int Nlam, int *lam_ids, double *lam_values,
+			int Nabun, int *abundance_id, double *abundance_value,
 			int get_atomic_rfs, int get_populations,
 			int NKurucz_lists, char *Kurucz_lists)
 	# myRLK_Line *pyrh_rlk_lines,
@@ -120,14 +121,16 @@ cdef extern from "rh/rhf1d/pyrh_hse.h":
 					double *rh_scale, double *rh_temp,
 					double *rh_ne, double *rh_nHtot, double *rh_rho, double *rh_pg, 
 					int atm_scale,
-					int fudge_num, double *fudge_lam, double *fudge)
+					int fudge_num, double *fudge_lam, double *fudge,
+					int Nabun, int *abundance_id, double *abundance_value)
 
 	# cdef void dummy()
 
 	cdef void get_scales(char *cwd, int pyrh_Ndep,
 			              double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
 			              double *pyrh_nH, int pyrh_atm_scale, 
-			              double lam_ref, double *tau, double *height, double *cmass)
+			              double lam_ref, double *tau, double *height, double *cmass,
+						  int Nabun, int *abundance_id, double *abundance_value,)
 
 	cdef void get_ne_from_nH(char *cwd, 
 					int pyrh_atm_scale, int pyrh_Ndep, 

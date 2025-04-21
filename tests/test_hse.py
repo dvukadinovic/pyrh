@@ -41,7 +41,10 @@ atm_scale = 0 # tau
 
 old = atmos[2].copy()
 
-ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1])
+atomic_number = np.array([26], dtype=np.int32)
+atomic_abundance = np.array([7], dtype=np.float64)
+
+ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1], atomic_number=atomic_number, atomic_abundance=atomic_abundance)
 
 plt.plot(scale, old)
 plt.plot(scale, ne/1e6)

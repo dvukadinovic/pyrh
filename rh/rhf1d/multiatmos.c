@@ -17,25 +17,20 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "background.h"
-#include "constant.h"
-#include "error.h"
-#include "inputs.h"
-#include "statistics.h"
-#include "xdr.h"
-
+#include "../spectrum.h"
+#include "../background.h"
+#include "../constant.h"
+#include "../error.h"
+#include "../inputs.h"
+#include "../statistics.h"
+#include "../../headers/xdr.h"
 
 #define MULTI_COMMENT_CHAR  "*"
 #define N_HYDROGEN_MULTI     6
-
-
-/* --- Function prototypes --                          -------------- */
-
 
 /* --- Global variables --                             -------------- */
 
@@ -43,10 +38,9 @@ extern Spectrum spectrum;
 extern InputData input;
 extern char messageStr[];
 
-
 /* ------- begin -------------------------- MULTIatmos.c ------------ */
 
-void MULTIatmos(Atmosphere *atmos, Geometry *geometry)
+void MULTIatmos(Atmosphere *atmos, Geometry *geometry, int Nabun, int *atomic_id, double *atomic_abundance)
 {
   const char routineName[] = "MULTIatmos";
   register int k, n, mu;
@@ -60,7 +54,7 @@ void MULTIatmos(Atmosphere *atmos, Geometry *geometry)
 
   /* --- Get abundances of background elements --        ------------ */
  
-  readAbundance(atmos);
+  readAbundance(atmos, Nabun, atomic_id, atomic_abundance);
 
   atmos->NHydr = N_HYDROGEN_MULTI;
 

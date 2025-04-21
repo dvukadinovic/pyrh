@@ -16,7 +16,7 @@
        --                                              -------------- */
 
 #include <stdio.h> 
-#include <../headers/types.h>
+#include "../headers/types.h"
 #include <pthread.h>
 
 enum Topology       {ONE_D_PLANE, TWO_D_PLANE, SPHERICAL_SYMMETRIC,

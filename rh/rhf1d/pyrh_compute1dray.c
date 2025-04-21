@@ -22,16 +22,16 @@
 // #include <stdio.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "background.h"
-#include "statistics.h"
+#include "../spectrum.h"
+#include "../background.h"
+#include "../statistics.h"
 #include "error.h"
-#include "xdr.h"
-#include "constant.h"
+#include "../../headers/xdr.h"
+#include "../constant.h"
 
 #include "pyrh_compute1dray.h"
 
@@ -107,7 +107,7 @@ myRLK_Line get_RLK_lines(char *cwd)
   // print out if we have ABO coeffs for each Kurucz line
   input.verbose = TRUE;
 
-  readAbundance(&atmos);
+  readAbundance(&atmos, 0, NULL, NULL);
   // needs H atomic weight to compute ABO coeffs...
   readAtomicModels(); 
 
@@ -128,6 +128,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
+              int Nabun, int *atomic_id, double *atomic_abundance,
               int get_atomic_rfs, int get_populations,
               int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
@@ -239,7 +240,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  MULTIatmos(&atmos, &geometry, Nabun, atomic_id, atomic_abundance);
   atmos.active_layer = -1;
   
   if (pyrh_atm_scale==0){
