@@ -100,7 +100,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 	//     atom_file, (active) ? "(active)\n\n" : "(passive)\n");
   //   Error(MESSAGE, routineName, messageStr);
   // }
-  return ;
   atom->fp_input = fopen(atom_file, "r");
   atom->active = active;
 
@@ -140,8 +139,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
     Error(ERROR_LEVEL_2, routineName, messageStr);
   }
 
-  printf("Got it\n");
-
   /* --- Get Number of levels, lines fixed transitions, and continua  */
  
   getLine(atom->fp_input, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
@@ -151,8 +148,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   Nlevel = atom->Nlevel;
   Nline  = atom->Nline;  Ncont  = atom->Ncont;  Nrad = Nline + Ncont;
   Nfixed = atom->Nfixed;
-
-    printf("Got it\n");
 
   atom->E = (double *) malloc(Nlevel * sizeof(double));
   atom->g = (double *) malloc(Nlevel * sizeof(double));
@@ -179,8 +174,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
     atom->E[i] *= (HPLANCK * CLIGHT) / CM_TO_M;
   }
-
-    printf("Got it\n");
 
   if (atom->stage[Nlevel-1] != (atom->stage[Nlevel-2] + 1)) {
     sprintf(messageStr,
@@ -375,8 +368,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
-  printf("Got lines\n");
-  
+
   /* --- Go through the bound-free transitions --      -------------- */
 
   atom->continuum =
@@ -455,8 +447,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
-  printf("Got contiuum \n");
-
+  
   /* --- Go through fixed transitions --               -------------- */
 
   if (atom->Nfixed > 0) {
@@ -514,7 +505,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       }
     }
   }
-    printf("Got fixed\n");
+
   if (atom->active) {
 
       atom->popsoutFile = (char *) malloc(12 * sizeof(char));
@@ -617,8 +608,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
     fclose(atom->fp_input);
   }
-
-    printf("Got active\n");
 
   // sprintf(labelStr, "Read %s %2s",
 	//   (atom->active) ? "Active" : "Atom", atom->ID);
