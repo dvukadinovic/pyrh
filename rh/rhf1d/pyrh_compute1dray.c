@@ -93,9 +93,7 @@ myRLK_Line get_RLK_lines(char *cwd)
   atmos.Stokes = TRUE;
   atmos.Nrlk = 0;
 
-  int argc = 1;
-  char* argv[] = {};
-  setOptions(argc, argv);
+  setOptions(1, NULL);
   
   readInput();
 
@@ -113,13 +111,12 @@ myRLK_Line get_RLK_lines(char *cwd)
 
   readKuruczLines(input.KuruczData);
 
-  // output.rlk_lines = atmos.rlk_lines;
-  // output.Nrlk = atmos.Nrlk;
+  output.rlk_lines = atmos.rlk_lines;
+  output.Nrlk = atmos.Nrlk;
 
   return output;
 }
 
-// int argc, char *argv[], 
 mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
@@ -143,12 +140,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   strcpy(commandline.keyword_input, keyword_input);
   free(keyword_input);
 
-  int argc = 1;
-  char* argv[] = {};
-  // = {"../rhf1d", "-i", keyword_input};
-
-  setOptions(argc, argv);
-  // getCPU(0, TIME_START, NULL);
+  setOptions(1, NULL);
   SetFPEtraps();
 
   readInput();
@@ -344,8 +336,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
-  // printf("%e\n", spectrum.J[3][41]);
-  // printf(" --- Iteration done! --- \n");
 
   adjustStokesMode();
   niter = 0;
@@ -363,7 +353,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
-  _solveray(argv, mu, &spec);
+  _solveray(mu, &spec);
 
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){

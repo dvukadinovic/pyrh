@@ -22,17 +22,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "background.h"
-#include "statistics.h"
-#include "inputs.h"
-#include "error.h"
-#include "xdr.h"
-#include "constant.h"
+#include "../spectrum.h"
+#include "../background.h"
+#include "../statistics.h"
+#include "../inputs.h"
+#include "../error.h"
+#include "../../headers/xdr.h"
+#include "../constant.h"
 
 #include "pyrh_compute1dray.h"
 
@@ -61,7 +61,7 @@ extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(char *argv[], double muz, mySpectrum *spec);
+void _solveray(double muz, mySpectrum *spec);
 
 int _getnumber(int* z)
 {
@@ -72,7 +72,7 @@ int _getnumber(int* z)
 
 /* ------- begin -------------------------- solveray.c -------------- */
 
-void _solveray(char *argv[], double muz, mySpectrum *spec)
+void _solveray(double muz, mySpectrum *spec)
 {
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
@@ -112,7 +112,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   spec->J = NULL;
   spec->J20 = NULL;
 
-  int Nlw = spec->nlw;// - 1;
+  int Nlw = spec->nlw;
   Nlw -= 1;
 
   spec->stokes = 0;

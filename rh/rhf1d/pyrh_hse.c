@@ -79,13 +79,12 @@ void hse(char* cwd, int pyrh_Ndep,
   Atom *atom;
 
   /* --- Read input data and initialize --             -------------- */
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
+  // int argc = 1;
+  // char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
   // char* keyword_input = malloc(160);
   // concatenate(keyword_input, cwd, "/keyword.input");
 
-  setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
+  setOptions(1, NULL);
   SetFPEtraps();
 
   char* keyword_input = malloc(160);
@@ -407,15 +406,14 @@ void get_scales(char *cwd, int pyrh_Ndep,
                int Nabun, int *abundance_id, double *abundance_value)
 {
   /* --- Read input data and initialize --             -------------- */
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
+  // int argc = 1;
+  // char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
 
-  setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
+  setOptions(1, NULL);
   SetFPEtraps();
 
   readInput();
@@ -560,16 +558,15 @@ void get_ne_from_nH(char *cwd,
                     double *pyrh_nH, double *pyrh_ne)
 {
   /* --- Read input data and initialize --             -------------- */
-  int argc = 1;
-  char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
+  // int argc = 1;
+  // char* argv[] = {"../rhf1d"};//, "-i", keyword_input};
 
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
   free(keyword_input);
 
-  setOptions(argc, argv);
-  getCPU(0, TIME_START, NULL);
+  setOptions(1, NULL);
   SetFPEtraps();
 
   readInput();
