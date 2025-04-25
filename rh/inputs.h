@@ -72,7 +72,7 @@ typedef struct {
          JFile[MAX_VALUE_LENGTH],
          background_File[MAX_VALUE_LENGTH],
          background_ray_File[MAX_VALUE_LENGTH],
-         H_atom[MAX_VALUE_LENGTH],
+         H_atom[MAX_VALUE_LENGTH], // not used
          H2_molecule[MAX_VALUE_LENGTH],
          radrateFile[MAX_VALUE_LENGTH],
          collrateFile[MAX_VALUE_LENGTH],
@@ -109,6 +109,7 @@ typedef struct {
          // number of atomic line parameters for which we want to compute RFs
          n_atomic_pars;
   double iterLimit, PRDiterLimit, metallicity;
+  double *abundances;
 
   pthread_attr_t thread_attr;
 } InputData;

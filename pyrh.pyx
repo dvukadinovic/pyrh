@@ -11,10 +11,86 @@ import cython
 import ctypes
 import sys
 import time
+import xdrlib
 
 from libc.stdlib cimport malloc, free
 
 cnp.import_array()
+
+default_abundances = np.array([12.00, 10.99, 1.16, 1.15, 2.60, 8.39, 8.00, # H
+					    8.66,  4.40, 8.09, 6.33, 7.58, 6.47, 7.55, # O...
+						5.45,  7.21, 5.50, 6.56, 5.12, 6.36, 3.10, # P...
+						4.99,  4.00, 5.67, 5.39, 7.44, 4.92, 6.25, # Ti...
+						4.21,  4.60, 2.88, 3.41, 2.37, 3.35, 2.63, # Cu...
+						3.23,  2.60, 2.90, 2.24, 2.60, 1.42, 1.92, # Kr...
+					   -7.26,  1.84, 1.12, 1.69, 0.94, 1.86, 1.66, # Tc... ???
+						2.00,  1.00, 2.24, 1.51, 2.23, 1.12, 2.13, # Sn...
+						1.22,  1.55, 0.71, 1.50, -7.96, 1.00, 0.51, # La...
+						1.12, -0.10, 1.10, 0.26, 0.93, 0.00, 1.08, # Gd...
+						0.76,  0.88, 0.13, 1.11, 0.27, 1.45, 1.35, # Lu...
+						1.80,  1.01, 1.09, 0.90, 1.85, 0.71, -7.96, # Pt...
+					   -7.96, -7.96, -7.96, -7.96, -7.96, 0.12, -7.96, # At...
+					   -0.47, -7.96, -7.96, -7.96, -7.96, -7.96, -7.96, -7.96 # U...
+					], dtype=np.float64)
+
+atomweights = [
+  {"H " :   1.008}, {"HE" :   4.003}, {"LI" :   6.939}, {"BE" :   9.013},
+  {"B " :  10.810}, {"C " :  12.010}, {"N " :  14.010}, {"O " :  16.000},
+  {"F " :  19.000}, {"NE" :  20.180}, {"NA" :  22.990}, {"MG" :  24.310},
+  {"AL" :  26.980}, {"SI" :  28.090}, {"P " :  30.980}, {"S " :  32.070},
+  {"CL" :  35.450}, {"AR" :  39.950}, {"K " :  39.100}, {"CA" :  40.080},
+  {"SC" :  44.960}, {"TI" :  47.900}, {"V " :  50.940}, {"CR" :  52.000},
+  {"MN" :  54.940}, {"FE" :  55.850}, {"CO" :  58.940}, {"NI" :  58.710},
+  {"CU" :  63.550}, {"ZN" :  65.370}, {"GA" :  69.720}, {"GE" :  72.600},
+  {"AS" :  74.920}, {"SE" :  78.960}, {"BR" :  79.910}, {"KR" :  83.800},
+  {"RB" :  85.480}, {"SR" :  87.630}, {"Y " :  88.910}, {"ZR" :  91.220},
+  {"NB" :  92.910}, {"MO" :  95.950}, {"TC" :  99.000}, {"RU" : 101.100},
+  {"RH" : 102.900}, {"PD" : 106.400}, {"AG" : 107.900}, {"CD" : 112.400},
+  {"IN" : 114.800}, {"SN" : 118.700}, {"SB" : 121.800}, {"TE" : 127.600},
+  {"I " : 126.900}, {"XE" : 131.300}, {"CS" : 132.900}, {"BA" : 137.400},
+  {"LA" : 138.900}, {"CE" : 140.100}, {"PR" : 140.900}, {"ND" : 144.300},
+  {"PM" : 147.000}, {"SM" : 150.400}, {"EU" : 152.000}, {"GD" : 157.300},
+  {"TB" : 158.900}, {"DY" : 162.500}, {"HO" : 164.900}, {"ER" : 167.300},
+  {"TM" : 168.900}, {"YB" : 173.000}, {"LU" : 175.000}, {"HF" : 178.500},
+  {"TA" : 181.000}, {"W " : 183.900}, {"RE" : 186.300}, {"OS" : 190.200},
+  {"IR" : 192.200}, {"PT" : 195.100}, {"AU" : 197.000}, {"HG" : 200.600},
+  {"TL" : 204.400}, {"PB" : 207.200}, {"BI" : 209.000}, {"PO" : 210.000},
+  {"AT" : 211.000}, {"RN" : 222.000}, {"FR" : 223.000}, {"RA" : 226.100},
+  {"AC" : 227.100}, {"TH" : 232.000}, {"PA" : 231.000}, {"U " : 238.000},
+  {"NP" : 237.000}, {"PU" : 244.000}, {"AM" : 243.000}, {"CM" : 247.000},
+  {"BK" : 247.000}, {"CF" : 251.000}, {"ES" : 254.000}
+]
+
+cdef set_partition_functions(rh.Atmosphere *atmos):
+	fp = open("../rh/Atoms/pf_Kurucz.input", "rb").read()
+	buf = xdrlib.Unpacker(fp)
+
+	cdef int Npf
+	cdef cnp.ndarray[double, ndim=1, mode="c"] Tpf
+	# cdef cnp.ndarray[double, ndim=2, mode="c"] pf
+	cdef double[:, :] pf
+	cdef cnp.ndarray[double, ndim=1, mode="c"] ionpot
+
+	Npf = buf.unpack_int()
+	Tpf = np.array(buf.unpack_farray(Npf, buf.unpack_double), dtype=np.float64)
+
+	atmos.Npf = Npf
+	atmos.Tpf = &Tpf[0]
+
+	for ide in range(atmos.Nelem):
+		pti = buf.unpack_int()
+		Nstage = buf.unpack_int()
+		atmos.elements[ide].Nstage = Nstage
+		pf = np.array(buf.unpack_farray(Nstage*Npf, buf.unpack_double)).reshape(Nstage, Npf)
+		pf = np.log(pf)
+		ionpot = np.array(buf.unpack_farray(Nstage, buf.unpack_double))
+		ionpot *= 19.8644746e-24
+
+		atmos.elements[ide].pf = rh.matrix_double(Nstage, atmos.Npf)
+		for ids in range(Nstage):
+			atmos.elements[ide].pf[ids] = <double *>&pf[ids,0]
+
+		atmos.elements[ide].ionpot = &ionpot[0]
 
 cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 	cdef Py_ssize_t i
@@ -36,16 +112,6 @@ cpdef Pystring2char(lists):
 
 	return N, argv
 
-# add OF table as input to rhf1d()
-
-cdef void string2pointer(string, char* c_char_pointer):
-	py_list = string.split(" ")
-	argc = len(py_list)
-	py_string = [item.encode("utf-8") for item in py_list]
-	arr = (ctypes.c_char_p * argc)(*py_string)
-	for i_ in range(argc):
-		c_char_pointer[i_] = arr[i_]
-
 class Populations(object):
 	def __init__(self, ID, nlevel, nz, n, nstar):
 		self.ID = ID
@@ -54,8 +120,73 @@ class Populations(object):
 		self.n = n
 		self.nstar = nstar
 
+cdef rh.ne_solution get_solve_ne(_type):
+	if _type=="NONE":
+		return int(0)
+	if _type=="ONCE":
+		return int(1)
+	if _type=="ITERATION":
+		return int(2)
+	
+	sys.exit("Cannot assign 'solve_ne' attribute. Unsupported value.")
+
+cdef rh.S_interpol_stokes get_S_interpol_stokes(_type):
+	if _type=="DELO_PARABOLIC":
+		return int(0)
+	if _type=="DELO_BEZIER3":
+		return int(1)
+
+	sys.exit("Cannot assign 'S_interpolation_stokes' attribute. Unsupported value.")
+
+cdef rh.S_interpol get_S_interpolation(_type):
+	if _type=="S_LINEAR":
+		return int(0)
+	if _type=="S_PARABOLIC":
+		return int(1)
+	if _type=="S_BEZIER3":
+		return int(2)
+
+	sys.exit("Cannot assign 'S_interpolation' attribute. Unsupported value.")
+
+cdef rh.StokesMode get_StokesMode(_type):
+	if _type=="NO_STOKES":
+		return int(0)
+	if _type=="FIELD_FREE":
+		return int(1)
+	if _type=="POLARIZATION_FREE":
+		return int(2)
+	if _type=="FULL_STOKES":
+		return int(3)
+
+	sys.exit("Cannot assign 'StokesMode' attribute. Unsupported value.")
+
+cdef rh.solution get_startJ(_type):
+	if _type=="UNKNOWN":
+		return int(-1)
+	if _type=="LTE_POPULATIONS":
+		return int(0)
+	if _type=="ZERO_RADIATION":
+		return int(1)
+	if _type=="OLD_POPULATIONS":
+		return int(2)
+	if _type=="NEW_J":
+		return int(3)
+	if _type=="OLD_J":
+		return int(4)
+
+	sys.exit("Cannot assign 'startJ' attribute. Unsupported value.")
+
+cdef int set_bool_value(flag):
+	return int(1) if flag else int(0)
+
+cdef int set_int_value(flag):
+	return int(flag)
+
 cdef class RH:
 	cdef char* cwd[160]
+	cdef rh.myRLK_Line lines
+	cdef rh.InputData input
+	cdef rh.Atmosphere atmos
 
 	# cdef int Nrlk
 	# cdef rh.myRLK_Line rlk_lines
@@ -65,18 +196,133 @@ cdef class RH:
 	# cdef double[::1] wavetable
 
 	def __init__(self, cwd):
-		# convert cwd to the c char pointer
+		# convert the 'cwd' to the C char pointer
 		py_list = cwd.split(" ")
 		argc = len(py_list)
 		py_string = [item.encode("utf-8") for item in py_list]
 		arr = (ctypes.c_char_p * argc)(*py_string)
 		for i_ in range(argc):
 			self.cwd[i_] = arr[i_]
-		# string2pointer(cwd, self.cwd[0])
+
+		self.atmos.Nelem = int(len(atomweights))
+		
+	def dummy(self):
+		# just pass PF and Nstages trough the atmosphere and load it inside RH\
+		# or create a separate function for this... I do not want to do this many times in inversion...
+		rh.test_InputData(self.input, self.atmos)
+
+	def set_abundances(self, abundances={}):
+		self.input.abundances = <double *> malloc(self.atmos.Nelem * sizeof(double))
+		for ida in range(self.atmos.Nelem):
+			self.input.abundances[ida] = 10**(default_abundances[ida]-12)
+
+		# update by the user provided values
+		for key, value in abundances.items():
+			self.input.abundances[key] = 10**(value-12)
+
+		# multiply with metallicity and get total abundances
+		self.atmos.totalAbund = self.input.abundances[0]
+		self.atmos.wght_per_H = self.input.abundances[0] * list(atomweights[0].values())[0]
+		for ida in range(1,self.atmos.Nelem):
+			self.input.abundances[ida] *= self.input.metallicity
+			self.atmos.totalAbund += self.input.abundances[ida] 
+			self.atmos.wght_per_H += self.input.abundances[ida] * list(atomweights[ida].values())[0]
+
+		self.atmos.avgMolWght = self.atmos.wght_per_H/self.atmos.totalAbund
+
+	def set_keywords(self,
+					 isum=-1, 
+					 Ngdelay=0, 
+					 Ngorder=0,
+					 Ngperiod=1,
+					 NmaxIter=1,
+					 PRD_NmaxIter=1,
+					 PRD_Ngdelay=0,
+					 PRD_Ngorder=0,
+					 PRD_Ngperiod=0,
+					 NmaxScatter=0,
+					 n_atomic_pars=0,
+					 iterLimit=1e-2,
+					 PRDiterLimit=1e-2,
+					 metallicity=0.0,
+					 solve_ne="NONE",
+					 S_interpolation_stokes="DELO_BEZIER3",
+					 S_interpolation="S_BEZIER3",
+					 StokesMode="FULL_STOKES",
+					 startJ="NEW_J",
+					 magneto_optical=False,
+					 PRD_angle_dep=False,
+					 XRD=False,
+					 Eddington=False,
+					 backgr_pol=False,
+					 allow_passive_bb=True,
+					 NonICE=False,
+					 rlkscatter=True,
+					 xdr_endian=False,
+					 old_background=False,
+					 accelerate_mols=False,
+					 do_fudge=False,
+					 pyrhHSE=False,
+					 get_atomic_rfs=False,
+					 LS_Lande=True,
+					 solve_NLTE=False,
+					 verbose=False,
+					 get_populations=False,
+					 read_atom_model=False):
+		#--- int attributes
+		self.input.isum = set_int_value(isum)
+		self.input.Ngdelay = set_int_value(Ngdelay)
+		self.input.Ngorder = set_int_value(Ngorder)
+		self.input.Ngperiod = set_int_value(Ngperiod)
+		self.input.NmaxIter = set_int_value(NmaxIter)
+		self.input.PRD_NmaxIter = set_int_value(PRD_NmaxIter)
+		self.input.PRD_Ngdelay = set_int_value(PRD_Ngdelay)
+		self.input.PRD_Ngorder = set_int_value(PRD_Ngorder)
+		self.input.PRD_Ngperiod = set_int_value(PRD_Ngperiod)
+		self.input.NmaxScatter = set_int_value(NmaxScatter)
+		self.input.Nthreads = int(1) # always fixed
+		self.input.n_atomic_pars = set_int_value(n_atomic_pars)
+
+		#--- double attributes
+		self.input.iterLimit = iterLimit
+		self.input.PRDiterLimit = PRDiterLimit
+		self.input.metallicity = 10**(metallicity)
+
+		#--- enum attributes
+		self.input.solve_ne = get_solve_ne(solve_ne)
+		self.input.S_interpolation_stokes = get_S_interpol_stokes(S_interpolation_stokes)
+		self.input.S_interpolation = get_S_interpolation(S_interpolation)
+		self.input.StokesMode = get_StokesMode(StokesMode)
+		self.input.startJ = get_startJ(startJ)
+
+		#--- bool attributes
+		self.input.magneto_optical = set_bool_value(magneto_optical)
+		self.input.PRD_angle_dep = set_bool_value(PRD_angle_dep)
+		self.input.XRD = set_bool_value(XRD)
+		self.input.Eddington = set_bool_value(Eddington)
+		self.input.backgr_pol = set_bool_value(backgr_pol)
+		self.input.limit_memory = int(0)
+		self.input.allow_passive_bb = set_bool_value(allow_passive_bb)
+		self.input.NonICE = set_bool_value(NonICE)
+		self.input.rlkscatter = set_bool_value(rlkscatter)
+		self.input.xdr_endian = set_bool_value(xdr_endian)
+		self.input.old_background = set_bool_value(old_background)
+		self.input.accelerate_mols = set_bool_value(accelerate_mols)
+		self.input.do_fudge = set_bool_value(do_fudge)
+		self.input.pyrhHSE = set_bool_value(pyrhHSE)
+		self.input.get_atomic_rfs = set_bool_value(get_atomic_rfs)
+		self.input.LS_Lande = set_bool_value(LS_Lande)
+		self.input.solve_NLTE = set_bool_value(solve_NLTE)
+		self.input.verbose = set_bool_value(verbose)
+		self.input.get_populations = set_bool_value(get_populations)
+		self.input.read_atom_model = set_bool_value(read_atom_model)
+
+	def set_elements(self):
+		rh.set_elements(self.input, &self.atmos)
+		set_partition_functions(&self.atmos)
 
 	def get_RLK_lines(self):
-		cdef rh.myRLK_Line lines
-		lines = rh.get_RLK_lines(self.cwd[0])
+		self.lines = rh.get_RLK_lines(self.cwd[0])
 
 	def read_atom(self, atom_file_name):
 		cdef char* pyrh_atom_file_name[100]
