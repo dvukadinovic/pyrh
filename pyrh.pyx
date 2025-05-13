@@ -600,13 +600,13 @@ def compute1d(cwd,
 									n=n,
 									nstar=nstar
 									)
-
 	if get_atomic_rfs:
 		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
-		output += rf
+		output = (output, rf.T)
 
+	# to preserve the order of all output parameters
 	if get_populations:
-		output += populations
+		output = (output, populations)
 
 	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
