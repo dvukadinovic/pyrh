@@ -118,7 +118,7 @@
 #include "error.h"
 #include "statistics.h"
 #include "inputs.h"
-#include "xdr.h"
+#include "../headers/xdr.h"
 
 
 #define COMMENT_CHAR  "#"

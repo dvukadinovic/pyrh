@@ -607,7 +607,12 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
   C = 2.0*PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
 
   /* --- Open the data file --                         -------------- */
- 
+
+  char *tmp = malloc(200), *tmp2 = malloc(200);
+  concatenate(tmp, input.pyrh_path, "/rh/Molecules/");
+  concatenate(tmp2, tmp, line_data);
+  strcpy(line_data, tmp2);
+
   if ((fp_lines = fopen(line_data, "r")) == NULL) {
     sprintf(messageStr, "Unable to open inputfile %s", line_data);
     Error(ERROR_LEVEL_2, routineName, messageStr);
@@ -740,10 +745,10 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
 		       &lambda_air, &log_gf,
 		       &mrt->gi, &mrt->Ei, &mrt->gj, &mrt->Ej);
       } else {
-	Nread = sscanf(inputLine,
-		       "%10lf %7lf %5lf %10lf %5lf %11lf",
-		       &lambda_air, &log_gf,
-		       &mrt->gi, &mrt->Ei, &mrt->gj, &mrt->Ej);
+        Nread = sscanf(inputLine,
+                "%10lf %7lf %5lf %10lf %5lf %11lf",
+                &lambda_air, &log_gf,
+                &mrt->gi, &mrt->Ei, &mrt->gj, &mrt->Ej);
       }
       checkNread(Nread, Nrequired=6, routineName, checkPoint=3);
     
@@ -918,6 +923,8 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
   sprintf(messageStr, " --- read %d %s lines for molecule %2s\n\n",
 	  Nrt, type_string, molecule->ID);
   Error(MESSAGE, routineName, messageStr);
+
+  free(tmp); free(tmp2);
 }
 /* ------- end ---------------------------- readMolecularLines.c ---- */
 

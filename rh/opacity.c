@@ -713,6 +713,8 @@ flags MolecularOpacity(double lambda, int nspect, int mu, bool_t to_obs,
 {
   register int n, k, kr;
 
+  // printf(" Get MolOpacity @ %f\n", lambda);
+
   /* --- Opacity due to molecular lines in the background. LTE
          populations are assumed. If magnetic fields are present
          the Stokes emission coefficients eta_{Q,U,V} are also

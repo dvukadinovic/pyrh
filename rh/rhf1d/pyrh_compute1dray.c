@@ -29,7 +29,7 @@
 #include "../spectrum.h"
 #include "../background.h"
 #include "../statistics.h"
-#include "error.h"
+#include "../error.h"
 #include "../../headers/xdr.h"
 #include "../constant.h"
 
@@ -41,14 +41,6 @@
 /* --- Global variables --                             -------------- */
 
 enum Topology topology = ONE_D_PLANE;
-
-// Atmosphere atmos;
-// Geometry geometry;
-// Spectrum spectrum;
-// ProgramStats stats;
-// InputData input;
-// CommandLine commandline;
-
 
 /* --- Global variables --- */
 
