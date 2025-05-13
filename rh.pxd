@@ -2,11 +2,19 @@
 # ctypedef struct pthread_attr_t_ *pthread_attr_t
 # cdef pthread_attr_t dummy
 
+ctypedef struct Dusan:
+	int n
+	double dusan
+	double *run
+	# int **again
+
 cdef extern from "headers/types.h":
 	ctypedef int bool_t
 
 cdef extern from "rh/rh.h":
 	cdef double **matrix_double(int Nrow, int Ncol)
+	cdef int **matrix_int(int Nrow, int Ncol)
+	cdef void freeMatrix(void **matrix)
 	cdef enum StokesMode: NO_STOKES, FIELD_FREE, POLARIZATION_FREE, FULL_STOKES
 	cdef enum solution: UNKNOWN=-1, LTE_POPULATIONS, ZERO_RADIATION, OLD_POPULATIONS, NEW_J, OLD_J
 	cdef double** matrix_double(int Nrow, int Ncol)

@@ -13,6 +13,7 @@ import sys
 import time
 import xdrlib
 
+from libc.string cimport memcpy
 from libc.stdlib cimport malloc, free
 
 cnp.import_array()
@@ -60,6 +61,59 @@ atomweights = [
   {"NP" : 237.000}, {"PU" : 244.000}, {"AM" : 243.000}, {"CM" : 247.000},
   {"BK" : 247.000}, {"CF" : 251.000}, {"ES" : 254.000}
 ]
+
+# @cython.auto_pickle(True)
+cdef class Test:
+	cdef rh.Dusan me
+
+	def __init__(self):
+		self.me.n = 5
+		self.me.dusan = 1.2
+
+		self.me.run = <double *> malloc(self.me.n * sizeof(double))
+		for idi in range(self.me.n):
+			self.me.run[idi] = (idi+1)**2
+
+		# self.me.again = rh.matrix_int(self.me.n, 10)
+		# self.me.again = <int**> malloc(self.me.n * sizeof(int*))
+		# for idi in range(self.me.n):
+		# 	self.me.again[idi] = <int*> malloc(10 * sizeof(int))
+		# self.me.again[0][0] = int(10)
+
+	cdef bytes pack(self):
+		a = <bytes>(<char*> self.me.run)[:sizeof(double)*self.me.n]
+		# a = <bytes>(<char*> self.me.again)[:sizeof(int)*self.me.n*10]
+		return a
+
+	cdef void unpack(self, bytes data):
+		tmp = <bytes>data[:sizeof(double)*self.me.n]
+		memcpy(self.me.run, <char*>tmp, sizeof(double)*self.me.n)
+		# tmp = <bytes>data#[sizeof(double)*self.me.n:]
+		# memcpy(self.me.again, <char*>tmp, sizeof(int)*self.me.n*10)
+
+	def get(self, idi):
+		return self.me.run[idi]
+
+	# def get_again(self):
+	# 	return self.me.again[0][0]
+
+	def __reduce__(self):
+		data = self.pack()
+		return (rebuild, (data,))
+
+	# def __dealloc__(self):
+	def __del__(self):
+		free(self.me.run)
+		# rh.freeMatrix(<void **>self.me.again)
+		# if (self.me.again==NULL):
+		# 	for idi in range(self.me.n):
+		# 		free(self.me.again[idi])
+		# 	free(self.me.again)
+
+cpdef object rebuild(bytes data):
+	c = Test()
+	c.unpack(data)
+	return c
 
 cdef set_partition_functions(rh.Atmosphere *atmos):
 	fp = open("../rh/Atoms/pf_Kurucz.input", "rb").read()
