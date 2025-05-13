@@ -1,13 +1,18 @@
 import pyrh
+import pickle
 
-RH = pyrh.RH(".")
+t = pyrh.Test()
+print(t.get_again())
+send_me = pickle.dumps(t)
+del t
+new = pickle.loads(send_me)
+print(new.get_again())
 
-RH.set_keywords()
-RH.set_abundances()
-RH.set_elements()
-RH.dummy()
+# RH = pyrh.RH(".")
 
-# print(RH.InputData)
-# RH.get_RLK_lines()
-# RH.set_InputData()
-# print(RH._InputData.Nrays)
+# a = pickle.dumps(RH.input)
+
+# RH.set_keywords()
+# RH.set_abundances()
+# RH.set_elements()
+# RH.dummy()

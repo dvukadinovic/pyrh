@@ -61,12 +61,12 @@ for _ in range(1):
 
 plt.plot(spec[-1], spec[0])
 
-atomic_number = np.array([26], dtype=np.int32)
-atomic_abundance = np.array([7], dtype=np.float64)
+# atomic_number = np.array([26], dtype=np.int32)
+# atomic_abundance = np.array([7], dtype=np.float64)
 
-print("Get a new spectrum")
-spec = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave, atomic_number=atomic_number, atomic_abundance=atomic_abundance)
+# print("Get a new spectrum")
+# spec = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave, atomic_number=atomic_number, atomic_abundance=atomic_abundance)
 
-plt.plot(spec[-1], spec[0])
+# plt.plot(spec[-1], spec[0])
 
 plt.show()
