@@ -64,6 +64,7 @@ atomweights = [
 
 # @cython.auto_pickle(True)
 cdef class Test:
+	# from: https://stackoverflow.com/questions/36301322/pickle-cython-class-with-c-pointers
 	cdef rh.Dusan me
 
 	def __init__(self):
