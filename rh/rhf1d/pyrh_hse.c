@@ -144,7 +144,7 @@ void hse(char* cwd, int pyrh_Ndep,
   atmos.Nrlk = 0;
 
   geometry.Ndep = pyrh_Ndep;
-  
+
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry, Nabun, abundance_id, abundance_value);
   
@@ -191,6 +191,7 @@ void hse(char* cwd, int pyrh_Ndep,
   /* --- read atoms and molecules ----------------------------------- */
   
   readAtomicModels();
+  
   readMolecularModels();
   
   /* --- set wavelength only to 500 nm ------------------------------ */
@@ -272,6 +273,7 @@ void hse(char* cwd, int pyrh_Ndep,
 
   double LOG10 = log(10);
   double dlogtau;
+
 
   /*--- Start HSE solution for the rest of atmospheric layers -------------- */
 

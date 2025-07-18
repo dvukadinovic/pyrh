@@ -205,8 +205,7 @@ void getABOcross(RLK_Line *rlk){
   meanvelocity = sqrt(8.0 * KBOLTZMANN / (PI * reducedmass));
   crossmean    = SQ(RBOHR) * pow(meanvelocity / 1.0E4, -rlk->alpha);
 
-  rlk->cross *= 2.0 * pow(4.0/PI, rlk->alpha/2.0) * 
-    exp(gammln((4.0 - rlk->alpha)/2.0)) * meanvelocity * crossmean;  
+  rlk->cross *= 2.0 * pow(4.0/PI, rlk->alpha/2.0) * exp(gammln((4.0 - rlk->alpha)/2.0)) * meanvelocity * crossmean;  
 
   rlk->vdwaals = BARKLEM;
 }

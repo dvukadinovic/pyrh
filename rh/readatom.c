@@ -47,7 +47,6 @@
 void  distribute_nH(void);
 char *getAtomID(char *atom_file);
 
-
 /* --- Global variables --                             -------------- */
 
 extern Atmosphere atmos;
@@ -83,7 +82,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
   C = 2*PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
 
-
   /* --- Open the data file for current model atom --  -------------- */
 
   // If we are performing HSE, we set all atoms to LTE (PASSIVE state)
@@ -111,7 +109,6 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   for (n = 0;  n < (int) strlen(atom->ID);  n++)
     atom->ID[n] = toupper(atom->ID[n]);
   if (strlen(atom->ID) == 1) strcat(atom->ID, " ");
-
 
   /* --- NOTE: atomic weight and abundance are read from the 
          abundance input file (abundance.input by default).
@@ -269,8 +266,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       getLine(atom->fp_input, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
       Nread = sscanf(inputLine, "%d", &line->Ncomponent);
       line->c_shift = (double *) malloc(line->Ncomponent * sizeof(double));
-      line->c_fraction =
-	(double *) malloc(line->Ncomponent * sizeof(double));
+      line->c_fraction = (double *) malloc(line->Ncomponent * sizeof(double));
 
       c_sum = 0.0;
       for (n = 0;  n < line->Ncomponent;  n++) {
@@ -339,11 +335,11 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
              is more than one thread --                -------------- */
 
       if (input.Nthreads > 1) {
-	if ((status = pthread_mutex_init(&line->rate_lock, NULL))) {
-	  sprintf(messageStr, "Unable to initialize mutex_lock, status = %d",
-		  status);
-	  Error(ERROR_LEVEL_2, routineName, messageStr);
-	}
+        if ((status = pthread_mutex_init(&line->rate_lock, NULL))) {
+          sprintf(messageStr, "Unable to initialize mutex_lock, status = %d",
+            status);
+          Error(ERROR_LEVEL_2, routineName, messageStr);
+        }
       }
 
       if (atmos.Stokes) {
@@ -371,8 +367,7 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
   /* --- Go through the bound-free transitions --      -------------- */
 
-  atom->continuum =
-    (AtomicContinuum *) malloc(Ncont * sizeof(AtomicContinuum));
+  atom->continuum = (AtomicContinuum *) malloc(Ncont * sizeof(AtomicContinuum));
   for (kr = 0;  kr < Ncont;  kr++) {
     continuum = atom->continuum + kr;
     initAtomicContinuum(continuum);
@@ -391,10 +386,8 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
 
     lambda0 = (HPLANCK * CLIGHT)/(atom->E[j] - atom->E[i]);
     continuum->lambda0 = lambda0 / NM_TO_M;
-    continuum->lambda  =
-      (double *) malloc(continuum->Nlambda * sizeof(double));
-    continuum->alpha   =
-      (double *) malloc(continuum->Nlambda * sizeof(double));
+    continuum->lambda  = (double *) malloc(continuum->Nlambda * sizeof(double));
+    continuum->alpha   = (double *) malloc(continuum->Nlambda * sizeof(double));
 
     if (strstr(nuDepStr, "EXPLICIT")) {
       continuum->hydrogenic = FALSE;
@@ -632,9 +625,13 @@ void initAtom(Atom *atom)
   atom->stage = NULL;
   atom->periodic_table = 0;
   atom->abundance = atom->weight = 0.0;
-  atom->g = atom->E = atom->vbroad = NULL;
+  atom->g = NULL;
+  atom->E = NULL;
+  atom->vbroad = NULL;
+  atom->abo_level = NULL;
   atom->C = NULL;
-  atom->n = atom->nstar = NULL;
+  atom->n = NULL;
+  atom->nstar = NULL;
   atom->ntotal = NULL;
   atom->Gamma = NULL;
   atom->line = NULL;
@@ -798,7 +795,6 @@ void readAtomicModels(void)
 {
   const char routineName[] = "readAtomicModels";
   register int n, m, i;
-
   char    filename[MAX_LINE_SIZE],
           actionKey[MAX_KEYWORD_SIZE], popsKey[MAX_KEYWORD_SIZE],
           popsFile[MAX_LINE_SIZE], inputLine[MAX_LINE_SIZE], *atomID;
@@ -830,7 +826,7 @@ void readAtomicModels(void)
   /* --- Read atomic data for the various model atoms -- ------------ */
 
   for (n = 0;  n < atmos.Natom;  n++) {
-
+    
     getLine(fp_atoms, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
     Nread = sscanf(inputLine, "%s %s %s %s ",
 		   filename, actionKey, popsKey, popsFile);
@@ -851,10 +847,10 @@ void readAtomicModels(void)
 
     for (m = 0;  m < n;  m++) {
       if (strstr(atomID, atmos.atoms[m].ID)) {
-	sprintf(messageStr,
-		"Aready read atomic model for element %s\n", atomID);
-	Error(ERROR_LEVEL_2, routineName, messageStr);
-      }
+        sprintf(messageStr,
+          "Aready read atomic model for element %s\n", atomID);
+        Error(ERROR_LEVEL_2, routineName, messageStr);
+            }
     }
     /* --- Set active flag. Active set to TRUE means atom will be
            treated in Non-LTE --                       -------------- */
@@ -862,7 +858,6 @@ void readAtomicModels(void)
     atom = &atmos.atoms[n];
     readAtom(atom, filename,
 	     active=(strstr(actionKey, "ACTIVE") ? TRUE : FALSE));
-
 
     /* --- Set flag for initial soltion --             -------------- */
 
@@ -891,18 +886,16 @@ void readAtomicModels(void)
 
     if (atom->initial_solution == OLD_POPULATIONS) {
       if (Nread < 4) {
-	sprintf(messageStr,
-		"No file with OLD_POPULATIONS specified for atom: %s\n",
-		atomID);
-	Error(ERROR_LEVEL_2, routineName, messageStr);
+        sprintf(messageStr,
+          "No file with OLD_POPULATIONS specified for atom: %s\n",
+          atomID);
+        Error(ERROR_LEVEL_2, routineName, messageStr);
       }
-      atom->popsinFile =
-	(char *) malloc((strlen(popsFile) + 1) * sizeof(char));
+      atom->popsinFile = (char *) malloc((strlen(popsFile) + 1) * sizeof(char));
       strcpy(atom->popsinFile, popsFile);
     }
   }
-  fclose(fp_atoms);  
-
+  
   /* --- Create an alias to the hydrogen atom structure -- ---------- */
 
   atmos.H = &atmos.atoms[0];

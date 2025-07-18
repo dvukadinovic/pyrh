@@ -172,8 +172,7 @@ void readKuruczLines(char *inputFile)
     rewind(fp_linelist);
 
     if (atmos.Nrlk == 0) atmos.rlk_lines = NULL;
-    atmos.rlk_lines = (RLK_Line *)
-      realloc(atmos.rlk_lines, (Nline + atmos.Nrlk) * sizeof(RLK_Line));
+    atmos.rlk_lines = (RLK_Line *) realloc(atmos.rlk_lines, (Nline + atmos.Nrlk) * sizeof(RLK_Line));
 
     /* --- Read lines from file --                     -------------- */
 
