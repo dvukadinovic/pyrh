@@ -484,6 +484,9 @@ def hse(cwd,
 	if full_output:
 		return ne, nHtot, rho, pg
 
+	del rho
+	del pg
+
 	return ne, nHtot
 
 @cython.boundscheck(False)

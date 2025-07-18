@@ -90,6 +90,7 @@ void hse(char* cwd, int pyrh_Ndep,
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
   /* --- Read input data and initialize --             -------------- */
 
@@ -106,7 +107,8 @@ void hse(char* cwd, int pyrh_Ndep,
   // molecules list file
   concatenate(tmp, "/", input.molecules_input);
   concatenate(input.molecules_input, cwd, tmp);
-  
+  free(tmp);
+
   spectrum.updateJ = TRUE;
   input.limit_memory = FALSE;
   // we want to solve for ne
@@ -210,6 +212,7 @@ void hse(char* cwd, int pyrh_Ndep,
 
   /*--- Start HSE solution for the top boundary  */
 
+  atmos.backgrflags = NULL;
   atmos.active_layer = 0;
   iter = 0;
 
@@ -372,32 +375,37 @@ void hse(char* cwd, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
+  // free_everything();
+
+  free(atmos.backgrflags);
+
+  free(Nm);
+  free(total_opacity);
+
+  free(wavetable);
+  if (spectrum.lambda!=NULL) free(spectrum.lambda);
+  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
+  if (spectrum.as!=NULL) free(spectrum.as); 
+
   freeAtoms();
   freeMolecules();
-
-  if (atmos.Stokes){
-    freeMatrix((void **) atmos.cos_gamma);
-    freeMatrix((void **) atmos.cos_2chi);
-    freeMatrix((void **) atmos.sin_2chi);
-  }
+  freeElements(); 
+  
+  free(atmos.vturb);
+  free(atmos.N);
+  free(atmos.nHmin);
 
   freeOpacityEmissivity();
+  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
+  
+  free(geometry.tau_ref);
+  free(geometry.cmass);
+  free(geometry.height);
 
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
-
-  // free geometry related data
-  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
-  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
-  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
-
-  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
-
-  // clear HSE related parameters
-  free(Nm); Nm = NULL;
-  free(total_opacity); total_opacity = NULL;
+  free(geometry.wmu);
+  free(geometry.mux);
+  free(geometry.muy);
+  free(geometry.muz);
 }
 /* ------- end ---------------------------- pyrh_hse.c -------------- */
 
@@ -534,10 +542,7 @@ void get_scales(char *cwd, int pyrh_Ndep,
   }
 
   freeOpacityEmissivity();
-
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
+  freeElements();
 
   // free geometry related data
   // if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
@@ -665,10 +670,7 @@ void get_ne_from_nH(char *cwd,
 
   // free atmosphere related data
   free(atmos.vturb);
-
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
+  freeElements();
 
   // free geometry related data
   if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;

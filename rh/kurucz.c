@@ -105,7 +105,7 @@ void             initRLK(RLK_Line *rlk);
 bool_t           RLKdeterminate(char *labeli, char *labelj, RLK_Line *rlk);
 void             getUnsoldcross(RLK_Line *rlk);
 void             free_BS(Barklemstruct *bs);
-void             freePartitionFunction();
+void             freeElements();
 
 
 /* --- Global variables --                             -------------- */
@@ -1031,7 +1031,7 @@ void free_BS(Barklemstruct *bs)
 }
 /* ------- end ---------------------------- free_BS.c --------------- */
 
-void freePartitionFunction()
+void freeElements()
 {
   free(atmos.Tpf);  atmos.Tpf = NULL;
   for (int n = 0;  n < atmos.Nelem;  n++) {
@@ -1040,4 +1040,5 @@ void freePartitionFunction()
     freeMatrix((void **) atmos.elements[n].pf);
     if (atmos.elements[n].n) freeMatrix((void **) atmos.elements[n].n);
   }
+  free(atmos.elements);
 }

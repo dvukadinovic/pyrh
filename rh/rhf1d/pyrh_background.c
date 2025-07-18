@@ -260,11 +260,11 @@ void pyrh_Background(bool_t equilibria_only, double* total_opacity)
          a wavelength overlaps with a Bound-Bound transition in the
          background, or whether it is polarized --     -------------- */
 
-  atmos.backgrflags = (flags *) malloc(spectrum.Nspect * sizeof(flags));
-  for (nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
-    atmos.backgrflags[nspect].hasline = FALSE;
-    atmos.backgrflags[nspect].ispolarized = FALSE;
-  }
+  if (atmos.backgrflags==NULL) atmos.backgrflags = (flags *) malloc(spectrum.Nspect * sizeof(flags));
+  // for (nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
+  //   atmos.backgrflags[nspect].hasline = FALSE;
+  //   atmos.backgrflags[nspect].ispolarized = FALSE;
+  // }
   /* --- Allocate memory for the list of record numbers that specifies
          for each wavelength where to find the background opacity,
          scattering opacity, and emissivity --         -------------- */

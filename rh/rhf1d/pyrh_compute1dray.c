@@ -347,6 +347,12 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   _solveray(mu, &spec);
 
+  free(spec.lam);
+  free(spec.sI);
+  free(spec.sQ);
+  free(spec.sU);
+  free(spec.sV);
+
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){
     geometry.vel[k] /= KM_TO_M;
@@ -358,12 +364,23 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
+  if (atmos.moving || atmos.Stokes) free(atmos.backgrrecno);
+  free(atmos.backgrflags);
 
+  for (int idl=0; idl<atmos.Nrlk; idl++){
+    free(atmos.rlk_lines[idl].zm->q);
+    free(atmos.rlk_lines[idl].zm->strength);
+    free(atmos.rlk_lines[idl].zm->shift);
+    free(atmos.rlk_lines[idl].zm);
+  }
+  free(atmos.rlk_lines);
+  
   freeAtoms();
   freeMolecules();
+  freeElements();
+  
+  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
+  if (spectrum.as!=NULL) free(spectrum.as); 
 
   if (atmos.Stokes){
     freeMatrix((void **) atmos.cos_gamma);
@@ -384,6 +401,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
   if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
+
+  free(geometry.wmu);
+  free(geometry.mux);
+  free(geometry.muy);
+  free(geometry.muz);
 
   return spec;
 }

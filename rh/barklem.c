@@ -308,6 +308,11 @@ bool_t getBarklemactivecross(AtomicLine *line)
   line->cvdWaals[2] = 1.0;
   line->cvdWaals[3] = 0.0;
 
+  free(bs.neff1);
+  free(bs.neff2);
+  freeMatrix((void **) bs.cross);
+  freeMatrix((void **) bs.alpha);
+
   return TRUE;
 }
 /* ------- end ---------------------------- getBarklemactivecross.c -- */

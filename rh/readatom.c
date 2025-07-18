@@ -149,24 +149,23 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
   atom->E = (double *) malloc(Nlevel * sizeof(double));
   atom->g = (double *) malloc(Nlevel * sizeof(double));
   atom->stage = (int *)   malloc(Nlevel * sizeof(int));
-// HNS: rh change
+  // HNS: rh change
   atom->abo_level = (int *)   malloc(Nlevel * sizeof(int));
-  atom->label = (char **) malloc(Nlevel * sizeof(char *));
+  // atom->label = (char **) malloc(Nlevel * sizeof(char *));
+  atom->label = malloc(Nlevel * sizeof(char *));
 
   /* --- Read in the level energies, statistical weights, labels,
          and ionization stage --                       -------------- */
 
   for (i = 0;  i < Nlevel;  i++) {
-    atom->label[i] = (char *) calloc((ATOM_LABEL_WIDTH+1), sizeof(char)); 
+    // atom->label[i] = (char *) calloc((ATOM_LABEL_WIDTH+1), sizeof(char));
+    atom->label[i] = malloc((ATOM_LABEL_WIDTH+1)*sizeof(char)); 
     getLine(atom->fp_input, COMMENT_CHAR, inputLine , exit_on_EOF=TRUE);
-// HNS: rh change
-    atom->abo_level[i]=-1;
+    // HNS: rh change
+    // atom->abo_level[i]=-1;
     Nread = sscanf(inputLine, "%lf %lf '%20c' %d %d %d",
-    &atom->E[i], &atom->g[i], atom->label[i], &atom->stage[i], &dummy, &atom->abo_level[i]);
-//
-
-//    Nread = sscanf(inputLine, "%lf %lf '%20c' %d",
-//      &atom->E[i], &atom->g[i], atom->label[i], &atom->stage[i]);
+    &atom->E[i], &atom->g[i], atom->label[i], 
+    &atom->stage[i], &dummy, &atom->abo_level[i]);
     checkNread(Nread, Nrequired=4, routineName, checkPoint=3);
 
     atom->E[i] *= (HPLANCK * CLIGHT) / CM_TO_M;
@@ -702,23 +701,36 @@ void freeAtom(Atom *atom)
 
   /* --- Free allocated memory for atomic data structure -- --------- */
 
-  if (atom->label != NULL)       freeMatrix((void **) atom->label);
+  if (atom->label != NULL)       {
+    // freeMatrix((void **) atom->label); 
+    for (kr=0; kr<atom->Nlevel; kr++){
+      free(atom->label[kr]);
+    }
+    free(atom->label);
+  }
+  // atom->label = NULL;
   if (atom->popsinFile != NULL)  free(atom->popsinFile);
   if (atom->popsoutFile != NULL) free(atom->popsoutFile);
   if (atom->stage != NULL)       free(atom->stage);
+  // atom->stage = NULL;
   if (atom->g != NULL)           free(atom->g);
+  // atom->g = NULL;
   if (atom->E != NULL)           free(atom->E);
+  // atom->E = NULL;
+  if (atom->abo_level != NULL)   free(atom->abo_level);
+  // atom->abo_level = NULL;
   if (atom->C != NULL)           freeMatrix((void **) atom->C);
   if (atom->vbroad != NULL)      free(atom->vbroad);
 
   /* --- Be careful here because atom->n points to atom->nstar in
          the case of LTE populations (see readAtom.c) -- ------------ */ 
 
-  if (atom->n != atom->nstar)
-  if (atom->n != NULL) freeMatrix((void **) atom->n);
+  if (atom->n != atom->nstar){
+    if (atom->n != NULL) freeMatrix((void **) atom->n);
+  }
   if (atom->nstar != NULL)  freeMatrix((void **) atom->nstar);
   if (atom->ntotal != NULL) free(atom->ntotal);
-
+  
   if (atom->Gamma != NULL)  freeMatrix((void **) atom->Gamma);
 
   if (atom->line != NULL) {
@@ -726,24 +738,29 @@ void freeAtom(Atom *atom)
       freeAtomicLine(atom->line + kr);
     free(atom->line);
   }
+
   if (atom->continuum != NULL) {
     for (kr = 0;  kr < atom->Ncont;  kr++)
       freeAtomicContinuum(atom->continuum + kr);
     free(atom->continuum);
   }
+
   if (atom->ft != NULL) free(atom->ft);
 }
 /* ------- end ---------------------------- freeAtom.c -------------- */
 
 void freeAtoms()
 {
-    if (atmos.Natom > 1) {
-        for (int n = 1;  n < atmos.Natom;  n++)
-          if (!atmos.atoms[n].active  &&
-              !atmos.hydrostatic  &&
-        input.solve_ne < ITERATION)
-      freeAtom(&atmos.atoms[n]);
+    if (atmos.Natom > 0) {
+        for (int n = 0;  n < atmos.Natom;  n++)
+        {
+          freeAtom(&atmos.atoms[n]);
+        }
+        //   if (!atmos.atoms[n].active  &&
+        //       !atmos.hydrostatic  &&
+        // input.solve_ne < ITERATION)
     }
+    free(atmos.atoms);
 }
 
 /* ------- begin -------------------------- freeAtomicLine.c -------- */
@@ -772,6 +789,8 @@ void freeAtomicLine(AtomicLine *line)
   if (line->Qelast != NULL)  free(line->Qelast);
   if (line->rho_prd != NULL) freeMatrix((void **) line->rho_prd);
   if (line->fp_GII != NULL)  free(line->fp_GII);
+
+  if (line->xrd != NULL)     freeMatrix((void **) line->xrd);
 }
 /* ------- end ---------------------------- freeAtomicLine.c -------- */
 
@@ -905,13 +924,15 @@ void readAtomicModels(void)
   for (n = 0;  n < atmos.Natom;  n++)
     atmos.elements[atmos.atoms[n].periodic_table].model = &atmos.atoms[n];
 
-  free(tmp); free(tmp2);
-
   /* --- Redistribute the hydrogen populations read in with the
          atmosphere over the atmospheric Hydrogen model -- ---------- */
 
   distribute_nH();
   getCPU(2, TIME_POLL, "Read atomic input");
+
+  fclose(fp_atoms);
+  free(tmp);
+  free(tmp2);
 }
 
 /* ------- end ---------------------------- readAtomicModels.c ------ */
