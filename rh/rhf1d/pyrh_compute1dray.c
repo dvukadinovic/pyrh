@@ -347,12 +347,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   _solveray(mu, &spec);
 
-  free(spec.lam);
-  free(spec.sI);
-  free(spec.sQ);
-  free(spec.sU);
-  free(spec.sV);
-
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){
     geometry.vel[k] /= KM_TO_M;
