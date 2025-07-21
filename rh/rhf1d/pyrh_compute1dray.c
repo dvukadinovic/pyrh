@@ -358,16 +358,18 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
-  if (atmos.moving || atmos.Stokes) free(atmos.backgrrecno);
-  free(atmos.backgrflags);
-
   for (int idl=0; idl<atmos.Nrlk; idl++){
-    free(atmos.rlk_lines[idl].zm->q);
-    free(atmos.rlk_lines[idl].zm->strength);
-    free(atmos.rlk_lines[idl].zm->shift);
-    free(atmos.rlk_lines[idl].zm);
+    if (atmos.rlk_lines[idl].zm != NULL){
+      free(atmos.rlk_lines[idl].zm->q);
+      free(atmos.rlk_lines[idl].zm->strength);
+      free(atmos.rlk_lines[idl].zm->shift);
+      free(atmos.rlk_lines[idl].zm);
+    }
   }
   free(atmos.rlk_lines);
+
+  if (atmos.moving || atmos.Stokes) free(atmos.backgrrecno);
+  free(atmos.backgrflags);
   
   freeAtoms();
   freeMolecules();
