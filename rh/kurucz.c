@@ -545,8 +545,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
   hc_4PI = hc / fourPI;
 
   if (input.rlkscatter) {
-    C       = 2 * PI * (Q_ELECTRON/EPSILON_0) *
-                (Q_ELECTRON/M_ELECTRON) / CLIGHT;
+    C       = 2 * PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
     C2_atom = 2.15E-6;
     C2_ion  = 3.96E-6;
   }
@@ -558,11 +557,9 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
   Nwhite = 0;
   rlk_locate(atmos.Nrlk, atmos.rlk_lines, lambda, &Nwhite);
   Nblue = Nwhite;
-  while (atmos.rlk_lines[Nblue].lambda0 + dlamb_char > lambda &&
-	 Nblue > 0)  Nblue--;
+  while (atmos.rlk_lines[Nblue].lambda0 + dlamb_char > lambda && Nblue > 0)  Nblue--;
   Nred = Nwhite;
-  while (atmos.rlk_lines[Nred].lambda0 - dlamb_char < lambda &&
-	 Nred < atmos.Nrlk-1)  Nred++;
+  while (atmos.rlk_lines[Nred].lambda0 - dlamb_char < lambda && Nred < atmos.Nrlk-1)  Nred++;
 
   /* --- Initialize the contribution for this wavelength and angle -- */
 
