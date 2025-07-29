@@ -72,7 +72,7 @@ typedef struct {
          JFile[MAX_VALUE_LENGTH],
          background_File[MAX_VALUE_LENGTH],
          background_ray_File[MAX_VALUE_LENGTH],
-         H_atom[MAX_VALUE_LENGTH],
+         H_atom[MAX_VALUE_LENGTH], // not used
          H2_molecule[MAX_VALUE_LENGTH],
          radrateFile[MAX_VALUE_LENGTH],
          collrateFile[MAX_VALUE_LENGTH],
@@ -91,7 +91,10 @@ typedef struct {
          // flag for computing semi-analytically the RFs for atomic line parameters
          get_atomic_rfs,
          LS_Lande, // flag for computing the Lande factors in LS
-         solve_NLTE; // flag if the solution is NLTE; its LTE for False
+         solve_NLTE, // flag if the solution is NLTE; its LTE for False
+         verbose, // flag to verbose if needed some information on reading Kurucz lines
+         get_populations, // flag if need to retrieve also the level populations of Active atoms
+         read_atom_model; // flag if the atomic model is just read and no initialization of populations and broadening is needed (than it requires the atmospheric model)
   enum   solution startJ;
   
   enum   StokesMode StokesMode;
@@ -106,6 +109,7 @@ typedef struct {
          // number of atomic line parameters for which we want to compute RFs
          n_atomic_pars;
   double iterLimit, PRDiterLimit, metallicity;
+  double *abundances;
 
   pthread_attr_t thread_attr;
 } InputData;

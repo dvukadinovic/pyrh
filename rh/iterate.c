@@ -242,9 +242,9 @@ double solveSpectrum(bool_t eval_operator, bool_t redistribute)
     }
   }
 
-  sprintf(messageStr, " Spectrum max delta J = %6.4E (lambda#: %d)\n",
-	  dJmax, lambda_max);
-  Error(MESSAGE, NULL, messageStr);
+  // sprintf(messageStr, " Spectrum max delta J = %6.4E (lambda#: %d)\n",
+	//   dJmax, lambda_max);
+  // Error(MESSAGE, NULL, messageStr);
 
   getCPU(3, TIME_POLL,
 	 (eval_operator) ? "Spectrum & Operator" : "Solve Spectrum");

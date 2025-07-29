@@ -22,16 +22,16 @@
 // #include <stdio.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "background.h"
-#include "statistics.h"
-#include "error.h"
-#include "xdr.h"
-#include "constant.h"
+#include "../spectrum.h"
+#include "../background.h"
+#include "../statistics.h"
+#include "../error.h"
+#include "../../headers/xdr.h"
+#include "../constant.h"
 
 #include "pyrh_compute1dray.h"
 
@@ -41,14 +41,6 @@
 /* --- Global variables --                             -------------- */
 
 enum Topology topology = ONE_D_PLANE;
-
-// Atmosphere atmos;
-// Geometry geometry;
-// Spectrum spectrum;
-// ProgramStats stats;
-// InputData input;
-// CommandLine commandline;
-
 
 /* --- Global variables --- */
 
@@ -85,29 +77,30 @@ myRLK_Line get_RLK_lines(char *cwd)
 {
   myRLK_Line output;
 
-  atmos.Stokes = TRUE;
-  atmos.Nrlk = 0;
-
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
-  int argc = 1;
-  char* argv[] = {};
+  atmos.Stokes = TRUE;
+  atmos.Nrlk = 0;
 
-  setOptions(argc, argv);
+  setOptions(1, NULL);
+
   readInput();
 
   char* tmp = malloc(160);
-  concatenate(tmp, "/", input.KuruczData);
-  concatenate(input.KuruczData, cwd, tmp);
-
   concatenate(tmp, "/", input.atoms_input);
   concatenate(input.atoms_input, cwd, tmp);
+  free(tmp);
 
-  readAbundance(&atmos);
-  // need H atom to be read; H.weight needed for ABO coeffs
-  readAtomicModels();
+  // print out if we have ABO coeffs for each Kurucz line
+  input.verbose = TRUE;
+
+  readAbundance(&atmos, 0, NULL, NULL);
+  // needs H atomic weight to compute ABO coeffs...
+  readAtomicModels(); 
+
   readKuruczLines(input.KuruczData);
 
   output.Nrlk = atmos.Nrlk;
@@ -116,21 +109,16 @@ myRLK_Line get_RLK_lines(char *cwd)
   return output;
 }
 
-void dummy(myRLK_Line pyrh_lines){
-  printf("Nlines = %d\n", pyrh_lines.Nrlk);
-  printf("Ej = %e\n", pyrh_lines.rlk_lines[0].GStark);
-}
-
-// int argc, char *argv[], 
 mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
-              double *pyrh_nH, int pyrh_atm_scale, 
+              double *pyrh_nH, int pyrh_atm_scale,
               int Nwave, double *lam,
               int fudge_num, double *fudge_lam, double *fudge,
               int Nloggf, int *loggf_ids, double *loggf_values,
               int Nlam, int *lam_ids, double *lam_values,
-              int get_atomic_rfs,
+              int Nabun, int *atomic_id, double *atomic_abundance,
+              int get_atomic_rfs, int get_populations,
               int NKurucz_lists, char *Kurucz_lists)
               // myRLK_Line *pyrh_rlk_lines,
 {
@@ -142,16 +130,16 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   char* keyword_input = malloc(160);
   concatenate(keyword_input, cwd, "/keyword.input");
   strcpy(commandline.keyword_input, keyword_input);
+  free(keyword_input);
 
-  int argc = 1;
-  char* argv[] = {};
-  // = {"../rhf1d", "-i", keyword_input};
-
-  setOptions(argc, argv);
-  // getCPU(0, TIME_START, NULL);
+  setOptions(1, NULL);
   SetFPEtraps();
 
   readInput();
+
+  input.verbose = FALSE;
+
+  input.get_populations = get_populations;
 
   // We are not performing HSE; atoms and molecules can be NLTE
   input.pyrhHSE = FALSE;
@@ -174,6 +162,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // Kurucz list file
   concatenate(tmp, "/", input.KuruczData);
   concatenate(input.KuruczData, cwd, tmp);
+  free(tmp);
 
   // DV: override/set some parameters 
   // atoms and molecules can be NLTE (if HSE=TRUE, than everything is LTE)
@@ -235,7 +224,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   geometry.Ndep = pyrh_Ndep;
   
   getCPU(1, TIME_START, NULL);
-  MULTIatmos(&atmos, &geometry);
+  MULTIatmos(&atmos, &geometry, Nabun, atomic_id, atomic_abundance);
   atmos.active_layer = -1;
   
   if (pyrh_atm_scale==0){
@@ -339,8 +328,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
-  // printf("%e\n", spectrum.J[3][41]);
-  // printf(" --- Iteration done! --- \n");
 
   adjustStokesMode();
   niter = 0;
@@ -358,7 +345,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
-  _solveray(argv, mu, &spec);
+  _solveray(mu, &spec);
 
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){
@@ -371,8 +358,25 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   //--- free all the memory that we do not use anymore
 
+  for (int idl=0; idl<atmos.Nrlk; idl++){
+    if (atmos.rlk_lines[idl].zm != NULL){
+      free(atmos.rlk_lines[idl].zm->q);
+      free(atmos.rlk_lines[idl].zm->strength);
+      free(atmos.rlk_lines[idl].zm->shift);
+      free(atmos.rlk_lines[idl].zm);
+    }
+  }
+  free(atmos.rlk_lines);
+
+  if (atmos.moving || atmos.Stokes) free(atmos.backgrrecno);
+  free(atmos.backgrflags);
+  
   freeAtoms();
   freeMolecules();
+  freeElements();
+  
+  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
+  if (spectrum.as!=NULL) free(spectrum.as); 
 
   if (atmos.Stokes){
     freeMatrix((void **) atmos.cos_gamma);
@@ -383,9 +387,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   freeOpacityEmissivity();
   if (input.get_atomic_rfs) freeOpacityEmissivityDer();
 
-  if (atmos.Nrlk!=0) {
-    freePartitionFunction();
-  }
+  free(atmos.N);
+  free(atmos.nHmin);
 
   // free geometry related data
   if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
@@ -394,6 +397,11 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
   if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
+
+  free(geometry.wmu);
+  free(geometry.mux);
+  free(geometry.muy);
+  free(geometry.muz);
 
   return spec;
 }

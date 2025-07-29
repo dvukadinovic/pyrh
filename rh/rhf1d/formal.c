@@ -14,17 +14,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "constant.h"
-#include "background.h"
-#include "inputs.h"
-#include "error.h"
-#include "xdr.h"
-#include "bezier.h"
+#include "../spectrum.h"
+#include "../constant.h"
+#include "../background.h"
+#include "../inputs.h"
+#include "../error.h"
+#include "../../headers/xdr.h"
+#include "../bezier.h"
 
 
 /* --- Function prototypes --                          -------------- */
@@ -233,7 +233,9 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	    Piecewise_1D(nspect, mu, to_obs, chi, S, I, Psi);
       	  } else if (input.S_interpolation == S_BEZIER3) {
       	    Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi, dI);
-            if (input.get_atomic_rfs) Piecewise_Bezier3_1D_RFs(nspect, mu, to_obs, chi, S, I, dI);
+            // if (input.get_atomic_rfs && to_obs) {
+            //   Piecewise_Bezier3_1D_RFs(nspect, mu, to_obs, chi, S, I, dI);
+            // }
       	  } else {
       	    sprintf(messageStr,
       		    "Unknown radiation solver: %d",
@@ -290,8 +292,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 
     for (k = 0;  k < Nspace;  k++) {
       chi[k] = as->chi[k] + as->chi_c[k];
-      S[k]   = (as->eta[k] +
-		  as->eta_c[k] + as->sca_c[k]*Jdag[k]) / chi[k];
+      S[k]   = (as->eta[k] + as->eta_c[k] + as->sca_c[k]*Jdag[k]) / chi[k];
     }
 
     for (mu = 0;  mu < Nrays;  mu++) {
@@ -325,7 +326,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
   free_as(nspect, eval_operator);
   if (eval_operator) free(Psi);
 
-  free(chi); 
+  free(chi);
   if (solveStokes) {
     freeMatrix((void **) Ipol);
     freeMatrix((void **) Spol);

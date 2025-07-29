@@ -22,17 +22,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
-#include "spectrum.h"
-#include "background.h"
-#include "statistics.h"
-#include "inputs.h"
-#include "error.h"
-#include "xdr.h"
-#include "constant.h"
+#include "../spectrum.h"
+#include "../background.h"
+#include "../statistics.h"
+#include "../inputs.h"
+#include "../error.h"
+#include "../../headers/xdr.h"
+#include "../constant.h"
 
 #include "pyrh_compute1dray.h"
 
@@ -61,7 +61,7 @@ extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(char *argv[], double muz, mySpectrum *spec);
+void _solveray(double muz, mySpectrum *spec);
 
 int _getnumber(int* z)
 {
@@ -72,7 +72,7 @@ int _getnumber(int* z)
 
 /* ------- begin -------------------------- solveray.c -------------- */
 
-void _solveray(char *argv[], double muz, mySpectrum *spec)
+void _solveray(double muz, mySpectrum *spec)
 {
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
@@ -112,7 +112,7 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
   spec->J = NULL;
   spec->J20 = NULL;
 
-  int Nlw = spec->nlw;// - 1;
+  int Nlw = spec->nlw;
   Nlw -= 1;
 
   spec->stokes = 0;
@@ -140,16 +140,48 @@ void _solveray(char *argv[], double muz, mySpectrum *spec)
       spec->sV[index] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
     }
+    // free_as(idl, FALSE);
     if (input.get_atomic_rfs){
       for (int idp=0; idp<input.n_atomic_pars; idp++){
         spec->rfs[index][idp] = atmos.atomic_rfs[idl][0][idp];
       }
     }
     index += 1;
-    // for (int idz=0; idz<atmos.Nspace; idz++)
-    //   spec->J[idl,idz] = &spectrum.J[idz][idl];
   }
-  spec->J = spectrum.J;
+  // for (int idl=0; idl<spectrum.Nspect-3; idl++){
+  //   printf(" -- %d :: ", idl);
+  //   // free_as(idl, FALSE);
+  // }
+
   spec->nlw = Nlw;
-  // memcpy(spec->J, spectrum.J, (Nlw+1)*atmos.Nspace * sizeof(double));
+
+  // deallocate Stokes spectrum
+  if (spectrum.lambda!=NULL) free(spectrum.lambda);
+  if (spectrum.I!=NULL) freeMatrix((void **) spectrum.I);
+  if (spectrum.Stokes_Q!=NULL) freeMatrix((void **) spectrum.Stokes_Q);
+  if (spectrum.Stokes_U!=NULL) freeMatrix((void **) spectrum.Stokes_U);
+  if (spectrum.Stokes_V!=NULL) freeMatrix((void **) spectrum.Stokes_V);
+
+  // deallocate J and J20
+  if (spectrum.J!=NULL) freeMatrix((void **) spectrum.J);
+  if (input.backgr_pol){
+    if (spectrum.J20!=NULL) freeMatrix((void **) spectrum.J20);
+  }
+
+  Atom *atom;
+
+  if (input.get_populations){
+    spec->atom_pops = malloc(atmos.Nactiveatom * sizeof(AtomPops));
+    spec->Nactive_atoms = atmos.Nactiveatom;
+    for (int nact = 0;  nact < atmos.Nactiveatom;  nact++) {
+      atom = atmos.activeatoms[nact];
+
+      // spec->atom_pops[nact].ID = atom->ID;
+      strcpy(&spec->atom_pops[nact].ID[0], &atom->ID[0]);
+      spec->atom_pops[nact].Nlevel = atom->Nlevel;
+      spec->atom_pops[nact].Nz = atmos.Nspace;
+      spec->atom_pops[nact].n = atom->n;
+      spec->atom_pops[nact].nstar = atom->nstar;
+    } 
+  }
 }

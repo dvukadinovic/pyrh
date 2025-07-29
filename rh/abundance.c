@@ -56,16 +56,11 @@
 #include "constant.h"
 #include "error.h"
 #include "inputs.h"
-#include "xdr.h"
+#include "../headers/xdr.h"
 #include "atomweights.h"
-
 
 #define COMMENT_CHAR           "#"
 #define MINIMUM_LOG_ABUNDANCE  -8.0
-
-
-/* --- Function prototypes --                          -------------- */
-
 
 /* --- Global variables --                             -------------- */
 
@@ -74,14 +69,14 @@ extern char messageStr[];
 
 /* ------- begin -------------------------- readAbundance.c --------- */
 
-void readAbundance(Atmosphere *atmos)
+void readAbundance(Atmosphere *atmos, int Nabun, int *atomic_id, double *atomic_abundance)
 {
   const char routineName[] = "readAbundance";
   register int n, k, i;
 
   char   ID[ATOM_ID_WIDTH+1], line[MAX_LINE_SIZE], *match;
   bool_t result = TRUE, DEX = FALSE, exit_on_EOF;
-  int    Nread, pti;
+  int    Nread, pti, ida_reading=1;
   double abund, totalAbund, avgWeight, metallicity;
   Element *element;
   FILE  *fp_abund, *fp_pf;
@@ -119,12 +114,23 @@ void readAbundance(Atmosphere *atmos)
     UpperCase(ID);
     if (strlen(ID) == 1) strcat(ID, " ");
 
+    // update abundance to those forwarded from globin
+    if (Nabun!=0){
+      for (int ida=0; ida<Nabun; ida++){
+        if (atomic_id[ida]==ida_reading){
+          abund = atomic_abundance[ida];
+          break;
+        }
+      }
+    }
+    ida_reading += 1;
+
     for (n = 0;  n < atmos->Nelem;  n++) {
       if ((match = strstr(atmos->elements[n].ID, ID))) {
-	atmos->elements[n].abund = abund;
-	if (strstr(ID, "H ")  &&  (abund == 12.0)) DEX = TRUE;
-        atmos->elements[n].abundance_set = TRUE;
-	break;
+        atmos->elements[n].abund = abund;
+        if (strstr(ID, "H ")  &&  (abund == 12.0)) DEX = TRUE;
+              atmos->elements[n].abundance_set = TRUE;
+        break;
       }
     }
     if (!match) {

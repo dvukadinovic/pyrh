@@ -196,6 +196,20 @@ bool_t getBarklemcross(Barklemstruct *bs, RLK_Line *rlk)
 }
 /* ------- end ---------------------------- getBarklemcross.c ------- */
 
+void getABOcross(RLK_Line *rlk){
+  double reducedmass, meanvelocity, crossmean;
+  Element *element;
+
+  element = &atmos.elements[rlk->pt_index - 1];
+  reducedmass  = AMU / (1.0/atmos.H->weight + 1.0/element->weight);
+  meanvelocity = sqrt(8.0 * KBOLTZMANN / (PI * reducedmass));
+  crossmean    = SQ(RBOHR) * pow(meanvelocity / 1.0E4, -rlk->alpha);
+
+  rlk->cross *= 2.0 * pow(4.0/PI, rlk->alpha/2.0) * exp(gammln((4.0 - rlk->alpha)/2.0)) * meanvelocity * crossmean;  
+
+  rlk->vdwaals = BARKLEM;
+}
+
 /* ------- begin -------------------------- getBarklemactivecross.c - */
 
 bool_t getBarklemactivecross(AtomicLine *line)
@@ -293,6 +307,11 @@ bool_t getBarklemactivecross(AtomicLine *line)
 
   line->cvdWaals[2] = 1.0;
   line->cvdWaals[3] = 0.0;
+
+  free(bs.neff1);
+  free(bs.neff2);
+  freeMatrix((void **) bs.cross);
+  freeMatrix((void **) bs.alpha);
 
   return TRUE;
 }

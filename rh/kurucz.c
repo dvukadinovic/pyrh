@@ -85,7 +85,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 
 #define COMMENT_CHAR             "#"
 // #define RLK_RECORD_LENGTH        160
-#define RLK_RECORD_LENGTH        164
+#define RLK_RECORD_LENGTH        171
 #define Q_WING                   20.0
 #define MILLI                    1.0E-03
 #define ANGSTROM_TO_NM           0.1
@@ -105,7 +105,7 @@ void             initRLK(RLK_Line *rlk);
 bool_t           RLKdeterminate(char *labeli, char *labelj, RLK_Line *rlk);
 void             getUnsoldcross(RLK_Line *rlk);
 void             free_BS(Barklemstruct *bs);
-void             freePartitionFunction();
+void             freeElements();
 
 
 /* --- Global variables --                             -------------- */
@@ -172,8 +172,7 @@ void readKuruczLines(char *inputFile)
     rewind(fp_linelist);
 
     if (atmos.Nrlk == 0) atmos.rlk_lines = NULL;
-    atmos.rlk_lines = (RLK_Line *)
-      realloc(atmos.rlk_lines, (Nline + atmos.Nrlk) * sizeof(RLK_Line));
+    atmos.rlk_lines = (RLK_Line *) realloc(atmos.rlk_lines, (Nline + atmos.Nrlk) * sizeof(RLK_Line));
 
     /* --- Read lines from file --                     -------------- */
 
@@ -184,7 +183,7 @@ void readKuruczLines(char *inputFile)
 
         initRLK(rlk);
 
-      	Nread = sscanf(inputLine, "%lf %lf %s %lf",
+        Nread = sscanf(inputLine, "%lf %lf %s %lf",
       		       &lambda_air, &gf, (char *) &elem_code, &Ei);
 
         /* --- Ionization stage and periodic table index -- --------- */
@@ -193,7 +192,7 @@ void readKuruczLines(char *inputFile)
 
         Nread += sscanf(inputLine+53, "%lf", &Ej);
 
-      	Ei = fabs(Ei) * (HPLANCK * CLIGHT) / CM_TO_M;
+        Ei = fabs(Ei) * (HPLANCK * CLIGHT) / CM_TO_M;
       	Ej = fabs(Ej) * (HPLANCK * CLIGHT) / CM_TO_M;
 
         /* --- Beware: the Kurucz linelist has upper and lower levels
@@ -261,23 +260,33 @@ void readKuruczLines(char *inputFile)
       	rlk->Bji = CUBE(lambda0) / (2.0 * HPLANCK * CLIGHT) * rlk->Aji;
       	rlk->Bij = (rlk->gj / rlk->gi) * rlk->Bji;
 
-        line_index++;
-
         /* --- Store in nm --                          -------------- */
 
         rlk->lambda0 = lambda0 / NM_TO_M;
 
         // DV: read orbital quantum numbers of levels 
         int Nread_l, li=-1, lj=-1;
-        bool_t got_orbital_numbers = FALSE;
-        Nread_l = sscanf(inputLine+160, "%1d %1d", &li, &lj);
+        double alpha, sigma;
+        // bool_t got_orbital_numbers = FALSE;
+        bool_t got_ABO_coeffs = FALSE;
+        Nread_l = sscanf(inputLine+160, "%lf %lf", &alpha, &sigma);
         if (Nread_l!=-1){
-          got_orbital_numbers = TRUE;
-          if (swap_levels){
-            SWAPDOUBLE(li, lj);
+          if (((alpha==0.0) || (alpha==1.0) || (alpha==2.0) || (alpha==3.0)) || ((sigma==0.0) || (sigma==1.0) || (sigma==2.0) || (sigma==3.0))){
+            // got_orbital_numbers = TRUE;
+            li = (int)alpha;
+            lj = (int)sigma;
+            if (swap_levels){
+              SWAPDOUBLE(li, lj);
+            }
+            rlk->li = li;
+            rlk->lj = lj;
           }
-          rlk->li = li;
-          rlk->lj = lj;
+          else{
+            got_ABO_coeffs = TRUE;
+            rlk->alpha = alpha;
+            rlk->cross = sigma;
+            getABOcross(rlk);
+          }
         }
 
         /* --- Get quantum numbers for angular momentum and spin -- - */
@@ -302,11 +311,12 @@ void readKuruczLines(char *inputFile)
 
         /* --- If possible use Barklem formalism --    -------------- */
 
-        useBarklem = FALSE;
+        // useBarklem = FALSE;
+        useBarklem = got_ABO_coeffs;
 
         // [DV] we use orbital quantum number (l) to determine the ABO cross section,
         // not the total angular momentum (L) from the term symbol.
-        if (got_orbital_numbers){
+        if (!got_ABO_coeffs){
           if ((rlk->li==0 && rlk->lj==1) || (rlk->li==1 && rlk->lj==0)){
             useBarklem = getBarklemcross(&bs_SP, rlk);
           }
@@ -317,6 +327,17 @@ void readKuruczLines(char *inputFile)
             useBarklem = getBarklemcross(&bs_DF, rlk);
           }
         }
+
+        if (input.verbose) {
+          if (useBarklem)
+          {
+            printf(" Using ABO broadening for line -- %d @ %f\n", line_index+1, lambda_air);
+          } else {
+            printf(" No ABO broadening for line    -- %d @ %f\n", line_index+1, lambda_air);
+          }
+        }
+
+        line_index++;
 
       	/* --- Else use good old Unsoeld --            -------------- */
 
@@ -524,8 +545,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
   hc_4PI = hc / fourPI;
 
   if (input.rlkscatter) {
-    C       = 2 * PI * (Q_ELECTRON/EPSILON_0) *
-                (Q_ELECTRON/M_ELECTRON) / CLIGHT;
+    C       = 2 * PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
     C2_atom = 2.15E-6;
     C2_ion  = 3.96E-6;
   }
@@ -537,11 +557,9 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
   Nwhite = 0;
   rlk_locate(atmos.Nrlk, atmos.rlk_lines, lambda, &Nwhite);
   Nblue = Nwhite;
-  while (atmos.rlk_lines[Nblue].lambda0 + dlamb_char > lambda &&
-	 Nblue > 0)  Nblue--;
+  while (atmos.rlk_lines[Nblue].lambda0 + dlamb_char > lambda && Nblue > 0)  Nblue--;
   Nred = Nwhite;
-  while (atmos.rlk_lines[Nred].lambda0 - dlamb_char < lambda &&
-	 Nred < atmos.Nrlk-1)  Nred++;
+  while (atmos.rlk_lines[Nred].lambda0 - dlamb_char < lambda && Nred < atmos.Nrlk-1)  Nred++;
 
   /* --- Initialize the contribution for this wavelength and angle -- */
 
@@ -1010,12 +1028,14 @@ void free_BS(Barklemstruct *bs)
 }
 /* ------- end ---------------------------- free_BS.c --------------- */
 
-void freePartitionFunction()
+void freeElements()
 {
   free(atmos.Tpf);  atmos.Tpf = NULL;
   for (int n = 0;  n < atmos.Nelem;  n++) {
+    free(atmos.elements[n].mol_index);
     free(atmos.elements[n].ionpot);
     freeMatrix((void **) atmos.elements[n].pf);
     if (atmos.elements[n].n) freeMatrix((void **) atmos.elements[n].n);
   }
+  free(atmos.elements);
 }

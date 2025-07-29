@@ -439,37 +439,27 @@ void alloc_as(int nspect, bool_t crosscoupling)
     atom = atmos.activeatoms[nact];
 
     if (as->Nactiveatomrt[nact] > 0) {
-		  atom->rhth[nt].eta =
-				(double *) malloc(NrecStokes_as * atmos.Nspace * sizeof(double));
+		  atom->rhth[nt].eta = (double *) malloc(NrecStokes_as * atmos.Nspace * sizeof(double));
 
-			atom->rhth[nt].Vij =
-				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
-		  atom->rhth[nt].gij =
-				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
-		  atom->rhth[nt].wla =
-				matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+			atom->rhth[nt].Vij = matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+		  atom->rhth[nt].gij = matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
+		  atom->rhth[nt].wla = matrix_double(as->Nactiveatomrt[nact], atmos.Nspace);
 
       /* --- Allocate pointer space for cross-coupling coefficients - */
 
       if (crosscoupling) {
-				atom->rhth[nt].chi_down = 
-				  (double **) calloc(atom->Nlevel, sizeof(double *));
-				atom->rhth[nt].chi_up   =
-				  (double **) calloc(atom->Nlevel, sizeof(double *));
-				atom->rhth[nt].Uji_down =
-				  (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].chi_down = (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].chi_up   = (double **) calloc(atom->Nlevel, sizeof(double *));
+				atom->rhth[nt].Uji_down = (double **) calloc(atom->Nlevel, sizeof(double *));
 
 				for (m = 0;  m < as->Nlower[nact];  m++) {
 				  i = as->lower_levels[nact][m];
-				  atom->rhth[nt].chi_up[i] =
-				    (double *) malloc(atmos.Nspace * sizeof(double));
+				  atom->rhth[nt].chi_up[i] = (double *) malloc(atmos.Nspace * sizeof(double));
 				}
 				for (m = 0;  m < as->Nupper[nact];  m++) {
 				  j = as->upper_levels[nact][m];
-				  atom->rhth[nt].chi_down[j] =
-				    (double *) malloc(atmos.Nspace * sizeof(double));
-				  atom->rhth[nt].Uji_down[j] =
-				    (double *) malloc(atmos.Nspace * sizeof(double));
+				  atom->rhth[nt].chi_down[j] = (double *) malloc(atmos.Nspace * sizeof(double));
+				  atom->rhth[nt].Uji_down[j] = (double *) malloc(atmos.Nspace * sizeof(double));
 				}
       }
     }
@@ -479,15 +469,11 @@ void alloc_as(int nspect, bool_t crosscoupling)
     molecule = atmos.activemols[nact];
 
     if (as->Nactivemolrt[nact] > 0) {
-      molecule->rhth[nt].eta =
-				(double *) malloc(atmos.Nspace * sizeof(double));
+      molecule->rhth[nt].eta = (double *) malloc(atmos.Nspace * sizeof(double));
 
-      molecule->rhth[nt].Vij = 
-				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
-      molecule->rhth[nt].gij =
-				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
-      molecule->rhth[nt].wla =
-				matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+      molecule->rhth[nt].Vij = matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+      molecule->rhth[nt].gij = matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
+      molecule->rhth[nt].wla = matrix_double(as->Nactivemolrt[nact], atmos.Nspace);
     }
   }
 }
@@ -507,18 +493,14 @@ void free_as(int nspect, bool_t crosscoupling)
   as = &spectrum.as[nspect];
   nt = nspect % input.Nthreads;
 
-  // free(as->chi_c);
-  // free(as->eta_c);
-  // free(as->sca_c);
-
+  // printf("%d\n", nspect);
   free(as->chi);
   free(as->eta);
 
   if (input.StokesMode == FULL_STOKES && input.magneto_optical) {
     // if (atmos.backgrflags[nspect].ispolarized)
     //   free(as->chip_c);
-    if (containsPolarized(as))
-      free(as->chip);
+    if (containsPolarized(as)) free(as->chip);
   }
 
   for (nact = 0;  nact < atmos.Nactiveatom;  nact++) {
@@ -552,6 +534,13 @@ void free_as(int nspect, bool_t crosscoupling)
       }
     }
   }
+
+  // DV: cannot free() these in NLTE mode...
+  // free(as->Nlower);
+  // free(as->Nupper);
+
+  // freeMatrix((void **) as->lower_levels);
+  // freeMatrix((void **) as->upper_levels);
   
   for (nact = 0;  nact < atmos.Nactivemol;  nact++) {
     molecule = atmos.activemols[nact];
@@ -709,6 +698,8 @@ flags MolecularOpacity(double lambda, int nspect, int mu, bool_t to_obs,
 		       double *chi, double *eta, double *chip)
 {
   register int n, k, kr;
+
+  // printf(" Get MolOpacity @ %f\n", lambda);
 
   /* --- Opacity due to molecular lines in the background. LTE
          populations are assumed. If magnetic fields are present

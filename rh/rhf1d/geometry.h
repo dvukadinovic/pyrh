@@ -29,7 +29,7 @@ typedef struct {
 void convertScales(Atmosphere *atmos, Geometry *geometry);
 void getAngleQuad(Geometry *geometry);
 void getBoundary(Geometry *geometry);
-void MULTIatmos(Atmosphere *atmos, Geometry *geometry);
+void MULTIatmos(Atmosphere *atmos, Geometry *geometry, int Nabun, int *atomic_id, double *atomic_abundance);
 void writeGeometry(Geometry *geometry);
 
 

@@ -1,7 +1,7 @@
 pyrh API
 ========
 
-.. py:function:: pyrh.hse(cwd, atm_scale, scale, temp, pg_top=0.1, fudge_wave=None, fudge_value=None, full_output=False)
+.. py:function:: pyrh.hse(cwd, atm_scale, scale, temp, pg_top=0.1, fudge_wave=None, fudge_value=None, atomic_number=None, atomic_abundance=None, full_output=False)
 
 	Set the atmosphere in hydrostatic equilibrium (HSE) by computing the electron and total hydrogen densities from given temperature, assuming an ideal gas law and LTE populations of species in the atmosphere.
 
@@ -26,12 +26,18 @@ pyrh API
 	:param fudge_value: The opacity fudge coefficients for each wavelength given in ``fudge_wave``. This is 2D array with three columns, each giving the fudge coefficients for H-, scattering and metals continuum opacity sources, respectively. By default ``fudge_value=None``.
 	:type fudge_value: default, C contiguouse float64 numpy.ndarray
 
+	:param atomic_number: The array containing the atomic number of elements for which we want to alter the abundance from the default ones found in the ``pyrh/rh/Atoms/abundance.dat`` file.
+	:type atomic_number: default, C contiguouse int32 numpy.ndarray
+
+	:param atomic_abundance: The array containing the abundances of the elements listed in ``atomic_number``.
+	:type atomic_abundance: default, C contiguouse float64 numpy.ndarray
+
 	:param full_output: Flag for the amount of output provided. If ``True``, the method return electron density, total hydrogen density, mass density and gas pressure, respectively. By default ``full_output=False`` and the method returns only electron density and total hydrogen density.
 	:type full_output: default, bool
 
 	:return: Electron and total hydrogen density. If ``full_output=True``, then it returns electron density, total hydrogen density, mass density and gas pressure.
 
-.. py:function:: pyrh.get_scales(cwd, atm_scale, scale, atmosphere, lam_ref)
+.. py:function:: pyrh.get_scales(cwd, atm_scale, scale, atmosphere, lam_ref, atomic_number=None, atomic_abundance=None)
 
 	Compute the atmospheric scales: optical depth, height and column mass density at a given reference wavelength. From the provided scale, method computes opacity and converts it to the other two scales.
 
@@ -49,6 +55,12 @@ pyrh API
 
 	:param lam_ref: Reference wavelength in vacuum in nanometer units for which we give scales (optical depth and column mass) or at which we want to compute them.
 	:type lam_ref: double
+
+	:param atomic_number: The array containing the atomic number of elements for which we want to alter the abundance from the default ones found in the ``pyrh/rh/Atoms/abundance.dat`` file.
+	:type atomic_number: default, C contiguouse int32 numpy.ndarray
+
+	:param atomic_abundance: The array containing the abundances of the elements listed in ``atomic_number``.
+	:type atomic_abundance: default, C contiguouse float64 numpy.ndarray
 
 	:return: The scales in this order: optical depth, height in meters and column mass in kg/m2.
 	:return type: C contiguouse float64 numpy.ndarray
@@ -75,7 +87,7 @@ pyrh API
 	:return: The electron density in 1/cm3.
 	:return type: C contiguouse float64 numpy.ndarray
 
-.. py:function:: pyrh.compute1d(cwd, mu, atm_scale, atmosphere, wave, loggf_ids=None, loggf_values=None, lam_ids=None, lam_values=None, fudge_wave=None, fudge_value=None, get_atomic_rfs=False)
+.. py:function:: pyrh.compute1d(cwd, mu, atm_scale, atmosphere, wave, loggf_ids=None, loggf_values=None, lam_ids=None, lam_values=None, fudge_wave=None, fudge_value=None, atomic_number=None, atomic_abundance=None, get_atomic_rfs=False)
 
 	Synthesise a spectrum and return the Stokes vector.
 
@@ -111,6 +123,12 @@ pyrh API
 
 	:param fudge_value: The opacity fudge coefficients for each wavelength given in ``fudge_wave``. This is 2D array with three columns, each giving the fudge coefficients for H-, scattering and metals continuum opacity sources, respectively. By default ``fudge_value=None``.
 	:type fudge_value: default, C contiguouse float64 numpy.ndarray
+
+	:param atomic_number: The array containing the atomic number of elements for which we want to alter the abundance from the default ones found in the ``pyrh/rh/Atoms/abundance.dat`` file.
+	:type atomic_number: default, C contiguouse int32 numpy.ndarray
+
+	:param atomic_abundance: The array containing the abundances of the elements listed in ``atomic_number``.
+	:type atomic_abundance: default, C contiguouse float64 numpy.ndarray
 
 	:param get_atomic_rfs: Flag if we want to compute the analytical response functions to log(gf) for lines given in ``loggf_ids``. Default ``False``.
 	:type get_atomic_rfs: bool

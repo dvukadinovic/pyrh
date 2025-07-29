@@ -118,7 +118,7 @@
 #include "error.h"
 #include "statistics.h"
 #include "inputs.h"
-#include "xdr.h"
+#include "../headers/xdr.h"
 
 
 #define COMMENT_CHAR  "#"
@@ -308,8 +308,7 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   backgrrecno = 0;
 
   if (atmos.moving || atmos.Stokes) {
-    atmos.backgrrecno = 
-      (int *) malloc(2*spectrum.Nspect*atmos.Nrays * sizeof(int));
+    atmos.backgrrecno = (int *) malloc(2*spectrum.Nspect*atmos.Nrays * sizeof(int));
   } else
     atmos.backgrrecno = (int *) malloc(spectrum.Nspect * sizeof(int));
 
