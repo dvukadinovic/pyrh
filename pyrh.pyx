@@ -248,7 +248,7 @@ cdef class RH:
 	cdef public double wavelength_max
 	cdef double* wavelength_vacuum
 
-	def __init__(self):
+	def __init__(self, cwd):
 		# convert the 'cwd' to the C char pointer
 		py_list = cwd.split(" ")
 		argc = len(py_list)
