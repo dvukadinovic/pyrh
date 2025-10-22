@@ -335,6 +335,10 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
     free(S);
   }
 
+  if (input.get_atomic_rfs){
+    freeMatrix(dI);
+  }
+
   free(Jdag);
   if (input.limit_memory) free(J);
   if (input.backgr_pol) {
