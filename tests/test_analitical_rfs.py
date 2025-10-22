@@ -34,11 +34,8 @@ def spinor2multi(atm):
 
 def compute_numerical_rf():
 	start = time()
-	output = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]+perturbation, get_opacities=True)
-	spec_plus = output["spectrum"]
-	op = output["opacities"]
-	output = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]-perturbation, get_opacities=True)
-	spec_minus = output["spectrum"]
+	spec_plus = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]+perturbation)
+	spec_minus = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]-perturbation)
 
 	# plt.plot(spec_plus[0] - spec_minus[0], label="plus")
 	# plt.plot(spec_minus[0], label="minus")
@@ -48,7 +45,7 @@ def compute_numerical_rf():
 
 	print(f"Numerical RFs: {time() - start:.3f}")
 
-	return rf, op, output["opacities"]
+	return rf
 
 perturbation = 1e-3
 atmos = np.loadtxt("falc.dat", skiprows=1).T
@@ -61,58 +58,26 @@ atm_scale = 0 # tau
 
 wave = np.linspace(630.25, 630.5, num=201)
 
-ids = np.array([0, 1], dtype=np.int32)
-values = np.array([-0.71, -0.969], dtype=np.float64)
+ids = np.array([0], dtype=np.int32)
+values = np.array([-0.71], dtype=np.float64)
 
 start = time()
 
-# output = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave,
-#                       get_opacities=True
-#                     )
-# opacities = output["opacities"]
-rf_num, op_pos, op_neg = compute_numerical_rf()
+rf_num = compute_numerical_rf()
 
-output = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, 
+spec, rf = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, 
 					  loggf_ids=ids,
 					  loggf_values=values,
-                      get_atomic_rfs=True,
-                      get_opacities=True
+                      get_atomic_rfs=True
                     )
 print(f"Analytical RFs: {time() - start:.3f}")
-spec = output["spectrum"]
-rf = output["response_functions"]
-opacities_anal = output["opacities"]
-dopacities_anal = output["d_opacities"]
 
-idw = 150
-idp = 0
+# for idp in range(rf.shape[0]):
+# 	plt.plot(spec[-1], rf[idp]/spec[0][-1], lw=2, c="C0", label="ana")
+# plt.plot(spec[-1], rf_num/spec[0][-1], lw=0.75, c="k", label="num")
 
-# print(op_pos[idp,:,idw] - opacities_anal[idp,:,idw])
-# print(dopacities_anal[0,idp,:,idw]*perturbation)
-# print((op_pos[idp,:,idw] - opacities_anal[idp,:,idw])/dopacities_anal[0,idp,:,idw]/perturbation)
+plt.plot((rf[0]/rf_num-1)*100)
 
-# sys.exit()
-
-# plt.plot(op_pos[0,:,idw] - opacities_anal[0,:,idw], label="diff", c="C1", lw=2)
-# plt.plot(dopacities_anal[0,0,:,idw]*perturbation, label="anal", c="C2")
-# plt.plot(op_pos[1,:,idw] - opacities_anal[1,:,idw], label="diff", c="C1", lw=2, ls="--")
-# plt.plot(dopacities_anal[0,1,:,idw]*perturbation, label="anal", c="C2", ls="--")
-# plt.plot(opacities[0,:,idw]*np.log(10)*perturbation, label="theory")
-# plt.yscale("log")
-# plt.legend()
-# plt.show()
-
-# sys.exit()
-
-# print(rf[:,0]/rf_num[:])
-
-# plt.plot(spec[-1], (-rf[0] - rf_num)/rf_num[0])
-for idp in range(rf.shape[1]):
-	plt.plot(spec[-1], rf[...,idp]/spec[0][-1], lw=2, c="C0", label="ana")
-plt.plot(spec[-1], rf_num/spec[0][-1], lw=0.75, c="k", label="num")
-# plt.plot(rf[...,0]/rf_num)
-
-# plt.yscale("log")
 plt.legend()
 
 plt.show()
