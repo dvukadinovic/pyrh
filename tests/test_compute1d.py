@@ -32,7 +32,12 @@ def spinor2multi(atm):
 	return new
 
 def get_spectra():
-	return pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave)
+	out = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave)
+	plt.plot(out[-1], out[0])
+	plt.show()
+	del out
+	# for item in out:
+	# 	del item
 	# print(spec[0]/spec[0][0])
 	# print(spec[1]/spec[0][0])
 	# import matplotlib.pyplot as plt
@@ -57,9 +62,10 @@ wave = np.linspace(630.25, 630.5, num=100)
 # it increases more with iterations than with wavelengths
 
 for _ in range(1):
-	spec = get_spectra()
+	# print(_)
+	get_spectra()
 
-plt.plot(spec[-1], spec[0])
+# plt.plot(spec[-1], spec[0])
 
 # atomic_number = np.array([26], dtype=np.int32)
 # atomic_abundance = np.array([7], dtype=np.float64)
@@ -69,4 +75,4 @@ plt.plot(spec[-1], spec[0])
 
 # plt.plot(spec[-1], spec[0])
 
-plt.show()
+# plt.show()

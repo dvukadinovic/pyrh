@@ -1,7 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
+# import matplotlib.pyplot as plt
+import time
 import pyrh
+
+def do_it():
+	ne, nH, rho, pg = pyrh.hse(cwd, atm_scale, scale, atmos[1], full_output=True)
+	del ne
+	del nH
+	del rho
+	del pg
+	# time.sleep(0.25)
 
 def spinor2multi(atm):
 	"""
@@ -39,14 +47,19 @@ scale = atmos[0]
 cwd = "."
 atm_scale = 0 # tau
 
-old = atmos[2].copy()
+# time.sleep(2)
+for _ in range(100000):
+	# print(_)
+	do_it()
 
-atomic_number = np.array([26], dtype=np.int32)
-atomic_abundance = np.array([7], dtype=np.float64)
+# old = atmos[2].copy()
 
-ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1], atomic_number=atomic_number, atomic_abundance=atomic_abundance)
+# atomic_number = np.array([26], dtype=np.int32)
+# atomic_abundance = np.array([7], dtype=np.float64)
 
-plt.plot(scale, old)
-plt.plot(scale, ne/1e6)
-plt.yscale("log")
-plt.show()
+# ne, nHtot = pyrh.hse(cwd, atm_scale, scale, atmos[1], atomic_number=atomic_number, atomic_abundance=atomic_abundance)
+
+# plt.plot(scale, old)
+# plt.plot(scale, ne/1e6)
+# plt.yscale("log")
+# plt.show()
