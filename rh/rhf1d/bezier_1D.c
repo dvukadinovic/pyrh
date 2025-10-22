@@ -651,8 +651,8 @@ void Piecewise_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
         Zkp1 = -spectrum.dchi_c_lam[nspect][k+dk][idp] * I[k+dk] + spectrum.deta_c_lam[nspect][k+dk][idp];
         Zkp1 /= chi[k+dk];
         dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkm1, Zk, Zkp1);
-        c1 = MAX(Zk - dt03 * dZk[idp], 0.0);
-        c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
+        c1 = Zk - dt03 * dZk[idp];
+        c2 = Zkm1 + dt03 * dZup[idp];
         dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
       }
        
