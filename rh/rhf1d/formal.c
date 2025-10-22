@@ -64,42 +64,43 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
     }
   }
 
+  
   as = &spectrum.as[nspect];
   alloc_as(nspect, eval_operator);
-
+  
   /* --- Check whether current active set includes a bound-bound
-         and/or polarized transition and/or angle-dependent PRD
-         transition, and/or polarization through background scattering.
-         Otherwise, only angle-independent opacity and source functions
-         are needed --                                 -------------- */ 
-
+  and/or polarized transition and/or angle-dependent PRD
+  transition, and/or polarization through background scattering.
+  Otherwise, only angle-independent opacity and source functions
+  are needed --                                 -------------- */ 
+  
   /* --- Check for bound-bound transition in active set -- ---------- */
-
+  
   boundbound    = containsBoundBound(as);
-
+  
   /* --- Check for line with angle-dependent PRD in set -- ---------- */
 
   PRD_angle_dep = (containsPRDline(as) && input.PRD_angle_dep);
-
+  
   /* --- Check for polarized bound-bound transition in active set - - */
-
+  
   polarized_as  = containsPolarized(as);
-
+  
   /* --- Check for polarized bound-bound transition in background - - */
-
+  
   polarized_c   = atmos.backgrflags[nspect].ispolarized;
 
   /* --- Determine if we solve for I, or for I, Q, U, V -- ---------- */
-
+  
   solveStokes   = (input.StokesMode == FULL_STOKES &&
-		   (polarized_as || polarized_c || input.backgr_pol));
-
-  /* --- Determine if we have to do angle-dependent opacity and
-         emissivity --                                 -------------- */
-
-  angle_dep     = (polarized_as || polarized_c || PRD_angle_dep ||
-		   (input.backgr_pol && input.StokesMode == FULL_STOKES) ||
-		   (atmos.moving &&
+    (polarized_as || polarized_c || input.backgr_pol));
+    
+    /* --- Determine if we have to do angle-dependent opacity and
+    emissivity --                                 -------------- */
+    
+    angle_dep     = (polarized_as || polarized_c || PRD_angle_dep ||
+      (input.backgr_pol && input.StokesMode == FULL_STOKES) ||
+      (atmos.moving &&
 		    (boundbound || atmos.backgrflags[nspect].hasline)));
 
   /* --- Allocate temporary space --                   -------------- */
@@ -232,10 +233,10 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	  } else if (input.S_interpolation == S_PARABOLIC) {
       	    Piecewise_1D(nspect, mu, to_obs, chi, S, I, Psi);
       	  } else if (input.S_interpolation == S_BEZIER3) {
-      	    Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi, dI);
-            // if (input.get_atomic_rfs && to_obs) {
-            //   Piecewise_Bezier3_1D_RFs(nspect, mu, to_obs, chi, S, I, dI);
-            // }
+            Piecewise_Bezier3_1D(nspect, mu, to_obs, chi, S, I, Psi, dI);
+            if (input.get_atomic_rfs && to_obs) {
+              Piecewise_Bezier3_1D_RFs(nspect, mu, to_obs, chi, S, I, dI);
+            }
       	  } else {
       	    sprintf(messageStr,
       		    "Unknown radiation solver: %d",
@@ -243,8 +244,8 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	    Error(ERROR_LEVEL_1, routineName, messageStr);
       	  }
       	}
-	
-      	if (eval_operator) {
+        
+        if (eval_operator) {
           for (k = 0;  k < Nspace;  k++) Psi[k] /= chi[k];
           addtoGamma(nspect, wmu, I, Psi);
       	}
@@ -256,13 +257,12 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	  addtoRates(nspect, mu, to_obs, wmu, I, redistribute);
 
       	  /* --- Accumulate anisotropy --            -------------- */
-      	  if (input.backgr_pol) {
+          if (input.backgr_pol) {
       	    for (k = 0;  k < Nspace;  k++)
-      	      J20[k] +=
-      		(threemu1 * Ipol[0][k] + threemu2 * Ipol[1][k]) * wmu;
+      	      J20[k] +=       		(threemu1 * Ipol[0][k] + threemu2 * Ipol[1][k]) * wmu;
       	  }
 
-      	  if (PRD_angle_dep) writeImu(nspect, mu, to_obs, I);
+          if (PRD_angle_dep) writeImu(nspect, mu, to_obs, I);
         }
       } // end of for(to_obs)
 
@@ -275,7 +275,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       }
 
       // Store RFs
-      if (input.get_atomic_rfs){
+      if (input.get_atomic_rfs && to_obs){
         for (int idp=0; idp<input.n_atomic_pars; idp++){
             atmos.atomic_rfs[nspect][mu][idp] = dI[0][idp];
         }

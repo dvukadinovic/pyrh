@@ -81,6 +81,7 @@ void Iterate(int NmaxIter, double iterLimit)
   while (niter <= NmaxIter && !StopRequested()) {
     getCPU(2, TIME_START, NULL);
 
+
     for (nact = 0;  nact < atmos.Nactiveatom;  nact++)
       initGammaAtom(atmos.activeatoms[nact]);
     for (nact = 0;  nact < atmos.Nactivemol;  nact++)
@@ -205,24 +206,24 @@ double solveSpectrum(bool_t eval_operator, bool_t redistribute)
       /* --- Start batch of concurrent threads --      -------------- */
 
       for (nt = 0;  nt < Nthreads;  nt++) {
-	ti[nt].nspect = nspect + nt;
-	if (!redistribute ||
-	    (redistribute && containsPRDline(&spectrum.as[nspect+nt]))) {
-	  pthread_create(&thread_id[nt], &input.thread_attr,
-			 Formal_pthread, &ti[nt]);
-	} else
-	  thread_id[nt] = 0;
+        ti[nt].nspect = nspect + nt;
+        if (!redistribute ||
+            (redistribute && containsPRDline(&spectrum.as[nspect+nt]))) {
+          pthread_create(&thread_id[nt], &input.thread_attr,
+            Formal_pthread, &ti[nt]);
+        } else
+          thread_id[nt] = 0;
       }
       /* --- Let the finished threads of the batch join again -- ---- */
 
       for (nt = 0;  nt < Nthreads;  nt++) {
-	if (thread_id[nt]) {
-	  pthread_join(thread_id[nt], NULL);
-	  if (ti[nt].dJ > dJmax) {
-	    dJmax = ti[nt].dJ;
-	    lambda_max = nspect + nt;
-	  }
-	}
+        if (thread_id[nt]) {
+          pthread_join(thread_id[nt], NULL);
+          if (ti[nt].dJ > dJmax) {
+            dJmax = ti[nt].dJ;
+            lambda_max = nspect + nt;
+          }
+        }
       }
     }
     free(thread_id);
@@ -231,13 +232,12 @@ double solveSpectrum(bool_t eval_operator, bool_t redistribute)
 
     /* --- Else call the solution for wavelengths sequentially -- --- */
     for (nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
-      if (!redistribute ||
-	         (redistribute && containsPRDline(&spectrum.as[nspect]))) {
+      if (!redistribute || (redistribute && containsPRDline(&spectrum.as[nspect]))) {
         dJ = Formal(nspect, eval_operator, redistribute);
-      	if (dJ > dJmax) {
-      	  dJmax = dJ;
-      	  lambda_max = nspect;
-      	}
+        if (dJ > dJmax) {
+          dJmax = dJ;
+          lambda_max = nspect;
+        }
       }
     }
   }
