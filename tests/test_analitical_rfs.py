@@ -61,10 +61,9 @@ wave = np.linspace(630.25, 630.5, num=201)
 ids = np.array([0], dtype=np.int32)
 values = np.array([-0.71], dtype=np.float64)
 
-start = time()
-
 rf_num = compute_numerical_rf()
 
+start = time()
 spec, rf = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, 
 					  loggf_ids=ids,
 					  loggf_values=values,
