@@ -22,8 +22,7 @@
 #include "inputs.h"
 #include "error.h"
 #include "statistics.h"
-#include "xdr.h"
-
+#include "../headers/xdr.h"
 
 /* --- Function prototypes --                          -------------- */
 
@@ -543,12 +542,21 @@ void freeOpacityEmissivity(){
 void allocateOpacityEmissivityDer(){
   // derivative of continuum opacity (including Kurucz lines)
   spectrum.dchi_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchi_Q = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchi_U = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchi_V = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
   
   // derivative of continuum emissivity (including Kurucz lines)
   spectrum.deta_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.deta_Q = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.deta_U = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.deta_V = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
   
   // derivative of continuum polarization contribution (?) (including Kurucz lines)
   spectrum.dchip_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchip_Q = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchip_U = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
+  spectrum.dchip_V = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
 
   // derivative of the scattering in continuum(including Kurucz lines)
   spectrum.dsca_c_lam = matrix3d_double(spectrum.Nspect, atmos.Nspace, input.n_atomic_pars);
@@ -556,7 +564,19 @@ void allocateOpacityEmissivityDer(){
 
 void freeOpacityEmissivityDer(){
   freeMatrix3d(spectrum.dchi_c_lam, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchi_Q, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchi_U, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchi_V, spectrum.Nspect, atmos.Nspace);
+
   freeMatrix3d(spectrum.deta_c_lam, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.deta_Q, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.deta_U, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.deta_V, spectrum.Nspect, atmos.Nspace);
+
   freeMatrix3d(spectrum.dchip_c_lam, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchip_Q, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchip_U, spectrum.Nspect, atmos.Nspace);
+  freeMatrix3d(spectrum.dchip_V, spectrum.Nspect, atmos.Nspace);
+
   freeMatrix3d(spectrum.dsca_c_lam, spectrum.Nspect, atmos.Nspace);
 }

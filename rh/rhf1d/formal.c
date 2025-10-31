@@ -51,7 +51,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
   enum     FeautrierOrder F_order;     
   int      Nspace = atmos.Nspace, Nrays = atmos.Nrays;
   double  *I, *chi, *S, **Ipol, **Spol, *Psi, *Jdag, wmu, dJmax, dJ,
-          *J20dag, musq, threemu1, threemu2, *J, *J20, **dI;
+          *J20dag, musq, threemu1, threemu2, *J, *J20, **dI, **dIpol;
   ActiveSet *as;
 
   /* --- Retrieve active set as of transitions at wavelength nspect - */
@@ -123,7 +123,12 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 
   dI = NULL;
   if (input.get_atomic_rfs){
-    dI = matrix_double(Nspace, input.n_atomic_pars);
+    if (solveStokes){
+      dIpol = matrix3d_double(4, Nspace, input.n_atomic_pars);
+      dI = dIpol[0];
+    } else {
+      dI = matrix_double(Nspace, input.n_atomic_pars);
+    }
   }
 
   /* --- Store current mean intensity, initialize new one to zero - - */
@@ -212,8 +217,10 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 
       	  /* --- Polarized transfer --                 -------------- */
       	  if (input.S_interpolation_stokes == DELO_BEZIER3) {
-      	    Piece_Stokes_Bezier3_1D(nspect, mu, to_obs,
-      				    chi, Spol, Ipol, Psi);
+      	    Piece_Stokes_Bezier3_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
+            if (input.get_atomic_rfs && to_obs) {
+              Piece_Stokes_Bezier3_1D_RFs(nspect, mu, to_obs, chi, Spol, Ipol, Psi, dIpol);
+            }
       	  } else if (input.S_interpolation_stokes == DELO_PARABOLIC) {
       	    Piece_Stokes_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
       	  } else { sprintf(messageStr,

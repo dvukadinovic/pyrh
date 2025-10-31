@@ -75,7 +75,9 @@ print(f"Analytical RFs: {time() - start:.3f}")
 # 	plt.plot(spec[-1], rf[idp]/spec[0][-1], lw=2, c="C0", label="ana")
 # plt.plot(spec[-1], rf_num/spec[0][-1], lw=0.75, c="k", label="num")
 
-plt.plot((rf[0]/rf_num-1)*100)
+# plt.plot((rf[0]/rf_num-1)*100)
+plt.plot(rf[0])
+plt.plot(rf_num, linestyle="--")
 
 plt.legend()
 

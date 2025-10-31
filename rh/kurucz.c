@@ -703,6 +703,16 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	      eta_U[k] += eta_l * phi_U;
       	      eta_V[k] += eta_l * phi_V;
 
+              if (rlk->get_loggf_rf){
+                spectrum.dchi_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_Q * LN10;
+                spectrum.dchi_U[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_U * LN10;
+                spectrum.dchi_V[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_V * LN10;
+
+                spectrum.deta_Q[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_Q * LN10;
+                spectrum.deta_Q[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_U * LN10;
+                spectrum.deta_Q[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_V * LN10;
+              }
+
       	      if (input.magneto_optical) {
             		chip_Q[k] += chi_l * psi_Q;
             		chip_U[k] += chi_l * psi_U;

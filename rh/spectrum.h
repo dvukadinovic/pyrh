@@ -46,6 +46,9 @@ typedef struct {
   double  **chi_c_lam, **eta_c_lam, **sca_c_lam, **chip_c_lam;
   // background opacities/emissivities derivative per wavelength -- for atomic RFs (D.Vukadinovic)
   double ***dchi_c_lam, ***deta_c_lam, ***dsca_c_lam, ***dchip_c_lam;
+  double ***dchi_Q, ***dchi_U, ***dchi_V;
+  double ***deta_Q, ***deta_U, ***deta_V;
+  double ***dchip_Q, ***dchip_U, ***dchip_V;
   int *wave_inds;
 } Spectrum;
 
