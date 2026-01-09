@@ -291,13 +291,12 @@ flags passive_bb(double lambda, int nspect, int mu, bool_t to_obs,
 
 	  for (nc = 0;  nc < line->Ncomponent;  nc++) {
 	    for (k = 0;  k < atmos.Nspace;  k++) {
-	      v = (lambda - line->lambda0 - line->c_shift[nc]) *
-		CLIGHT / (line->lambda0 * atom->vbroad[k]);
+	      v = (lambda - line->lambda0 - line->c_shift[nc]) * CLIGHT / (line->lambda0 * atom->vbroad[k]);
 	      if (atmos.moving) {
-		if (to_obs)
-		  v += vproject(k, mu) / atom->vbroad[k];
-		else
-		  v -= vproject(k, mu) / atom->vbroad[k];
+          if (to_obs)
+            v += vproject(k, mu) / atom->vbroad[k];
+          else
+            v -= vproject(k, mu) / atom->vbroad[k];
 	      }
 	      if (line->Voigt)
 		phi = Voigt(linelist[entry]->adamp[k], v, NULL,
