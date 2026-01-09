@@ -302,7 +302,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
-    atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, atmos.Nrays, input.n_atomic_pars);
+    atmos.atomic_rfs = matrix4d_double(4, spectrum.Nspect, atmos.Nrays, input.n_atomic_pars);
   }
 
   getBoundary(&geometry);

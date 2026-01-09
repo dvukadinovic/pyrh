@@ -129,7 +129,7 @@ cdef extern from "rh/rhf1d/pyrh_compute1dray.h":
 		double *sU
 		double *sV
 		double **J
-		double **rfs
+		double ***rfs
 		AtomPops *atom_pops
 
 	ctypedef struct AtMol:

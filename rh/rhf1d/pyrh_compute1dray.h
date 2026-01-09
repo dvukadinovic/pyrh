@@ -13,7 +13,7 @@ typedef struct{
 	int nlw, Nrays, stokes;
 	double *lam, *sI, *sQ, *sU, *sV;
 	double **J, **J20;
-    double **rfs;
+    double ***rfs;
     int Nactive_atoms;
     AtomPops *atom_pops;
 } mySpectrum;

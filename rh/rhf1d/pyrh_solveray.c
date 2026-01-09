@@ -121,7 +121,7 @@ void _solveray(double muz, mySpectrum *spec)
   spec->sQ = (double *) malloc(Nlw * sizeof(double));
   spec->sU = (double *) malloc(Nlw * sizeof(double));
   spec->sV = (double *) malloc(Nlw * sizeof(double));
-  if (input.get_atomic_rfs) spec->rfs = matrix_double(Nlw, input.n_atomic_pars);
+  if (input.get_atomic_rfs) spec->rfs = matrix3d_double(4, Nlw, input.n_atomic_pars);
   // spec->J  = matrix_double(Nlw+1, atmos.Nspace);
 
   int index=0;
@@ -142,8 +142,10 @@ void _solveray(double muz, mySpectrum *spec)
     }
     // free_as(idl, FALSE);
     if (input.get_atomic_rfs){
-      for (int idp=0; idp<input.n_atomic_pars; idp++){
-        spec->rfs[index][idp] = atmos.atomic_rfs[idl][0][idp];
+      for (int ids=0; ids<4; ids++){
+        for (int idp=0; idp<input.n_atomic_pars; idp++){
+          spec->rfs[ids][index][idp] = atmos.atomic_rfs[ids][idl][0][idp];
+        }
       }
     }
     index += 1;

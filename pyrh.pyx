@@ -156,6 +156,17 @@ cdef convert_2d(double **arr, Py_ssize_t nx, Py_ssize_t ny):
 			pyarr[i,j] = arr[i][j]
 	return pyarr
 
+cdef convert_3d(double ***arr, Py_ssize_t nx, Py_ssize_t ny, Py_ssize_t nz):
+	cdef Py_ssize_t i
+	cdef Py_ssize_t j
+	cdef Py_ssize_t k
+	cdef cnp.ndarray[cnp.float64_t, ndim=3] pyarr = np.zeros((nx, ny, nz))
+	for i in range(nx):
+		for j in range(ny):
+			for k in range(nz):
+				pyarr[i,j,k] = arr[i][j][k]
+	return pyarr
+
 cpdef Pystring2char(lists):
 	cdef int N = len(lists)
 	cdef char* argv[140]
@@ -657,7 +668,7 @@ def compute1d(cwd,
 									nstar=nstar
 									)
 	if get_atomic_rfs:
-		rf = convert_2d(spec.rfs, spec.nlw, Nloggf+Nlam)
+		rf = convert_3d(spec.rfs, 4, spec.nlw, Nloggf+Nlam)
 		output = (output, rf.T)
 
 	# to preserve the order of all output parameters

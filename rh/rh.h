@@ -74,7 +74,9 @@ char   **matrix_char(int Nrow, int Ncol);
 int    **matrix_int(int Nrow, int Ncol);
 double **matrix_double(int Nrow, int Ncol);
 double ***matrix3d_double(int Nrow, int Ncol, int Ndep);
+double ****matrix4d_double(int Nrow, int Ncol, int Ndep, int Nfourth);
 void freeMatrix3d(double ***matrix3d, int Nrow, int Ncol);
+void freeMatrix4d(double ****matrix4d, int Nrow, int Ncol, int Ndep);
 void   freeMatrix(void **Matrix);
 void   SolveLinearEq(int N, double **A, double *b, bool_t improve);
 

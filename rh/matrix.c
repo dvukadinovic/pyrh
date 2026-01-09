@@ -104,6 +104,29 @@ double ***matrix3d_double(int Nrow, int Ncol, int Ndep)
 
   return Matrix3d;
 }
+
+double ****matrix4d_double(int Nrow, int Ncol, int Ndep, int Nfourth)
+{
+  int i, j, k;
+  int typeSize = sizeof(double), pointerSize = sizeof(double *);
+  double ****Matrix4d;
+
+  // double *all = (double *) malloc(Nrow * Ncol * Ndep * typeSize);
+
+  Matrix4d = (double ****) malloc(Nrow * pointerSize);
+  for (i=0; i<Nrow; i++){
+    Matrix4d[i] = (double ***) malloc(Ncol * pointerSize);
+    for (j=0; j<Ncol; j++){
+      Matrix4d[i][j] = (double **) malloc(Ndep * pointerSize);
+      for (k=0; k<Ndep; k++){
+        Matrix4d[i][j][k] = (double *) malloc(Nfourth * typeSize);
+      }
+    } 
+  }
+
+  return Matrix4d;
+}
+
 /* ------- end ---------------------------- matrix3d_double.c --------- */
 
 
@@ -135,4 +158,19 @@ void freeMatrix3d(double ***matrix3d, int Nrow, int Ncol)
     free(matrix3d[i]);
   }
   free(matrix3d);
+}
+
+void freeMatrix4d(double ****matrix4d, int Nrow, int Ncol, int Ndep)
+{
+  int i, j, k;
+  for (i=0; i<Nrow; ++i){
+    for (j=0; j<Ncol; ++j){
+      for (k=0; k<Ndep; ++k){
+        free(matrix4d[i][j][k]);
+      }
+      free(matrix4d[i][j]);
+    }
+    free(matrix4d[i]);
+  }
+  free(matrix4d);
 }
