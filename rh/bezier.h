@@ -24,8 +24,8 @@ void MatInv(float *mat);
 
 void m4inv(double MI[4][4]);
 
-
 void m4v(float a[4][4], double b[4], double c[4]);
+void m4v_double(double a[4][4], double *b, double c[4]);
 void m4m(double a[4][4], double b[4][4], double c[4][4]);
 
 void cent_deriv_vec(double wprime[4], double dsup, double dsdn,

@@ -64,6 +64,7 @@ void   addtoRates(int nspect, int mu, bool_t to_obs, double wmu,
 void   initScatter(void);
 
 void   StokesK(int nspect, int k, double chi_I, double K[4][4]);
+void   Gvec(int nspect, int k, double chi_I, double **I, double **G);
 void   addtoCoupling(int nspect);
 
 

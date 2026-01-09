@@ -18,16 +18,20 @@
 
 #include <math.h>
 #include <string.h>    // memcpy, memset
+#include <stdio.h>
 
 #ifdef SIMDON
 #include <x86intrin.h> // Intrinsic SSE instructions
 #endif
 
 #include "bezier.h"
-
+#include "headers/xdr.h"
+#include "rh.h"
+#include "inputs.h"
 
 /* --- Global variables --                             -------------- */
 
+extern InputData input;
 
 /* ------- begin -------------------------- cent_deriv.c ------------ */
 
@@ -62,9 +66,9 @@ inline void cent_deriv_mat(double wprime[4][4], double dsup, double dsdn,
   
   for(j = 0;  j<4;  j++)
     for(i = 0;  i < 4;  i++)
-      wprime[j][i] = cent_deriv(dsup, dsdn, chiup[j][i], chic[j][i],
-				chidn[j][i]);
+      wprime[j][i] = cent_deriv(dsup, dsdn, chiup[j][i], chic[j][i], chidn[j][i]);
 }
+
 /* ------- end ---------------------------- cent_deriv_mat.c -------- */
 
 
@@ -114,6 +118,16 @@ inline void m4v(float a[4][4], double b[4], double c[4])
     for(k = 0; k<4; k++)
       c[i] += ((double)a[i][k]) * b[k];
 }
+
+inline void m4v_double(double a[4][4], double *b, double c[4])
+{
+  register int k, i;
+  memset(&c[0],0,sizeof(double)*4);
+  for(i = 0; i<4; i++)
+    for(k = 0; k<4; k++)
+      c[i] += a[i][k] * b[k];
+}
+
 /* ------- end ---------------------------- m4v.c ------------------- */
 
 
@@ -125,6 +139,7 @@ inline void Svec(int k, double **S, double *Sf)
 
   Sf[0] = S[0][k], Sf[1] = S[1][k], Sf[2] = S[2][k], Sf[3] = S[3][k];
 }
+
 /* ------- end ---------------------------- Svec.c ------------------ */
 
 

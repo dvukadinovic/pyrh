@@ -51,15 +51,17 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
   enum     FeautrierOrder F_order;     
   int      Nspace = atmos.Nspace, Nrays = atmos.Nrays;
   double  *I, *chi, *S, **Ipol, **Spol, *Psi, *Jdag, wmu, dJmax, dJ,
-          *J20dag, musq, threemu1, threemu2, *J, *J20, **dI, **dIpol;
+          *J20dag, musq, threemu1, threemu2, *J, *J20, **dI, ***dIpol;
   ActiveSet *as;
 
   /* --- Retrieve active set as of transitions at wavelength nspect - */
 
   if (input.get_atomic_rfs){
-    for (int idp=0; idp<input.n_atomic_pars; idp++){
-      for (mu = 0;  mu < Nrays;  mu++) {
-        atmos.atomic_rfs[nspect][mu][idp] = 0.0;
+    for (int ids=0; ids<4; ids++){
+      for (int idp=0; idp<input.n_atomic_pars; idp++){
+        for (mu = 0;  mu < Nrays;  mu++) {
+          atmos.atomic_rfs[ids][nspect][mu][idp] = 0.0;
+        }
       }
     }
   }
@@ -201,7 +203,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
           }
 
           /* --- Add emissivity due to background scattering -- ----- */
-          if (input.backgr_pol && input.StokesMode == FULL_STOKES) {
+          if (input.backgr_pol && input.StokesMode == FULL_STOKES && input.solve_NLTE) {
             for (k = 0;  k < Nspace;  k++) {
               Spol[0][k] += threemu1 * as->sca_c[k]*J20dag[k];
               Spol[1][k] += threemu2 * as->sca_c[k]*J20dag[k];
@@ -209,17 +211,15 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
           }
 
       	  for (n = 0;  n < 4;  n++) {
-      	    for (k = 0;  k < Nspace;  k++)
+      	    for (k = 0;  k < Nspace;  k++){
       	      Spol[n][k] /= chi[k];
-      	  }
-
-          // if (nspect==3 && to_obs==0) printf("%e | %e | %e | %e \n", J[41], S[41], chi[41], as->sca_c[41]);
-
+            }
+          }
       	  /* --- Polarized transfer --                 -------------- */
       	  if (input.S_interpolation_stokes == DELO_BEZIER3) {
       	    Piece_Stokes_Bezier3_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
             if (input.get_atomic_rfs && to_obs) {
-              Piece_Stokes_Bezier3_1D_RFs(nspect, mu, to_obs, chi, Spol, Ipol, Psi, dIpol);
+              Piece_Stokes_Bezier3_1D_RFs(nspect, mu, to_obs, chi, Spol, Ipol, dIpol);
             }
       	  } else if (input.S_interpolation_stokes == DELO_PARABOLIC) {
       	    Piece_Stokes_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
@@ -230,8 +230,9 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       	  }
       	} else {
 
-      	  for (k = 0;  k < Nspace;  k++)
+      	  for (k = 0;  k < Nspace;  k++){
       	    S[k] /= chi[k];
+          }
 
       	  /* --- Intensity only --                     -------------- */
       	  
@@ -283,8 +284,17 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 
       // Store RFs
       if (input.get_atomic_rfs && to_obs){
-        for (int idp=0; idp<input.n_atomic_pars; idp++){
-            atmos.atomic_rfs[nspect][mu][idp] = dI[0][idp];
+        if (solveStokes){
+          for (int idp=0; idp<input.n_atomic_pars; idp++){
+            atmos.atomic_rfs[0][nspect][mu][idp] = dIpol[0][1][idp];
+            atmos.atomic_rfs[1][nspect][mu][idp] = dIpol[1][1][idp];
+            atmos.atomic_rfs[2][nspect][mu][idp] = dIpol[2][1][idp];
+            atmos.atomic_rfs[3][nspect][mu][idp] = dIpol[3][1][idp];
+          }
+        } else {
+          for (int idp=0; idp<input.n_atomic_pars; idp++){
+            atmos.atomic_rfs[0][nspect][mu][idp] = dI[0][idp];
+          }
         }
       }
 

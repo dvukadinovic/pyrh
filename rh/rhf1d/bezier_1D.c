@@ -75,6 +75,8 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   float Md[4][4];
   double *z = geometry.height;
 
+  FILE *fptr;
+  fptr = fopen("I.txt", "a");
   
   if (to_obs) {
     dk      = -1;
@@ -127,7 +129,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
   for (n = 0;  n < 4;  n++) I[n][k_start] = I_upw[n];
   if (Psi) Psi[k_start] = 0.0;
-  
+
   k=k_start+dk;
   dsup = fabs(z[k] - z[k-dk]) * imu;
   dsdn = fabs(z[k+dk] - z[k]) * imu;
@@ -138,14 +140,12 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   dchi_c = cent_deriv(dsup,dsdn,chi[k-dk],chi[k],chi[k+dk]);
   
-  
   /* --- Upwind path_length (BEzier3 integration) -- ---------------- */
 
   c2 = MAX(chi[k]    - (dsup/3.0) * dchi_c,  0.0);
   c1 = MAX(chi[k-dk] + (dsup/3.0) * dchi_up, 0.0);
   
   dtau_uw = 0.25 * dsup * (chi[k] + chi[k-dk] + c1 + c2);
-
   
   /* --- Ku, K0 and dKu, dSu -                     ------------------ */
   
@@ -166,7 +166,13 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   /* --- Solve transfer along ray --                   -------------- */
 
-  for (k = k_start+dk;  k != k_end;  k += dk) {      
+  if (to_obs) fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", I[0][k_start], I[1][k_start], I[2][k_start], I[3][k_start]);
+
+  for (k = k_start+dk;  k != k_end;  k += dk) { 
+
+    // if (nspect==49 && k>50 && to_obs){
+    //   printf("k = %d | chi = (%2.8e, %2.8e, %2.8e, %2.8e)\n", k, spectrum.chi_c_lam[nspect][k], spectrum.chi_c_lam[nspect][atmos.Nspace+k], spectrum.chi_c_lam[nspect][2*atmos.Nspace+k], spectrum.chi_c_lam[nspect][3*atmos.Nspace+k]);
+    // }
       
     /* --- dchi/ds at downwind point --                -------------- */
       
@@ -209,16 +215,12 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
     for(j = 0;  j < 4;  j++){
       for(i = 0;  i < 4;  i++){
-	Md[j][i] = ident[j][i] + alpha * K0[j][i] - gamma *
-	  -(dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
-	  
-	Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] + theta *
-	  (dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) - Ku[j][i]);
-	  
-	Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] -
-						 dt03 * Ku[j][i]);
-	Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] +
-						 dt03 * K0[j][i]);
+        Md[j][i] = ident[j][i] + alpha * K0[j][i] + gamma*(-dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
+          
+        Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] - theta*(dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) + Ku[j][i]);
+          
+        Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] - dt03 * K0[j][i]);
+        Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] + dt03 * Ku[j][i]);
       }
     }
       
@@ -226,17 +228,14 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
            (gam * dS0 - theta * dSu) * dtau / 3.0 to compute the 
            right-hand term
            --                                      ------------------ */
-    
+
     memset(V0, 0, 4*sizeof(double));
-    
+
     for(i = 0;  i < 4;  i++){
       for(j = 0;  j < 4;  j++){
-      	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] +
-      	  Mc[i][j] * S0[j];
-        // if (nspect==1) 
-        //   printf("%e | %e | %e | %e | %e | %e\n", Ma[i][k], I[j][k-dk], Mb[i][j], Su[j], Mc[i][j], S0[j]);
+      	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] + Mc[i][j] * S0[j];
       }
-      V0[i] += dt03 * (gamma * dS0[i] - theta * dSu[i]);
+      V0[i] += dt03 * (-gamma * dS0[i] + theta * dSu[i]);
     }
     /* --- Solve linear system to get the intensity -- -------------- */
       
@@ -244,8 +243,11 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     MatInv(Md[0]);
     m4v(Md, V0, V1);      // Multiply Md^-1 * V0
 
-    for(i=0;i<4;i++) I[i][k] = V1[i];
-      
+    for(i=0;i<4;i++){
+      I[i][k] = V1[i];
+      if (to_obs) fprintf(fptr, "%2.8e ", I[i][k]);
+    }
+    if (to_obs) fprintf(fptr, "\n");
       
     /* --- Shift values for next depth --          ------------------ */
       
@@ -260,7 +262,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
     dtau_uw = dtau_dw;
     dsup    = dsdn;
     dchi_up = dchi_c;
-    dchi_c  = dchi_dn;      
+    dchi_c  = dchi_dn;    
   }
       
   /* --- Linear integration in the last interval -- ----------------- */
@@ -296,17 +298,22 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   MatInv(Md[0]);
   m4v(Md,V0,V1);      // Multiply Md^-1 * V0
   
-  for (n = 0;  n < 4;  n++) I[n][k] = V1[n];
+  for (n = 0;  n < 4;  n++){
+    I[n][k] = V1[n];
+    if (to_obs) fprintf(fptr, "%2.8e ", I[n][k]);
+  }
+  if (to_obs) fprintf(fptr, "\n");
+
+  fclose(fptr);
 }
 /* ------- end ------------------------- Piece_Stokes_Bezier3_1D.c -- */
 
 
 void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
-			     double *chi, double **S, double **I,
-			     double *Psi, double ***dI)
+			     double *chi, double **S, double **I, double ***dI)
 {
-  /* --- Cubic DELO-Bezier solver for polarized light
-         Coded by J. de la Cruz Rodriguez (ISP-SU 2017)
+  /* --- Cubic DELO-Bezier solver for polarized light perturbation
+         Copied from: Coded by J. de la Cruz Rodriguez (ISP-SU 2017)
 
          Reference(s):
          J. de la Cruz Rodriguez & N. Piskunov (2013)
@@ -329,8 +336,20 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
 
   // RFs variables
   int idp;
-  double dI_upw[4][input.n_atomic_pars];
-  
+  double **Gu, **G0, **Gd;
+  double **dGu, **dG0;
+  double Ml[4][4];
+
+  FILE *fptr;
+  // Open a file in writing mode
+  fptr = fopen("dI.txt", "a");
+ 
+  Gu      = matrix_double(input.n_atomic_pars,4);
+  G0      = matrix_double(input.n_atomic_pars,4);
+  Gd      = matrix_double(input.n_atomic_pars,4);
+  dGu     = matrix_double(input.n_atomic_pars,4);
+  dG0     = matrix_double(input.n_atomic_pars,4);
+
   if (to_obs) {
     dk      = -1;
     k_start = Ndep-1;
@@ -343,49 +362,10 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   dtau_uw = 0.5 * imu * (chi[k_start] + chi[k_start+dk]) * fabs(z[k_start] - z[k_start+dk]);
   
   /* --- Boundary conditions --                        -------------- */
-
-  // if (to_obs) {
-  //   switch (geometry.vboundary[BOTTOM]) {
-  //   case ZERO:
-  //     for (n = 0;  n < 4;  n++) I_upw[n] = 0.0;
-  //     break;
-  //   case THERMALIZED:
-  //     Planck(2, &atmos.T[Ndep-2], spectrum.lambda[nspect], Bnu, -1);
-  //     I_upw[0] = Bnu[1] - (Bnu[0] - Bnu[1]) / dtau_uw;
-  //     for (n = 1;  n < 4;  n++) I_upw[n] = 0.0;
-  //     break;
-  //   case IRRADIATED:
-  //     I_upw[0] = geometry.Ibottom[nspect][mu];
-  //     for (n = 1;  n < 4;  n++) I_upw[n] = 0.0;
-  //     break;
-  //   case REFLECTIVE:
-  //     sprintf(messageStr, "Boundary condition not implemented: %d",
-	//       geometry.vboundary[BOTTOM]);
-  //     Error(ERROR_LEVEL_2, routineName, messageStr);
-  //   }
-  // } else {
-  //   switch (geometry.vboundary[TOP]) {
-  //   case ZERO:
-  //     for (n = 0;  n < 4;  n++) I_upw[n] = 0.0;
-  //     break;
-  //   case IRRADIATED:
-  //     I_upw[0] = geometry.Itop[nspect][mu];
-  //     for (n = 1;  n < 4;  n++) I_upw[n] = 0.0;
-  //     break;
-  //   default:
-  //     sprintf(messageStr, "Boundary condition not implemented: %d",
-	//       geometry.vboundary[TOP]);
-  //     Error(ERROR_LEVEL_2, routineName, messageStr);
-  //   }
-  // }
-
-
-  // for (n = 0;  n < 4;  n++) I[n][k_start] = I_upw[n];
-  // if (Psi) Psi[k_start] = 0.0;
   
   for (n=0; n<4; n++){
     for (idp=0; idp<input.n_atomic_pars; idp++){
-      dI_upw[n][idp] = 0.0;
+      dI[n][k_start][idp] = 0.0;
     }
   }
 
@@ -394,13 +374,11 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   dsdn = fabs(z[k+dk] - z[k]) * imu;
   dchi_up= (chi[k] - chi[k-dk])/dsup;
 
-  
   /* ---  dchi/ds at central point--               ------------------ */
   
   dchi_c = cent_deriv(dsup,dsdn,chi[k-dk],chi[k],chi[k+dk]);
   
-  
-  /* --- Upwind path_length (BEzier3 integration) -- ---------------- */
+  /* --- Upwind path_length (Bezier3 integration) -- ---------------- */
 
   c2 = MAX(chi[k]    - (dsup/3.0) * dchi_c,  0.0);
   c1 = MAX(chi[k-dk] + (dsup/3.0) * dchi_up, 0.0);
@@ -411,23 +389,30 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   
   StokesK(nspect, k_start,    chi[k_start],    Ku);
   StokesK(nspect, k_start+dk, chi[k_start+dk], K0);
-
-  // Svec(k_start,    S, Su);
-  // Svec(k_start+dk, S, S0);
+  
+  Gvec(nspect, k_start, chi[k_start], I, Gu);
+  Gvec(nspect, k_start+dk, chi[k_start+dk], I, G0);
 
   /* --- Assume side derivative in the first interval -- ------------ */
-  
-  for(n = 0;  n < 4;  n++){
-    dSu[n] = (S0[n] - Su[n]) / dtau_uw;
-    
-    for(m = 0;  m < 4;  m++)
-      dKu[n][m] = (K0[n][m] - Ku[n][m]) / dtau_uw;
-  }
-  
-  /* --- Solve transfer along ray --                   -------------- */
 
-  for (k = k_start+dk;  k != k_end;  k += dk) {      
-      
+  for(n = 0;  n < 4;  n++){
+    for (idp=0; idp<input.n_atomic_pars; idp++){
+      dGu[idp][n] = (G0[idp][n] - Gu[idp][n]) / dtau_uw;
+    }
+    for (m=0; m<4; m++){
+      dKu[n][m] = (K0[n][m] - Ku[n][m]) / dtau_uw;
+    }
+  }
+
+  fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", dI[0][k_start][idp], dI[1][k_start][idp], dI[2][k_start][idp], dI[3][k_start][idp]);
+
+  /* --- Solve transfer along ray --                   -------------- */
+  for (k = k_start+dk;  k != k_end;  k += dk) {     
+
+    // if (nspect==49 && k>50 && to_obs){
+    //   printf("k = %d | dchi = (%2.8e, %2.8e, %2.8e, %2.8e)\n", k, spectrum.dchi_c_lam[nspect][k][0], spectrum.dchi_Q[nspect][k][0], spectrum.dchi_U[nspect][k][0], spectrum.dchi_V[nspect][k][0]);
+    // }
+    
     /* --- dchi/ds at downwind point --                -------------- */
       
     dsdn = fabs(z[k+dk] - z[k]) * imu;
@@ -440,8 +425,8 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
       
     /* --- Make sure that c1 and c2 don't do below zero -- ---------- */
       
-    c2 = MAX(chi[k]    + (dsdn/3.0) * dchi_c , 0.0);
     c1 = MAX(chi[k+dk] - (dsdn/3.0) * dchi_dn, 0.0);
+    c2 = MAX(chi[k]    + (dsdn/3.0) * dchi_c , 0.0);
           
     /* --- Bezier3 integrated dtau --              ------------------ */
       
@@ -451,72 +436,67 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
     /* --- Bezier3 coeffs. --                      ------------------ */
       
     Bezier3_coeffs(dt, &alpha, &beta, &gamma, &theta, &eps);
-   
-    /* --- Diagonal operator --                    ------------------ */
-      
-    if(Psi) Psi[k] = alpha + gamma;
+    w3(dtau_uw, w);
    
     /* ---- get algebra in place --                ------------------ */
-      
+    
     StokesK(nspect, k+dk, chi[k+dk], Kd);
-    Svec(k+dk, S, Sd);
+    Gvec(nspect, k+dk, chi[k+dk], I, Gd);
 
     cent_deriv_mat(dK0, dtau_uw, dtau_dw, Ku, K0, Kd);
-    cent_deriv_vec(dS0, dtau_uw, dtau_dw, Su, S0, Sd);
+    for (idp=0; idp<input.n_atomic_pars; idp++){
+      cent_deriv_vec(dG0[idp], dtau_uw, dtau_dw, Gu[idp], G0[idp], Gd[idp]);
+    }
+    
+    m4m(K0, K0, Ma); // K x K
+    m4m(Ku, Ku, Ml);
+    for (j = 0;  j < 4;  j++){
+      for (i = 0;  i < 4;  i++){
+        Ma[j][i] += dK0[j][i] + K0[j][i];
+        Md[j][i] = ident[j][i] + alpha*K0[j][i] + gamma*(K0[j][i] - dt03*Ma[j][i]); // delta_I_k coeff
+        
+        Ml[j][i] += dKu[j][i] + Ku[j][i];
+        Ml[j][i] = eps*ident[j][i] - beta*Ku[j][i] - theta*(dt03*Ml[j][i] + Ku[j][i]); // delta_I_k+1 coeff --> the one from the previous iteration
 
-    m4m(Ku, Ku, Ma); // Ku # Ku
-    m4m(K0, K0, A ); // K0 # K0
-
-    for(j = 0;  j < 4;  j++){
-      for(i = 0;  i < 4;  i++){
-	Md[j][i] = ident[j][i] + alpha * K0[j][i] - gamma *
-	  -(dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
-	  
-	Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] + theta *
-	  (dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) - Ku[j][i]);
-	  
-	Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] -
-						 dt03 * Ku[j][i]);
-	Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] +
-						 dt03 * K0[j][i]);
+        Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] - dt03 * K0[j][i]);
+        Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] + dt03 * Ku[j][i]);
       }
     }
-      
-    /* --- Here I am doing Ma*stk + Mb * Su + Mc * S0 + 
-           (gam * dS0 - theta * dSu) * dtau / 3.0 to compute the 
-           right-hand term
-           --                                      ------------------ */
-    
-    memset(V0, 0, 4*sizeof(double));
-    
-    for(i = 0;  i < 4;  i++){
-      for(j = 0;  j < 4;  j++){
-      	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] +
-      	  Mc[i][j] * S0[j];
-        // if (nspect==1) 
-        //   printf("%e | %e | %e | %e | %e | %e\n", Ma[i][k], I[j][k-dk], Mb[i][j], Su[j], Mc[i][j], S0[j]);
-      }
-      V0[i] += dt03 * (gamma * dS0[i] - theta * dSu[i]);
-    }
-    /* --- Solve linear system to get the intensity -- -------------- */
-      
-    // SIMD_MatInv(Md[0]);   // Invert Md
     MatInv(Md[0]);
-    m4v(Md, V0, V1);      // Multiply Md^-1 * V0
+      
+    for (idp=0; idp<input.n_atomic_pars; idp++){
+        
+      memset(V0, 0, 4*sizeof(double));
+      
+      for(i = 0;  i < 4;  i++){
+        for(j = 0;  j < 4;  j++){
+          V0[i] += Ml[i][j]*dI[j][k-dk][idp] + Mb[i][j]*Gu[idp][j] + Mc[i][j]*G0[idp][j];
+        }
+        V0[i] += dt03*(-gamma*dG0[idp][i] + theta*dGu[idp][i]);
+      }
+      
+      /* --- Solve linear system to get the intensity perturbation -- -------------- */
+        
+      m4v(Md, V0, V1);      // Multiply Md^-1 * V0
 
-    for(i=0;i<4;i++) I[i][k] = V1[i];
-      
-      
+      for(i=0;i<4;i++)
+      {
+        dI[i][k][idp] = V1[i];
+        fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+      }
+      fprintf(fptr, "\n");
+    }
+    
     /* --- Shift values for next depth --          ------------------ */
-      
-    memcpy(Su,   S0, 4*sizeof(double));
-    memcpy(S0,   Sd, 4*sizeof(double));
-    memcpy(dSu, dS0, 4*sizeof(double));
       
     memcpy(Ku[0],   K0[0], 16*sizeof(double));
     memcpy(K0[0],   Kd[0], 16*sizeof(double));
     memcpy(dKu[0], dK0[0], 16*sizeof(double));
-      
+
+    memcpy(Gu[0],   G0[0], input.n_atomic_pars*4*sizeof(double));
+    memcpy(G0[0],   Gd[0], input.n_atomic_pars*4*sizeof(double));
+    memcpy(dGu[0], dG0[0], input.n_atomic_pars*4*sizeof(double));
+
     dtau_uw = dtau_dw;
     dsup    = dsdn;
     dchi_up = dchi_c;
@@ -531,32 +511,43 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   w3(dtau_uw, w);
 
   /* --- dSu is defined negative in Han's implementation ------------ */
-  
-  for (n = 0;  n < 4;  n++)
-    V0[n] = w[0]*S[n][k] + w[1] * -dSu[n];
-  
-  if (Psi) Psi[k] = w[0] - w[1] / dtau_uw;
-      
-  for (n = 0;  n < 4;  n++) {
-    for (m = 0;  m < 4;  m++) {
-      A[n][m]  = -w[1]/dtau_uw * Ku[n][m];
-      Md[n][m] = (w[0] - w[1]/dtau_uw) * K0[n][m];
-    }
-    A[n][n]  = 1.0 - w[0];
-    Md[n][n] = 1.0;
-  }
-      
-  for (n = 0;  n < 4;  n++) 
-    for (m = 0;  m < 4;  m++) 
-      V0[n] += A[n][m] * I[m][k-dk];
 
-  /* --- Solve linear system --                    ------------------ */
+  for (idp=0; idp<input.n_atomic_pars; idp++){
+
+    for (j=0; j<4; j++){
+      for (n=0; n<4; n++){
+        Ma[j][n] = ident[j][n]*(1.0 - w[0]) - w[1]/dtau_uw*K0[j][n];
+        Md[j][n] = ident[j][n] + w[0]*Kd[j][n] - w[1]/dtau_uw*Kd[j][n];
+      }
+    }
+
+    memset(V0, 0, 4*sizeof(double));
+    for (n = 0;  n < 4;  n++){
+      for (j=0; j<4; j++){
+        V0[n] += Ma[n][j] * dI[n][k-dk][idp];
+      }
+      V0[n] += w[0]*Gd[idp][n] - w[1]*dG0[idp][n];  
+    }
   
-  // SIMD_MatInv(Md[0]); // Invert Md
-  MatInv(Md[0]);
-  m4v(Md,V0,V1);      // Multiply Md^-1 * V0
-  
-  for (n = 0;  n < 4;  n++) I[n][k] = V1[n];
+    /* --- Solve linear system --                    ------------------ */
+    
+    MatInv(Md[0]);
+    m4v(Md,V0,V1);      // Multiply Md^-1 * V0
+    
+    for(i=0;i<4;i++) {
+      dI[i][k][idp] = V1[i]; 
+      fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+    }
+    fprintf(fptr, "\n");
+  }
+
+  fclose(fptr);
+
+  freeMatrix(Gu);
+  freeMatrix(G0);
+  freeMatrix(Gd);
+  freeMatrix(dGu);
+  freeMatrix(dG0);
 }
 /* ------- end ------------------------- Piece_Stokes_Bezier3_1D.c -- */
 
@@ -732,7 +723,7 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
        /* --- Solve integral in this interval --       -------------- */
        
        I[k]= I_upw*eps + alpha*S[k] + beta*S[k-dk] + gamma * c1 + theta * c2; 
-
+  
        if (input.get_atomic_rfs && to_obs){
         for (idp=0; idp<input.n_atomic_pars; idp++){
           Zk = -spectrum.dchi_c_lam[nspect][k][idp] * I[k] + spectrum.deta_c_lam[nspect][k][idp];
@@ -746,6 +737,9 @@ void Piecewise_Bezier3_1D(int nspect, int mu, bool_t to_obs,
           c2 = MAX(Zkm1 + dt03 * dZup[idp], 0.0);
           dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
         }
+       }
+       if (nspect==50 && to_obs && k>52) {
+        //  printf("k = %d | I = %2.8e\n", k, I[k]);
        }
 
        /* --- Diagonal operator --                     -------------- */
@@ -902,7 +896,7 @@ void Piecewise_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
       /* --- Compute interpolation parameters --       -------------- */
        
       Bezier3_coeffs(dtau_uw, &alpha, &beta, &gamma, &theta, &eps);
-    
+
       for (idp=0; idp<input.n_atomic_pars; idp++){
         Zk = -spectrum.dchi_c_lam[nspect][k][idp] * I[k] + spectrum.deta_c_lam[nspect][k][idp];
         Zk /= chi[k];
@@ -913,8 +907,13 @@ void Piecewise_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
         dZk[idp] = cent_deriv(dtau_uw, dtau_dw, Zkm1, Zk, Zkp1);
         c1 = Zk - dt03 * dZk[idp];
         c2 = Zkm1 + dt03 * dZup[idp];
+        if (nspect==50 && to_obs && k>52) {
+          // printf("k = %d | Zk = %2.8e | Zkm1 = %2.8e | dZk = %2.8e | dZkm1 = %2.8e\n", k, Zk, Zkm1, dZk[idp], dZup[idp]);
+          printf("k = %d | dchi = %2.8e | deta = %2.8e | I = %2.8e | chi = %2.8e | Zk = %2.8e\n", k, spectrum.dchi_c_lam[nspect][k][idp], spectrum.deta_c_lam[nspect][k][idp], I[k], chi[k], Zk);
+        }
         dI[k][idp] = dI_upw[idp]*eps + alpha*Zk + beta*Zkm1 + gamma*c1 + theta*c2;
       }
+      // if (nspect==50) printf("k = %2d | Zu = %2.5e | Zk = %2.5e | Iu = %2.5e | I0 = %2.5e\n", k, Zkm1, Zk, I[k-dk], I[k]);
        
     } else { 
       
