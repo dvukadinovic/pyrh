@@ -4,6 +4,18 @@ from time import time
 import pyrh
 import sys
 
+# stokes = np.load("stokes_spec.npy")
+# I = np.load("nonpol_spec.npy")
+
+# print(stokes[59]/stokes[0], I[59]/I[0])
+
+# plt.plot(stokes, label="pol")
+# plt.plot(I, label="non pol")
+# plt.legend()
+# plt.show()
+
+# sys.exit()
+
 def spinor2multi(atm):
 	"""
 	Casting from SPINOR type atmosphere structure to MULTI type structure.
@@ -34,14 +46,16 @@ def spinor2multi(atm):
 
 def compute_numerical_rf():
 	start = time()
-	spec_plus = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]+perturbation)
+	# spec_plus = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]+perturbation)
 	spec_minus = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, loggf_ids=ids[:1], loggf_values=values[:1]-perturbation)
 
 	# plt.plot(spec_plus[0] - spec_minus[0], label="plus")
 	# plt.plot(spec_minus[0], label="minus")
 	# plt.show()
 
-	rf = (spec_plus[0] - spec_minus[0])/2/perturbation
+	rf = np.empty((4, spec_plus[0].shape[0]), dtype=np.float64)
+	for _ids in range(4):
+		rf[_ids] = (spec_plus[_ids] - spec_minus[_ids])/2/perturbation
 
 	print(f"Numerical RFs: {time() - start:.3f}")
 
@@ -50,34 +64,53 @@ def compute_numerical_rf():
 perturbation = 1e-3
 atmos = np.loadtxt("falc.dat", skiprows=1).T
 atmos = spinor2multi(atmos)
-scale = atmos[0]
 
-mu = 1.0
-cwd = "."
-atm_scale = 0 # tau
+atmos[6] = np.deg2rad(45.0)  # inclination
+atmos[7] = np.deg2rad(10.0)   # az
+# atmos[3] = (np.arange(atmos.shape[1]) - atmos.shape[1]/2)/15  # LOS vel
+atmos[4] = 0.0  # microturbulence
 
-wave = np.linspace(630.25, 630.5, num=201)
+# for idb, B in enumerate([0,500,2000,8000]):
+for idb, B in enumerate([1500]):
+	atmos[5] = B
 
-ids = np.array([0], dtype=np.int32)
-values = np.array([-0.71], dtype=np.float64)
+	scale = atmos[0]
 
-rf_num = compute_numerical_rf()
+	mu = 1.0
+	cwd = "."
+	atm_scale = 0 # tau
 
-start = time()
-spec, rf = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, 
-					  loggf_ids=ids,
-					  loggf_values=values,
-                      get_atomic_rfs=True
-                    )
-print(f"Analytical RFs: {time() - start:.3f}")
+	wave = np.linspace(630.255, 630.5, num=201)
 
-# for idp in range(rf.shape[0]):
-# 	plt.plot(spec[-1], rf[idp]/spec[0][-1], lw=2, c="C0", label="ana")
-# plt.plot(spec[-1], rf_num/spec[0][-1], lw=0.75, c="k", label="num")
+	ids = np.array([0], dtype=np.int32)
+	values = np.array([-0.71], dtype=np.float64)
 
-# plt.plot((rf[0]/rf_num-1)*100)
-plt.plot(rf[0])
-plt.plot(rf_num, linestyle="--")
+	rf_num = compute_numerical_rf()
+	print("----")
+
+	start = time()
+	spec, rf = pyrh.compute1d(cwd, mu, atm_scale, atmos, wave, 
+						loggf_ids=ids,
+						loggf_values=values,
+						get_atomic_rfs=True
+						)
+	print(f"Analytical RFs: {time() - start:.3f}")
+
+	print("==========================")
+	continue
+
+	ids = 0
+
+	plt.plot(rf[0,:,ids]/spec[0][0], c=f"C{idb}", label="Analytical RF")
+	plt.plot(rf_num[ids]/spec[0][0], linestyle="--", c=f"C{idb}", label="Numerical RF")
+
+	# plt.plot((rf[0,:,ids]/rf_num[ids] - 1)*100, label=f"rel. diff B={B}")
+	# maxRf = np.max(np.abs(rf_num[0]))
+	# plt.plot((rf[0,:,ids] - rf_num[ids])/maxRf, label=B)
+
+	# plt.yscale("symlog")
+
+	print(rf_num[:,49], rf[0,49,:])
 
 plt.legend()
 
