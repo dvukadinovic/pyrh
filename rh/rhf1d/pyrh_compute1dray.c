@@ -109,7 +109,8 @@ myRLK_Line get_RLK_lines(char *cwd)
   return output;
 }
 
-mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
+mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep, 
+              double *pyrh_spectrum, double *pyrh_rfs,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int pyrh_atm_scale,
@@ -345,7 +346,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
-  _solveray(mu, &spec);
+  _solveray(mu, &spec, pyrh_spectrum, pyrh_rfs);
 
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){

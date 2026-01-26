@@ -32,18 +32,7 @@ def spinor2multi(atm):
 	return new
 
 def get_spectra():
-	out = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave)
-	plt.plot(out[-1], out[0])
-	plt.show()
-	del out
-	# for item in out:
-	# 	del item
-	# print(spec[0]/spec[0][0])
-	# print(spec[1]/spec[0][0])
-	# import matplotlib.pyplot as plt
-	# plt.plot(spec[0])
-	# plt.show()
-	# del spec
+	pyrh.compute1d(cwd, 1.0, atm_scale, spec, atmos, wave)
 
 atmos = np.loadtxt("falc.dat", skiprows=1).T
 atmos = spinor2multi(atmos)
@@ -58,11 +47,9 @@ old = atmos[2].copy()
 
 wave = np.linspace(630.25, 630.5, num=100)
 
-# 6.772 MB for 100it in 201 nw
-# it increases more with iterations than with wavelengths
+spec = np.empty((len(wave), 4), dtype=np.float64)
 
 for _ in range(1):
-	# print(_)
 	get_spectra()
 
 # plt.plot(spec[-1], spec[0])

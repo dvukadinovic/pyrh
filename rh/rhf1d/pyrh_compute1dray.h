@@ -23,7 +23,8 @@ typedef struct{
 	RLK_Line *rlk_lines;
 } myRLK_Line;
  
-mySpectrum rhf1d(char *cwd, double mu, int Ndep,
+mySpectrum rhf1d(char *cwd, double mu, int Ndep, 
+              double *spectrum, double *pyrh_rfs,
               double *pyrh_scale, double *pyrh_temp, double *pyrh_ne, double *pyrh_vz, double *pyrh_vmic,
               double *pyrh_mag, double *pyrh_gamma, double *pyrh_chi,
               double *pyrh_nH, int atm_scale, 

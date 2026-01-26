@@ -61,7 +61,7 @@ extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(double muz, mySpectrum *spec);
+void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh_rfs);
 
 int _getnumber(int* z)
 {
@@ -72,7 +72,7 @@ int _getnumber(int* z)
 
 /* ------- begin -------------------------- solveray.c -------------- */
 
-void _solveray(double muz, mySpectrum *spec)
+void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh_rfs)
 {
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
@@ -116,45 +116,43 @@ void _solveray(double muz, mySpectrum *spec)
   Nlw -= 1;
 
   spec->stokes = 0;
-  spec->lam = (double *) malloc(Nlw * sizeof(double));
-  spec->sI = (double *) malloc(Nlw * sizeof(double));
-  spec->sQ = (double *) malloc(Nlw * sizeof(double));
-  spec->sU = (double *) malloc(Nlw * sizeof(double));
-  spec->sV = (double *) malloc(Nlw * sizeof(double));
-  if (input.get_atomic_rfs) spec->rfs = matrix3d_double(4, Nlw, input.n_atomic_pars);
+  // spec->lam = (double *) malloc(Nlw * sizeof(double));
+  // spec->sI = (double *) malloc(Nlw * sizeof(double));
+  // spec->sQ = (double *) malloc(Nlw * sizeof(double));
+  // spec->sU = (double *) malloc(Nlw * sizeof(double));
+  // spec->sV = (double *) malloc(Nlw * sizeof(double));
+  // if (input.get_atomic_rfs) spec->rfs = matrix3d_double(4, Nlw, input.n_atomic_pars);
   // spec->J  = matrix_double(Nlw+1, atmos.Nspace);
 
-  int index=0;
+  int idl;
+  int index = 0;
+  int index_rfs = 0;
   double tmp;
   
-  for (int idl=0; idl<Nlw+1; idl++){
+  for (idl=0; idl<Nlw+1; idl++){
     // skip referent wavelength
     if (spectrum.lambda[idl]==atmos.lambda_ref) continue;
-    // vacuum_to_air(1, &spectrum.lambda[idl], &tmp);
-    // spec->lam[index] = tmp;
-    spec->lam[index] = spectrum.lambda[idl];
-    spec->sI[index] = spectrum.I[idl][0];
+    // this will "fail" for NLTE spectra
+    pyrh_spectrum[index] = spectrum.I[idl][0];
     if (atmos.Stokes){
-      spec->sQ[index] = spectrum.Stokes_Q[idl][0];
-      spec->sU[index] = spectrum.Stokes_U[idl][0];
-      spec->sV[index] = spectrum.Stokes_V[idl][0];
+      pyrh_spectrum[index+1] = spectrum.Stokes_Q[idl][0];
+      pyrh_spectrum[index+2] = spectrum.Stokes_U[idl][0];
+      pyrh_spectrum[index+3] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
     }
-    // free_as(idl, FALSE);
+
     if (input.get_atomic_rfs){
       for (int ids=0; ids<4; ids++){
         for (int idp=0; idp<input.n_atomic_pars; idp++){
-          spec->rfs[ids][index][idp] = atmos.atomic_rfs[ids][idl][0][idp];
+          // spec->rfs[ids][index_rfs][idp] = atmos.atomic_rfs[ids][idl][0][idp];
+          // printf("idl = %d | ids = %d | idp = %d\n", idl, ids, idp);
+          pyrh_rfs[index_rfs] = atmos.atomic_rfs[ids][idl][0][idp];
+          index_rfs += 1;
         }
       }
     }
-    index += 1;
+    index += 4;
   }
-  // for (int idl=0; idl<spectrum.Nspect-3; idl++){
-  //   printf(" -- %d :: ", idl);
-  //   // free_as(idl, FALSE);
-  // }
-
   spec->nlw = Nlw;
 
   // deallocate Stokes spectrum
@@ -163,6 +161,12 @@ void _solveray(double muz, mySpectrum *spec)
   if (spectrum.Stokes_Q!=NULL) freeMatrix((void **) spectrum.Stokes_Q);
   if (spectrum.Stokes_U!=NULL) freeMatrix((void **) spectrum.Stokes_U);
   if (spectrum.Stokes_V!=NULL) freeMatrix((void **) spectrum.Stokes_V);
+
+  // if (spec->lam!=NULL) free(spec->lam);
+  // if (spec->sI!=NULL) free(spec->sI);
+  // if (spec->sQ!=NULL) free(spec->sQ);
+  // if (spec->sU!=NULL) free(spec->sU);
+  // if (spec->sV!=NULL) free(spec->sV);
 
   // deallocate J and J20
   if (spectrum.J!=NULL) freeMatrix((void **) spectrum.J);

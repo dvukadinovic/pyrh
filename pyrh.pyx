@@ -549,6 +549,7 @@ def get_scales(cwd,
 def compute1d(cwd,
 				double mu,
 				int atm_scale,
+				cnp.ndarray[double, ndim=2, mode="c"] spectrum,
 				cnp.ndarray[double, ndim=2, mode="c"] atmosphere,
 				cnp.ndarray[double, ndim=1, mode="c"] wave,
 				cnp.ndarray[int, ndim=1, mode="c"] loggf_ids=None,
@@ -560,6 +561,7 @@ def compute1d(cwd,
 				cnp.ndarray[int, ndim=1, mode="c"] atomic_number=None,
 				cnp.ndarray[double, ndim=1, mode="c"] atomic_abundance=None,
 				get_atomic_rfs=False,
+				cnp.ndarray[double, ndim=3, mode="c"] rfs=None,
 				get_populations=False):
 	cdef int Ndep = atmosphere.shape[1]
 	cdef int Nwave = wave.size
@@ -613,9 +615,11 @@ def compute1d(cwd,
 		abundance_id_ptr = &atomic_number[0]
 		abundance_value_ptr = &atomic_abundance[0]
 
+	cdef double *rfs_ptr = NULL
 	rh_get_atomic_rfs = 0
 	if get_atomic_rfs:
 		rh_get_atomic_rfs = 1
+		rfs_ptr = &rfs[0,0,0]
 	
 	rh_get_populations = 0
 	if get_populations:
@@ -630,7 +634,8 @@ def compute1d(cwd,
 	for i_ in range(argc):
 		argv[i_] = arr[i_]
 
-	spec = rh.rhf1d(argv[0], mu, Ndep,
+	result = rh.rhf1d(argv[0], mu, Ndep,
+			 &spectrum[0,0], rfs_ptr,
 			 &atmosphere[0,0], &atmosphere[1,0], 
 			 &atmosphere[2,0], &atmosphere[3,0], &atmosphere[4,0],
 			 &atmosphere[5,0], &atmosphere[6,0], &atmosphere[7,0],
@@ -644,32 +649,35 @@ def compute1d(cwd,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
-	lam = np.asarray(<cnp.float64_t[:spec.nlw]> spec.lam)
-	sI = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sI)
+	# lam = np.asarray(<cnp.float64_t[:spec.nlw]> spec.lam)
+	# sI = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sI)
 
-	sQ, sU, sV = None, None, None
-	if spec.stokes:
-		sQ = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sQ)
-		sU = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sU)
-		sV = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sV)
+	# sQ, sU, sV = None, None, None
+	# if spec.stokes:
+	# 	sQ = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sQ)
+	# 	sU = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sU)
+	# 	sV = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sV)
 
-	output = sI, sQ, sU, sV, lam
+	# output = sI, sQ, sU, sV, lam
+	# output = (spectrum, lam)
+
+	output = None
 
 	if get_populations:
 		populations = ()#[None]*spec.Nactive_atoms
-		for ida in range(spec.Nactive_atoms):
-			n = convert_2d(spec.atom_pops[ida].n, spec.atom_pops[ida].Nlevel, spec.atom_pops[ida].Nz)
-			nstar = convert_2d(spec.atom_pops[ida].nstar, spec.atom_pops[ida].Nlevel, spec.atom_pops[ida].Nz)
+		for ida in range(result.Nactive_atoms):
+			n = convert_2d(result.atom_pops[ida].n, result.atom_pops[ida].Nlevel, result.atom_pops[ida].Nz)
+			nstar = convert_2d(result.atom_pops[ida].nstar, result.atom_pops[ida].Nlevel, result.atom_pops[ida].Nz)
 			populations += Populations(
-									ID=spec.atom_pops[ida].ID,
-									nlevel=spec.atom_pops[ida].Nlevel,
-									nz=spec.atom_pops[ida].Nz,
+									ID=result.atom_pops[ida].ID,
+									nlevel=result.atom_pops[ida].Nlevel,
+									nz=result.atom_pops[ida].Nz,
 									n=n,
 									nstar=nstar
 									)
-	if get_atomic_rfs:
-		rf = convert_3d(spec.rfs, 4, spec.nlw, Nloggf+Nlam)
-		output = (output, rf.T)
+	# if get_atomic_rfs:
+	# 	rf = convert_3d(result.rfs, 4, result.nlw, Nloggf+Nlam)
+		# output = (output, rfs)
 
 	# to preserve the order of all output parameters
 	if get_populations:
