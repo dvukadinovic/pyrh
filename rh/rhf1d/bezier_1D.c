@@ -304,7 +304,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   }
   // if (to_obs) fprintf(fptr, "\n");
 
-  fclose(fptr);
+  // fclose(fptr);
 }
 /* ------- end ------------------------- Piece_Stokes_Bezier3_1D.c -- */
 
