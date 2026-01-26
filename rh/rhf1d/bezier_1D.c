@@ -75,8 +75,8 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   float Md[4][4];
   double *z = geometry.height;
 
-  FILE *fptr;
-  fptr = fopen("I.txt", "a");
+  // FILE *fptr;
+  // fptr = fopen("I.txt", "a");
   
   if (to_obs) {
     dk      = -1;
@@ -166,7 +166,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   /* --- Solve transfer along ray --                   -------------- */
 
-  if (to_obs) fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", I[0][k_start], I[1][k_start], I[2][k_start], I[3][k_start]);
+  // if (to_obs) fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", I[0][k_start], I[1][k_start], I[2][k_start], I[3][k_start]);
 
   for (k = k_start+dk;  k != k_end;  k += dk) { 
 
@@ -245,9 +245,9 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
     for(i=0;i<4;i++){
       I[i][k] = V1[i];
-      if (to_obs) fprintf(fptr, "%2.8e ", I[i][k]);
+      // if (to_obs) fprintf(fptr, "%2.8e ", I[i][k]);
     }
-    if (to_obs) fprintf(fptr, "\n");
+    // if (to_obs) fprintf(fptr, "\n");
       
     /* --- Shift values for next depth --          ------------------ */
       
@@ -300,9 +300,9 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   for (n = 0;  n < 4;  n++){
     I[n][k] = V1[n];
-    if (to_obs) fprintf(fptr, "%2.8e ", I[n][k]);
+    // if (to_obs) fprintf(fptr, "%2.8e ", I[n][k]);
   }
-  if (to_obs) fprintf(fptr, "\n");
+  // if (to_obs) fprintf(fptr, "\n");
 
   fclose(fptr);
 }
@@ -340,9 +340,9 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   double **dGu, **dG0;
   double Ml[4][4];
 
-  FILE *fptr;
+  // FILE *fptr;
   // Open a file in writing mode
-  fptr = fopen("dI.txt", "a");
+  // fptr = fopen("dI.txt", "a");
  
   Gu      = matrix_double(input.n_atomic_pars,4);
   G0      = matrix_double(input.n_atomic_pars,4);
@@ -404,7 +404,7 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
     }
   }
 
-  fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", dI[0][k_start][idp], dI[1][k_start][idp], dI[2][k_start][idp], dI[3][k_start][idp]);
+  // fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", dI[0][k_start][idp], dI[1][k_start][idp], dI[2][k_start][idp], dI[3][k_start][idp]);
 
   /* --- Solve transfer along ray --                   -------------- */
   for (k = k_start+dk;  k != k_end;  k += dk) {     
@@ -482,9 +482,9 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
       for(i=0;i<4;i++)
       {
         dI[i][k][idp] = V1[i];
-        fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+        // fprintf(fptr, "%2.8e ", dI[i][k][idp]);
       }
-      fprintf(fptr, "\n");
+      // fprintf(fptr, "\n");
     }
     
     /* --- Shift values for next depth --          ------------------ */
@@ -536,12 +536,12 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
     
     for(i=0;i<4;i++) {
       dI[i][k][idp] = V1[i]; 
-      fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+      // fprintf(fptr, "%2.8e ", dI[i][k][idp]);
     }
-    fprintf(fptr, "\n");
+    // fprintf(fptr, "\n");
   }
 
-  fclose(fptr);
+  // fclose(fptr);
 
   freeMatrix(Gu);
   freeMatrix(G0);
