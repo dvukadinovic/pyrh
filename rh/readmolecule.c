@@ -423,6 +423,8 @@ void freeMolecule(Molecule *molecule)
 {
   register int kr;
 
+  if (molecule->popsFile != NULL) free(molecule->popsFile);
+
   if (molecule->pt_index != NULL) free(molecule->pt_index);
   if (molecule->pt_count != NULL) free(molecule->pt_count);
   if (molecule->vbroad != NULL)   free(molecule->vbroad);
