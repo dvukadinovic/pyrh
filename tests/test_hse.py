@@ -2,15 +2,11 @@ import numpy as np
 # import matplotlib.pyplot as plt
 import time
 import pyrh
+from tqdm import tqdm
 
 def do_it():
-	ne, nH, rho, pg = pyrh.hse(cwd, atm_scale, scale, atmos[1], full_output=True)
-	del ne
-	del nH
-	del rho
-	del pg
-	# time.sleep(0.25)
-
+	pyrh.hse(cwd, atm_scale, scale, atmos[1], ne=atmos[2], nHtot=atmos[8], rho=rho, pg=pg, full_output=True)
+	
 def spinor2multi(atm):
 	"""
 	Casting from SPINOR type atmosphere structure to MULTI type structure.
@@ -41,15 +37,15 @@ def spinor2multi(atm):
 
 atmos = np.loadtxt("falc.dat", skiprows=1).T
 atmos= spinor2multi(atmos)
+rho = np.empty(atmos.shape[1], dtype=np.float64)
+pg = np.empty(atmos.shape[1], dtype=np.float64)
 
 scale = atmos[0]
 
 cwd = "."
 atm_scale = 0 # tau
 
-# time.sleep(2)
-for _ in range(100000):
-	# print(_)
+for _ in tqdm(range(100000)):
 	do_it()
 
 # old = atmos[2].copy()

@@ -49,7 +49,7 @@ wave = np.linspace(630.25, 630.5, num=100)
 
 spec = np.empty((len(wave), 4), dtype=np.float64)
 
-for _ in range(1):
+for _ in range(1000):
 	get_spectra()
 
 # plt.plot(spec[-1], spec[0])
