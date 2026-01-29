@@ -437,6 +437,10 @@ def hse(cwd,
 		int atm_scale,
 		cnp.ndarray[double, ndim=1, mode="c"] scale,
 		cnp.ndarray[double, ndim=1, mode="c"] temp,
+		cnp.ndarray[double, ndim=1, mode="c"] ne,
+		cnp.ndarray[double, ndim=1, mode="c"] nHtot,
+		cnp.ndarray[double, ndim=1, mode="c"] rho,
+		cnp.ndarray[double, ndim=1, mode="c"] pg,
 		double pg_top=0.1,
 		cnp.ndarray[double, ndim=1, mode="c"] fudge_wave=None,
 		cnp.ndarray[double, ndim=2, mode="c"] fudge_value=None,
@@ -447,10 +451,10 @@ def hse(cwd,
 
 	cdef char* argv[140]
 
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
-	cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
+	# cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
+	# cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
+	# cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
+	# cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
 	pg[0] = pg_top
 
 	py_list = cwd.split(" ")
@@ -490,13 +494,11 @@ def hse(cwd,
 			fudge_num, fudge_wave_ptr, fudge_value_ptr,
 			Nabun, abundance_id_ptr, abundance_value_ptr)
 
-	if full_output:
-		return ne, nHtot, rho, pg
+	# if full_output:
+	# 	return rho, pg
 
-	del rho
-	del pg
-
-	return ne, nHtot
+	# del rho
+	# del pg
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

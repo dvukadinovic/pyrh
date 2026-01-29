@@ -227,7 +227,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   getCPU(1, TIME_START, NULL);
   MULTIatmos(&atmos, &geometry, Nabun, atomic_id, atomic_abundance);
   atmos.active_layer = -1;
-  
+
   if (pyrh_atm_scale==0){
     geometry.scale = TAU500;
     for (int k=0; k<geometry.Ndep; k++) 
@@ -307,11 +307,12 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   getBoundary(&geometry);
-  
+
   Background(write_analyze_output=FALSE, equilibria_only=FALSE);
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
 
+  
   // call in NLTE
   if (input.solve_NLTE) getProfiles();
   // here it initializes the spectrum and J;
@@ -322,14 +323,14 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   bool_t pyrh_io_flag = FALSE;
   initSolution(pyrh_io_flag);
   if (input.solve_NLTE) initScatter();
-
+    
   getCPU(1, TIME_POLL, "Total Initialize");
 
   /* --- Solve radiative transfer for active ingredients -- --------- */
 
   // Here we get the spectrum (IQUV and J)
   Iterate(input.NmaxIter, input.iterLimit);
-
+  
   adjustStokesMode();
   niter = 0;
   while (niter < input.NmaxScatter) {
@@ -357,52 +358,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.B[k]      *= 1e4; // T --> G
   }
 
-  //--- free all the memory that we do not use anymore
-
-  for (int idl=0; idl<atmos.Nrlk; idl++){
-    if (atmos.rlk_lines[idl].zm != NULL){
-      free(atmos.rlk_lines[idl].zm->q);
-      free(atmos.rlk_lines[idl].zm->strength);
-      free(atmos.rlk_lines[idl].zm->shift);
-      free(atmos.rlk_lines[idl].zm);
-    }
-  }
-  free(atmos.rlk_lines);
-
-  if (atmos.moving || atmos.Stokes) free(atmos.backgrrecno);
-  free(atmos.backgrflags);
-  
-  freeAtoms();
-  freeMolecules();
-  freeElements();
-  
-  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
-  if (spectrum.as!=NULL) free(spectrum.as); 
-
-  if (atmos.Stokes){
-    freeMatrix((void **) atmos.cos_gamma);
-    freeMatrix((void **) atmos.cos_2chi);
-    freeMatrix((void **) atmos.sin_2chi);
-  }
-
-  freeOpacityEmissivity();
-  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
-
-  free(atmos.N);
-  free(atmos.nHmin);
-
-  // free geometry related data
-  if (geometry.tau_ref!=NULL) free(geometry.tau_ref); geometry.tau_ref = NULL;
-  if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
-  if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
-
-  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
-  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
-
-  free(geometry.wmu);
-  free(geometry.mux);
-  free(geometry.muy);
-  free(geometry.muz);
+  clean_from_memory();
 
   return spec;
 }

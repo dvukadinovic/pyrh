@@ -220,8 +220,6 @@ void hse(char* cwd, int pyrh_Ndep,
   atmos.ne[0] = 0;
   atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0])/atmos.totalAbund;
 
-  // printf("k = 0 | %e | %e | %e\n", atmos.ne[0], atmos.nHtot[0], total_opacity[0]);
-
   double deltaP;
   double turbP_el, turbP;
 
@@ -241,42 +239,26 @@ void hse(char* cwd, int pyrh_Ndep,
     pyrh_Background(equilibria_only=FALSE, total_opacity);
     get_Nm_total(Nm, atmos.active_layer);
 
-    // if (geometry.scale==GEOMETRIC){
-    //   pg[0] = atmos.gravity * rho[0] * geometry.height[0];
-    // }
-    // if (geometry.scale==TAU500){
-    //   deltaP = atmos.gravity * geometry.tau_ref[0] * rho[0] / total_opacity[0];
-    //   printf("%e | %e | %e | %e \n", pg[0], deltaP, atmos.ne[0], KBOLTZMANN*atmos.T[0]);
-    // }
-    
     nHtot_old = atmos.nHtot[0];
     // atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0] - Nm[0]) / atmos.totalAbund + atmos.nHmin[0] + 2*atmos.H2->n[0];
     // turbP_el = 0.5*M_ELECTRON*SQ(atmos.vturb[0])/KBOLTZMANN/atmos.T[0];
     // turbP = 0.5*atmos.avgMolWght*AMU*SQ(atmos.vturb[0])/KBOLTZMANN/atmos.T[0];
     // atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0]*(1 + turbP_el)) / atmos.totalAbund / (1 + turbP);
     atmos.nHtot[0] = (pg[0]/KBOLTZMANN/atmos.T[0] - atmos.ne[0])/atmos.totalAbund;
-    
-    // printf("k = 0 | %e | %e | %e | %e | %e\n", atmos.ne[0], atmos.nHtot[0], total_opacity[0], pg[0], rho[0]);
-
+  
     iter++;
     eta = fabs((atmos.nHtot[0] - nHtot_old)/atmos.nHtot[0]);
     if (eta<=1e-2) break;
   }
-  // printf("k = 0 | %e | %e | %e\n", atmos.ne[0], atmos.nHtot[0], total_opacity[0]);
-
+  
   if (geometry.scale==GEOMETRIC){
     geometry.cmass[0] = (atmos.nHtot[0] * atmos.totalAbund + atmos.ne[0]) * KBOLTZMANN*atmos.T[0] / atmos.gravity;
     geometry.tau_ref[0] = 0.5 * total_opacity[0] * (geometry.height[0] - geometry.height[1]);
     if (geometry.tau_ref[0] > 1.0) geometry.tau_ref[0] = 0.0;
   }
 
-  // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e\n", eta);
-
-  // printf("%d | %f | %e | %e | %e | %e\n", iter, atmos.T[0], atmos.ne[0], atmos.nHtot[0], total_opacity[0], Nm[0]);
-
   double LOG10 = log(10);
   double dlogtau;
-
 
   /*--- Start HSE solution for the rest of atmospheric layers -------------- */
 
@@ -314,28 +296,13 @@ void hse(char* cwd, int pyrh_Ndep,
       // de la Cruz Rodriguez et al. 2019
       // integration in logarithmic optical depth scale
       if (geometry.scale==TAU500) dlogtau = log10(geometry.tau_ref[k]) - log10(geometry.tau_ref[k-1]);
-      // if (iter==0){
-      //   dcmass = 1 / (total_opacity[k]/rho[k]);
-      //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
-      //   pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
-      // }
-      // else{
-      //   beta2 = total_opacity[k]/rho[k];
-      //   beta1 = total_opacity[k-1]/rho[k-1];
-      //   dcmass = log(beta2/beta1) / (beta2 - beta1);
-      //   // dcmass = 2/(beta2 + beta1);
-      //   // pg[k] = pg[k-1] + LOG10 * atmos.gravity * dlogtau * geometry.tau_ref[k] * dcmass;
-      //   pg[k] = pg[k-1] + atmos.gravity * (geometry.tau_ref[k] - geometry.tau_ref[k-1]) * dcmass;
-      // }
+      
       if (geometry.scale==TAU500){
         beta1 = rho[k-1]/total_opacity[k-1] * geometry.tau_ref[k-1];
         beta2 = rho[k]/total_opacity[k] * geometry.tau_ref[k];
         pg[k] = pg[k-1] + LOG10 * atmos.gravity * (beta2 + beta1)/2 * dlogtau;
-        // deltaP = atmos.gravity / sqrt(total_opacity[k]*total_opacity[k-1]/rho[k]/rho[k-1]) * (geometry.tau_ref[k] - geometry.tau_ref[k-1]);
-        // pg[k] = pg[k-1] + deltaP;
       }
       if (geometry.scale==GEOMETRIC){
-        // pg[k] = pg[k-1] + atmos.gravity * (rho[k] + rho[k-1])/2 * (geometry.height[k-1] - geometry.height[k]);
         deltaP = atmos.gravity * (geometry.height[k-1] - geometry.height[k]) * sqrt(rho[k]*rho[k-1]);
         pg[k] = pg[k-1] + deltaP;
         
@@ -343,12 +310,6 @@ void hse(char* cwd, int pyrh_Ndep,
         geometry.cmass[k]  = geometry.cmass[k-1]  + 0.5*(rho[k-1] + rho[k]) * (geometry.height[k-1] - geometry.height[k]);
         geometry.tau_ref[k] = geometry.tau_ref[k-1] + 0.5*(total_opacity[k-1] + total_opacity[k]) * (geometry.height[k-1] - geometry.height[k]);
       }
-
-      // BRC correction of gas pressure (from multiatmos.c)
-      // if (pg[k]<1.9082806*atmos.ne[k]*KBOLTZMANN*atmos.T[k]){
-      // //   pg[k] = 1.9082806*atmos.ne[k]*KBOLTZMANN*atmos.T[k];
-      //   printf("%d -- correcting gass pressure\n", k);
-      // }
 
       nHtot_old = atmos.nHtot[k];
       // atmos.nHtot[k] = (pg[k]/KBOLTZMANN/atmos.T[k] - atmos.ne[k] - Nm[k]) / atmos.totalAbund + atmos.nHmin[k] + 2*atmos.H2->n[k];
@@ -362,50 +323,60 @@ void hse(char* cwd, int pyrh_Ndep,
       eta = fabs((atmos.nHtot[k] - nHtot_old)/atmos.nHtot[k]);
       if (eta<=1e-2) break;
     }
-    // printf("-----\n");
-    // if (eta>1e-2 && iter==NMAX_HSE_ITER) printf("pyRH -- Max number of iterations reached... eta = %e @ %d\n", eta, k);
-    // printf("------------\n");
-    // printf("%d | %e | %e | %e | %e | %e \n", iter, atmos.ne[k], atmos.nHtot[k], total_opacity[k], pg[k], rho[k]);
-    // printf("nHmin = %e\n", atmos.nHmin[k]);
-    // printf("k = %d | iter = %d | eta = %f\n ----------- \n", k, iter, eta);
-    // printf("k = %d | iter = %d\n ----------- \n", k, iter);
   }
 
   // convertScales(&atmos, &geometry);
 
   //--- free all the memory that we do not use anymore
 
-  // free_everything();
-
   free(atmos.backgrflags);
+
+  if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+  if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
   free(Nm);
   free(total_opacity);
 
+  ActiveSet *as;
+  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
+  // might have to free as at each wavelength first (for NLTE)
+  for (int nspect = 0;  nspect < spectrum.Nspect;  nspect++) {
+      as = &spectrum.as[nspect];
+  
+      free(as->Nlower);
+      free(as->Nupper);
+
+      free(as->upper_levels);
+      free(as->lower_levels);
+  }
+  if (spectrum.as!=NULL) free(spectrum.as);
+
   free(wavetable);
   if (spectrum.lambda!=NULL) free(spectrum.lambda);
-  if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
-  if (spectrum.as!=NULL) free(spectrum.as); 
+  
+  freeOpacityEmissivity();
+  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
+
+  if (atmos.Nactiveatom > 0) free(atmos.activeatoms);
+  if (atmos.Nactivemol > 0) free(atmos.activemols);
 
   freeAtoms();
   freeMolecules();
-  freeElements(); 
+  free(atmos.nHmin);
   
   free(atmos.vturb);
   free(atmos.N);
-  free(atmos.nHmin);
-
-  freeOpacityEmissivity();
-  if (input.get_atomic_rfs) freeOpacityEmissivityDer();
+  
+  free(geometry.wmu);
+  free(geometry.mux);
+  free(geometry.muy);
+  free(geometry.muz);
   
   free(geometry.tau_ref);
   free(geometry.cmass);
   free(geometry.height);
 
-  free(geometry.wmu);
-  free(geometry.mux);
-  free(geometry.muy);
-  free(geometry.muz);
+  freeElements(); 
 }
 /* ------- end ---------------------------- pyrh_hse.c -------------- */
 
