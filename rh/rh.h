@@ -115,4 +115,6 @@ void   w3(double dtau, double *w);
 
 void   U3(double dtau, double *U);
 
+void   clean_from_memory();
+
 /* ------- end ---------------------------- rh.h -------------------- */
