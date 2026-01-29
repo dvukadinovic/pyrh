@@ -721,10 +721,10 @@ void freeAtom(Atom *atom)
   // atom->abo_level = NULL;
   if (atom->C != NULL)           freeMatrix((void **) atom->C);
   if (atom->vbroad != NULL)      free(atom->vbroad);
-
+  
   /* --- Be careful here because atom->n points to atom->nstar in
-         the case of LTE populations (see readAtom.c) -- ------------ */ 
-
+  the case of LTE populations (see readAtom.c) -- ------------ */ 
+  
   if (atom->n != atom->nstar){
     if (atom->n != NULL) freeMatrix((void **) atom->n);
   }
@@ -732,19 +732,19 @@ void freeAtom(Atom *atom)
   if (atom->ntotal != NULL) free(atom->ntotal);
   
   if (atom->Gamma != NULL)  freeMatrix((void **) atom->Gamma);
-
+  
   if (atom->line != NULL) {
     for (kr = 0;  kr < atom->Nline;  kr++)
-      freeAtomicLine(atom->line + kr);
+    freeAtomicLine(atom->line + kr);
     free(atom->line);
   }
-
+  
   if (atom->continuum != NULL) {
     for (kr = 0;  kr < atom->Ncont;  kr++)
-      freeAtomicContinuum(atom->continuum + kr);
+    freeAtomicContinuum(atom->continuum + kr);
     free(atom->continuum);
   }
-
+  
   if (atom->ft != NULL) free(atom->ft);
 }
 /* ------- end ---------------------------- freeAtom.c -------------- */
