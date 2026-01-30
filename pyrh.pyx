@@ -451,10 +451,6 @@ def hse(cwd,
 
 	cdef char* argv[140]
 
-	# cdef cnp.ndarray[cnp.float64_t, ndim=1] ne = np.empty(Ndep)
-	# cdef cnp.ndarray[cnp.float64_t, ndim=1] nHtot = np.empty(Ndep)
-	# cdef cnp.ndarray[cnp.float64_t, ndim=1] rho = np.empty(Ndep)
-	# cdef cnp.ndarray[cnp.float64_t, ndim=1] pg = np.empty(Ndep)
 	pg[0] = pg_top
 
 	py_list = cwd.split(" ")
@@ -493,12 +489,6 @@ def hse(cwd,
 			atm_scale,
 			fudge_num, fudge_wave_ptr, fudge_value_ptr,
 			Nabun, abundance_id_ptr, abundance_value_ptr)
-
-	# if full_output:
-	# 	return rho, pg
-
-	# del rho
-	# del pg
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -651,18 +641,6 @@ def compute1d(cwd,
 			 0, argv[0])
 			 # &self.wavetable[0], self.Nwave)
 
-	# lam = np.asarray(<cnp.float64_t[:spec.nlw]> spec.lam)
-	# sI = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sI)
-
-	# sQ, sU, sV = None, None, None
-	# if spec.stokes:
-	# 	sQ = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sQ)
-	# 	sU = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sU)
-	# 	sV = np.asarray(<cnp.float64_t[:spec.nlw]> spec.sV)
-
-	# output = sI, sQ, sU, sV, lam
-	# output = (spectrum, lam)
-
 	output = None
 
 	if get_populations:
@@ -684,7 +662,5 @@ def compute1d(cwd,
 	# to preserve the order of all output parameters
 	if get_populations:
 		output = (output, populations)
-
-	# J = convert_2d(spec.J, spec.nlw, spec.Nrays)
 
 	return output
