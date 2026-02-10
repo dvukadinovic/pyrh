@@ -303,7 +303,13 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
-    atmos.atomic_rfs = matrix4d_double(4, spectrum.Nspect, atmos.Nrays, input.n_atomic_pars);
+    atmos.atomic_rfs = matrix3d_double(4, spectrum.Nspect, input.n_atomic_pars);
+  }
+
+  if (input.solve_NLTE){
+    // turn off computation of RFs if we do NLTE computations;
+    // We will compute it once for the final output viewing angle (in _solveray())
+    input.get_atomic_rfs = FALSE;
   }
 
   getBoundary(&geometry);
@@ -347,6 +353,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.nlw = spectrum.Nspect;
   spec.Nrays = atmos.Nrays;
 
+  if (input.solve_NLTE && get_atomic_rfs) input.get_atomic_rfs = TRUE;
   _solveray(mu, &spec, pyrh_spectrum, pyrh_rfs);
 
   // revert units (since we pass pointers...)

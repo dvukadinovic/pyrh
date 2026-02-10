@@ -87,18 +87,18 @@ double **matrix_double(int Nrow, int Ncol)
 /* ------- begin -------------------------- matrix3d_double.c --------- */
 double ***matrix3d_double(int Nrow, int Ncol, int Ndep)
 {
-  int i, j;
+  int i, j, k;
   int typeSize = sizeof(double), pointerSize = sizeof(double *);
   double ***Matrix3d;
-
-  // double *all = (double *) malloc(Nrow * Ncol * Ndep * typeSize);
 
   Matrix3d = (double ***) malloc(Nrow * pointerSize);
   for (i=0; i<Nrow; i++){
     Matrix3d[i] = (double **) malloc(Ncol * pointerSize);
     for (j=0; j<Ncol; j++){
       Matrix3d[i][j] = (double *) malloc(Ndep * typeSize);
-      // Matrix3d[i][j] = all + (i*Ncol*Ndep) + (j*Ndep);
+      for (k=0; k<Ndep; k++){
+        Matrix3d[i][j][k] = 0;
+      }
     } 
   }
 
