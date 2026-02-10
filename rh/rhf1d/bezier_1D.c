@@ -215,12 +215,25 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
     for(j = 0;  j < 4;  j++){
       for(i = 0;  i < 4;  i++){
-        Md[j][i] = ident[j][i] + alpha * K0[j][i] + gamma*(-dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
+        // my implementation to match the non-polarized solution (altered the signs of gamma and theta coeff)
+        // Md[j][i] = ident[j][i] + alpha * K0[j][i] + gamma*(-dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
           
-        Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] - theta*(dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) + Ku[j][i]);
+        // Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] - theta*(dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) + Ku[j][i]);
           
-        Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] - dt03 * K0[j][i]);
-        Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] + dt03 * Ku[j][i]);
+        // Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] - dt03 * K0[j][i]);
+        // Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] + dt03 * Ku[j][i]);
+        
+        // original Jaime's implementation
+        Md[j][i] = ident[j][i] + alpha * K0[j][i] - gamma *
+          -(dt03 * (A[j][i] + dK0[j][i] + K0[j][i]) + K0[j][i]);
+          
+        Ma[j][i] = eps * ident[j][i] - beta * Ku[j][i] + theta *
+          (dt03 * (Ma[j][i] + dKu[j][i] + Ku[j][i]) - Ku[j][i]);
+          
+        Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] -
+                  dt03 * Ku[j][i]);
+        Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] +
+                  dt03 * K0[j][i]);
       }
     }
       
@@ -235,7 +248,11 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       for(j = 0;  j < 4;  j++){
       	V0[i] += Ma[i][j] * I[j][k-dk] + Mb[i][j] * Su[j] + Mc[i][j] * S0[j];
       }
-      V0[i] += dt03 * (-gamma * dS0[i] + theta * dSu[i]);
+      // my implementation to match the non-polarized solution (altered the signs of gamma and theta coeff)
+      // V0[i] += dt03 * (-gamma * dS0[i] + theta * dSu[i]);
+      
+      // original Jaime's implementation
+      V0[i] += dt03 * (gamma * dS0[i] - theta * dSu[i]);
     }
     /* --- Solve linear system to get the intensity -- -------------- */
       
