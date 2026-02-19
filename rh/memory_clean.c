@@ -41,7 +41,7 @@ void clean_from_memory()
     if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
     if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
-    if (input.get_atomic_rfs) freeMatrix3d(atmos.atomic_rfs, 4, spectrum.Nspect);
+    if (input.get_atomic_rfs) freeMatrix3d(atmos.atomic_rfs, spectrum.Nspect, 4);
 
     if (spectrum.wave_inds!=NULL) free(spectrum.wave_inds);
     // might have to free as at each wavelength first (for NLTE)
@@ -88,6 +88,6 @@ void clean_from_memory()
     if (geometry.cmass!=NULL) free(geometry.cmass); geometry.cmass = NULL;
     if (geometry.height!=NULL) free(geometry.height); geometry.height = NULL;
     
-    free(atmos.N);    
+    free(atmos.N);
     freeElements();
 }

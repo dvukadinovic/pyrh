@@ -137,7 +137,7 @@ void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh
     if (input.get_atomic_rfs){
       for (int ids=0; ids<4; ids++){
         for (int idp=0; idp<input.n_atomic_pars; idp++){
-          pyrh_rfs[index_rfs] = atmos.atomic_rfs[ids][idl][idp];
+          pyrh_rfs[index_rfs] = atmos.atomic_rfs[idl][ids][idp];
           index_rfs += 1;
         }
       }

@@ -607,6 +607,7 @@ def compute1d(cwd,
 		abundance_id_ptr = &atomic_number[0]
 		abundance_value_ptr = &atomic_abundance[0]
 
+	#--- RFs pointer
 	cdef double *rfs_ptr = NULL
 	rh_get_atomic_rfs = 0
 	if get_atomic_rfs:
@@ -617,6 +618,7 @@ def compute1d(cwd,
 	if get_populations:
 		rh_get_populations = 1
 	
+	#--- cwd path
 	cdef char* argv[140]
 
 	py_list = cwd.split(" ")

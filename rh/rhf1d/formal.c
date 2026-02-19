@@ -60,7 +60,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
     for (int ids=0; ids<4; ids++){
       for (int idp=0; idp<input.n_atomic_pars; idp++){
         for (mu = 0;  mu < Nrays;  mu++) {
-          atmos.atomic_rfs[ids][nspect][idp] = 0.0;
+          atmos.atomic_rfs[nspect][ids][idp] = 0.0;
         }
       }
     }
@@ -287,14 +287,14 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
       if (input.get_atomic_rfs && to_obs){
         if (solveStokes){
           for (int idp=0; idp<input.n_atomic_pars; idp++){
-            atmos.atomic_rfs[0][nspect][idp] = dIpol[0][0][idp];
-            atmos.atomic_rfs[1][nspect][idp] = dIpol[1][0][idp];
-            atmos.atomic_rfs[2][nspect][idp] = dIpol[2][0][idp];
-            atmos.atomic_rfs[3][nspect][idp] = dIpol[3][0][idp];
+            atmos.atomic_rfs[nspect][0][idp] = dIpol[0][0][idp];
+            atmos.atomic_rfs[nspect][1][idp] = dIpol[1][0][idp];
+            atmos.atomic_rfs[nspect][2][idp] = dIpol[2][0][idp];
+            atmos.atomic_rfs[nspect][3][idp] = dIpol[3][0][idp];
           }
         } else {
           for (int idp=0; idp<input.n_atomic_pars; idp++){
-            atmos.atomic_rfs[0][nspect][idp] = dI[0][idp];
+            atmos.atomic_rfs[nspect][0][idp] = dI[0][idp];
           }
         }
       }

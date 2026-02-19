@@ -224,10 +224,10 @@ void readKuruczLines(char *inputFile)
           for (int idl=0; idl<atmos.Nlam; idl++){
             if (atmos.lam_ids[idl]==line_index){
               lambda_air += atmos.lam_values[idl];
-              if (input.get_atomic_rfs){
-                rlk->get_dlam_rf = TRUE;
-                rlk->dlam_rf_ind = idl;
-              }
+              // if (input.get_atomic_rfs){
+              //   rlk->get_dlam_rf = TRUE;
+              //   rlk->dlam_rf_ind = idl;
+              // }
             }
           }
         }  
@@ -1051,7 +1051,7 @@ void freeElements()
     free(atmos.elements[n].mol_index);
     free(atmos.elements[n].ionpot);
     freeMatrix((void **) atmos.elements[n].pf);
-    if (atmos.elements[n].n) freeMatrix((void **) atmos.elements[n].n);
+    if (atmos.elements[n].n!=NULL) freeMatrix((void **) atmos.elements[n].n);
   }
   free(atmos.elements);
 }
