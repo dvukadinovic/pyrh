@@ -178,8 +178,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // atmos.H_LTE = TRUE; // --> move it after we check all atoms/molecules if they are active/passive?
   // if we need to solve NLTE problem
   input.solve_NLTE = FALSE;
-  
-  // --- DV --- this is where I stoped with reading the RH workflow.
 
   // set fudge factors
   if (fudge_lam!=NULL){
@@ -304,7 +302,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
     atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, 4, atmos.Nloggf); //input.n_atomic_pars);
-    // atmos.atomic_rfs = pyrh_rfs;
   }
 
   if (input.solve_NLTE){
