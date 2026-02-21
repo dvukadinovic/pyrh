@@ -331,9 +331,9 @@ void readKuruczLines(char *inputFile)
         if (input.verbose) {
           if (useBarklem)
           {
-            printf(" Using ABO broadening for line -- %d @ %f\n", line_index+1, lambda_air);
+            printf(" Using ABO broadening for line -- %3d @ %f for %d.%d\n", line_index+1, lambda_air, rlk->pt_index, rlk->stage);
           } else {
-            printf(" No ABO broadening for line    -- %d @ %f\n", line_index+1, lambda_air);
+            printf(" No ABO broadening for line    -- %3d @ %f for %d.%d\n", line_index+1, lambda_air, rlk->pt_index, rlk->stage);
           }
         }
 
