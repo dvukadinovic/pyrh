@@ -73,6 +73,31 @@ void concatenate(char* dest, char* str1, char* str2){
   strcat(dest, str2);
 }
 
+double get_epsilon(RLK_Line *rlk){
+  double C = 2 * PI * (Q_ELECTRON/EPSILON_0) * (Q_ELECTRON/M_ELECTRON) / CLIGHT;
+  double C2_atom = 2.15E-6;
+  double C2_ion  = 3.96E-6;
+
+  double T = 5790; // [K]
+  double ne = 2e19; // [m^-3]
+
+  double x, C3, dE, epsilon;
+
+  if (rlk->stage == 0) {
+    x  = 0.68;
+    C3 = C / (C2_atom * SQ(rlk->lambda0 * NM_TO_M));
+  } else {
+    x  = 0.0;
+    C3 = C / (C2_ion * SQ(rlk->lambda0 * NM_TO_M));
+  }
+
+  dE = rlk->Ej - rlk->Ei;
+
+  epsilon = 1.0 / (1.0 + C3 * pow(T, 1.5) / (ne * pow(KBOLTZMANN * T / dE, 1 + x)));
+
+  return epsilon;
+}
+
 myRLK_Line get_RLK_lines(char *cwd)
 {
   myRLK_Line output;
@@ -102,6 +127,11 @@ myRLK_Line get_RLK_lines(char *cwd)
   readAtomicModels(); 
 
   readKuruczLines(input.KuruczData);
+
+  // for (int i=0; i<atmos.Nrlk; i++){
+  //   double epsilon = get_epsilon(&atmos.rlk_lines[i]);
+  //   printf("Line %d: lambda0=%.4f, epsilon=%.3e\n", i, atmos.rlk_lines[i].lambda0, epsilon);
+  // }
 
   output.Nrlk = atmos.Nrlk;
   output.rlk_lines = atmos.rlk_lines;
