@@ -224,10 +224,11 @@ void readKuruczLines(char *inputFile)
           for (int idl=0; idl<atmos.Nlam; idl++){
             if (atmos.lam_ids[idl]==line_index){
               lambda_air += atmos.lam_values[idl];
-              // if (input.get_atomic_rfs){
-              //   rlk->get_dlam_rf = TRUE;
-              //   rlk->dlam_rf_ind = idl;
-              // }
+              if (input.get_atomic_rfs){
+                rlk->get_dlam_rf = TRUE;
+                // we count first log(gf) and then dlam (in globin)
+                rlk->dlam_rf_ind = idl + atmos.Nloggf;
+              }
             }
           }
         }  
@@ -520,6 +521,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
         *chi_Q, *chi_U, *chi_V, chi_l, *chip_Q, *chip_U, *chip_V,
          phi, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V,
          epsilon, C, C2_atom, C2_ion, C3, dE, x;
+  double dphi;
   Atom *metal;
   AtomicLine *line;
   Element *element;
@@ -692,6 +694,16 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
             if (rlk->get_loggf_rf){
               spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LN10;
               spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LN10;
+            }
+
+            if (rlk->get_dlam_rf){
+              dphi = phi/rlk->lambda0 + 0;
+              spectrum.dchi_c_lam[nspect][k][rlk->dlam_rf_ind] = eta_l * phi * rlk->lambda0/2/atmos.T[k]/KBOLTZMANN;
+              spectrum.dchi_c_lam[nspect][k][rlk->dlam_rf_ind] += chi_l * dphi;
+              spectrum.deta_c_lam[nspect][k][rlk->dlam_rf_ind] = -3/rlk->lambda0;
+              spectrum.deta_c_lam[nspect][k][rlk->dlam_rf_ind] += HPLANCK * CLIGHT / KBOLTZMANN / atmos.T[k]/pow(rlk->lambda0, 2);
+              spectrum.deta_c_lam[nspect][k][rlk->dlam_rf_ind] += dphi/phi;
+              spectrum.deta_c_lam[nspect][k][rlk->dlam_rf_ind] *= eta_l * phi;
             }
 
       	    if (rlk->zm != NULL && rlk->Grad) {

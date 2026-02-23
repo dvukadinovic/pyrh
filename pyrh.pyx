@@ -610,7 +610,7 @@ def compute1d(cwd,
 	#--- RFs pointer
 	cdef double *rfs_ptr = NULL
 	rh_get_atomic_rfs = 0
-	if get_atomic_rfs:
+	if get_atomic_rfs and (Nlam!=0 or Nloggf!=0):
 		rh_get_atomic_rfs = 1
 		rfs_ptr = &rfs[0,0,0]
 	

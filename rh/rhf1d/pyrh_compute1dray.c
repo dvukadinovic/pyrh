@@ -225,6 +225,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   // set log(gf) indices and values if forwarded
+  atmos.Nloggf = 0;
   if (Nloggf>=1){
     atmos.Nloggf = Nloggf;
     atmos.loggf_ids = loggf_ids;
@@ -233,11 +234,12 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
 
   // set lam0 indices and values if forwarded
+  atmos.Nlam = 0;
   if (Nlam>=1){
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
-    // input.n_atomic_pars += Nlam;
+    input.n_atomic_pars += Nlam;
   }
 
   if (get_atomic_rfs!=0) input.get_atomic_rfs = TRUE;
@@ -331,7 +333,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
-    atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, 4, atmos.Nloggf); //input.n_atomic_pars);
+    atmos.atomic_rfs = matrix3d_double(spectrum.Nspect, 4, input.n_atomic_pars);//atmos.Nloggf);
   }
 
   if (input.solve_NLTE){
