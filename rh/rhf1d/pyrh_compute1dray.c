@@ -166,7 +166,9 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   setOptions(1, NULL);
   SetFPEtraps();
 
+  // printf("Read input\n");
   readInput();
+  // printf("Done\n");
 
   input.verbose = FALSE;
 
@@ -239,7 +241,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.Nlam = Nlam;
     atmos.lam_ids = lam_ids;
     atmos.lam_values = lam_values;
-    input.n_atomic_pars += Nlam;
+    // input.n_atomic_pars += Nlam;
   }
 
   if (get_atomic_rfs!=0) input.get_atomic_rfs = TRUE;
@@ -308,8 +310,12 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     }
   }
 
+  // printf("Read atomic models\n");
   readAtomicModels();
+  // printf("Done\n");
+  // printf("Read Molecules\n");
   readMolecularModels();
+  // printf("Done\n");
 
   // check if we can avoid NLTE computations
   // (2 calls for LTE solution are needed instead of only one)
@@ -329,7 +335,9 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   }
   if (atmos.Stokes) Bproject();
 
+  // printf("SortLambda\n");
   SortLambda(lam, Nwave);
+  // printf("Done!\n");
 
   // allocate space for atomic RFs if needed
   if (input.get_atomic_rfs){
