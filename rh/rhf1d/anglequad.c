@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
 #include "geometry.h"
 
 
@@ -24,7 +24,6 @@
 /* --- Global variables --                             -------------- */
 
 extern Atmosphere atmos;
-
 
 /* ------- begin -------------------------- getAngleQuad.c ---------- */
 

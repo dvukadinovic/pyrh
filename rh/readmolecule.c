@@ -611,6 +611,8 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
   concatenate(tmp2, tmp, line_data);
   strcpy(line_data, tmp2);
 
+  // printf("Reading in the molecular line list: %s\n", line_data);
+
   if ((fp_lines = fopen(line_data, "r")) == NULL) {
     sprintf(messageStr, "Unable to open inputfile %s", line_data);
     Error(ERROR_LEVEL_2, routineName, messageStr);
@@ -668,35 +670,34 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
 
       mrt->gi = 2*Ji + 1;
       switch (branchStr[0]) {
-      case 'P':
-	Jj = Ji - 1;
-	break;
-      case 'Q':
-	Jj = Ji;
-	break;
-      case 'R':
-	Jj = Ji + 1;
-	break;
-      default:
-	sprintf(messageStr, "Invalid value of branch string in file %s: %s\n"
-		" Line: %f [nm]\n  Valid options are P, R and Q",
-		line_data, branchStr, mrt->lambda0);
-	Error(ERROR_LEVEL_2, routineName, messageStr);
+        case 'P':
+          Jj = Ji - 1;
+          break;
+        case 'Q':
+          Jj = Ji;
+          break;
+        case 'R':
+          Jj = Ji + 1;
+          break;
+        default:
+          sprintf(messageStr, "Invalid value of branch string in file %s: %s\n"
+            " Line: %f [nm]\n  Valid options are P, R and Q",
+            line_data, branchStr, mrt->lambda0);
+          Error(ERROR_LEVEL_2, routineName, messageStr);
       }
       mrt->gj = 2*Jj + 1;
 
-      mrt->Bji = CUBE(mrt->lambda0*NM_TO_M) /
-	(2.0*HPLANCK*CLIGHT) * mrt->Aji;
+      mrt->Bji = CUBE(mrt->lambda0*NM_TO_M) / (2.0*HPLANCK*CLIGHT) * mrt->Aji;
       mrt->Bij = (mrt->gj / mrt->gi) * mrt->Bji;
     
       /* --- Temporary measure to accommodate $^13$CO --   ---------- */  
 
       switch (isotope) {
-      case 12:
-      case 26: mrt->isotope_frac = 1.0 - C_13;  break;
-      case 13:
-      case 36: mrt->isotope_frac = C_13;        break;
-      default: mrt->isotope_frac = 1.0;
+        case 12:
+        case 26: mrt->isotope_frac = 1.0 - C_13;  break;
+        case 13:
+        case 36: mrt->isotope_frac = C_13;        break;
+        default: mrt->isotope_frac = 1.0;
       }
     }
     
@@ -738,7 +739,7 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
       getLine(fp_lines, COMMENT_CHAR, inputLine, exit_on_EOF=TRUE);
 
       if (strstr(format_string, "KURUCZ_TIO")) {
-	Nread = sscanf(inputLine,
+	      Nread = sscanf(inputLine,
 		       "%10lf %7lf %5lf %10lf %5lf %10lf",
 		       &lambda_air, &log_gf,
 		       &mrt->gi, &mrt->Ei, &mrt->gj, &mrt->Ej);
@@ -763,159 +764,170 @@ void readMolecularLines(struct Molecule *molecule, char *line_data)
 
       if (strstr(format_string, "KURUCZ_CD18")) {
 
-	/* --- Electronic configuration --             -------------- */
+        /* --- Electronic configuration --             -------------- */
 
-	mrt->configi[0] = inputLine[52];
-	mrt->configj[0] = inputLine[60];
-	mrt->configi[1] = '\0';
-	mrt->configj[1] = '\0';
+        mrt->configi[0] = inputLine[52];
+        mrt->configj[0] = inputLine[60];
+        mrt->configi[1] = '\0';
+        mrt->configj[1] = '\0';
 
-	/* --- Parity designation --                   -------------- */
+        /* --- Parity designation --                   -------------- */
 
-	mrt->parityi[0] = inputLine[55];
-	mrt->parityj[0] = inputLine[63];
-	mrt->parityi[1] = '\0';
-	mrt->parityj[1] = '\0';
-  
+        mrt->parityi[0] = inputLine[55];
+        mrt->parityj[0] = inputLine[63];
+        mrt->parityi[1] = '\0';
+        mrt->parityj[1] = '\0';
 
-	/* --- Vibrational quantum numbers --            ------------ */
+        /* --- Vibrational quantum numbers --            ------------ */
 
-	Nread = sscanf(inputLine+53, "%2d", &mrt->vi);
-	Nread = sscanf(inputLine+61, "%2d", &mrt->vj);
+        Nread = sscanf(inputLine+53, "%2d", &mrt->vi);
+        Nread = sscanf(inputLine+61, "%2d", &mrt->vj);
 
-	/* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
+        /* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
 
-	Nread = sscanf(inputLine+56, "%1d", &mrt->subi);
-	Nread = sscanf(inputLine+64, "%1d", &mrt->subj);
+        Nread = sscanf(inputLine+56, "%1d", &mrt->subi);
+        Nread = sscanf(inputLine+64, "%1d", &mrt->subj);
 
       } else if (strstr(format_string, "KURUCZ_NEW")) {
 
-	/* --- Electronic configuration --             -------------- */
+        /* --- Electronic configuration --             -------------- */
 
-	strncpy(mrt->configi, inputLine+52, 2);
-	strncpy(mrt->configj, inputLine+60, 2);
-	mrt->configi[2] = '\0';
-	mrt->configj[2] = '\0';
+        // strncpy(mrt->configi, inputLine+52, 2);
+        // strncpy(mrt->configj, inputLine+60, 2);
+        strncpy(mrt->configi, inputLine+52, 1);
+        strncpy(mrt->configj, inputLine+60, 1);
+        mrt->configi[2] = '\0';
+        mrt->configj[2] = '\0';
+        // printf("config: %s %s\n", mrt->configi, mrt->configj);
 
-	/* --- Parity designation --                   -------------- */
+        /* --- Parity designation --                   -------------- */
 
-	mrt->parityi[0] = inputLine[56];
-	mrt->parityj[0] = inputLine[64];
-	mrt->parityi[1] = '\0';
-	mrt->parityj[1] = '\0';
-  
-	/* --- Vibrational quantum numbers --            ------------ */
+        mrt->parityi[0] = inputLine[56];
+        mrt->parityj[0] = inputLine[64];
+        mrt->parityi[1] = '\0';
+        mrt->parityj[1] = '\0';
+        // printf("parity: %s %s\n", mrt->parityi, mrt->parityj);
+        
+        /* --- Vibrational quantum numbers --            ------------ */
 
-	Nread = sscanf(inputLine+54, "%2d", &mrt->vi);
-	Nread = sscanf(inputLine+62, "%2d", &mrt->vj);
+        // Nread = sscanf(inputLine+54, "%2d", &mrt->vi);
+        // Nread = sscanf(inputLine+62, "%2d", &mrt->vj);
+        Nread = sscanf(inputLine+53, "%2d", &mrt->vi);
+        Nread = sscanf(inputLine+61, "%2d", &mrt->vj);
+        // printf("v: %d %d\n", mrt->vi, mrt->vj);
 
-	/* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
+        /* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
 
-	Nread = sscanf(inputLine+57, "%1d", &mrt->subi);
-	Nread = sscanf(inputLine+65, "%1d", &mrt->subj);
+        // Nread = sscanf(inputLine+57, "%1d", &mrt->subi);
+        // Nread = sscanf(inputLine+65, "%1d", &mrt->subj);
+        Nread = sscanf(inputLine+56, "%1d", &mrt->subi);
+        Nread = sscanf(inputLine+64, "%1d", &mrt->subj);
+        // printf("sub: %d %d\n", mrt->subi, mrt->subj);
 
       } else if (strstr(format_string, "KURUCZ_TIO")) {
 
-	/* --- Electronic configuration --             -------------- */
+        /* --- Electronic configuration --             -------------- */
 
-	strncpy(mrt->configi, inputLine+50, 2);
-	strncpy(mrt->configj, inputLine+59, 2);
-	mrt->configi[2] = '\0';
-	mrt->configj[2] = '\0';
+        strncpy(mrt->configi, inputLine+50, 2);
+        strncpy(mrt->configj, inputLine+59, 2);
+        mrt->configi[2] = '\0';
+        mrt->configj[2] = '\0';
 
-	/* --- Parity designation --                   -------------- */
+        /* --- Parity designation --                   -------------- */
 
-	mrt->parityi[0] = ((inputLine[53] == 'p') ? 'E' : 'F');
-	mrt->parityj[0] = ((inputLine[61] == 'p') ? 'E' : 'F');
-	mrt->parityi[1] = '\0';
-	mrt->parityj[1] = '\0';
-  
-	/* --- Vibrational quantum numbers --            ------------ */
+        mrt->parityi[0] = ((inputLine[53] == 'p') ? 'E' : 'F');
+        mrt->parityj[0] = ((inputLine[61] == 'p') ? 'E' : 'F');
+        mrt->parityi[1] = '\0';
+        mrt->parityj[1] = '\0';
+        
+        /* --- Vibrational quantum numbers --            ------------ */
 
-	Nread = sscanf(inputLine+51, "%2d", &mrt->vi);
-	Nread = sscanf(inputLine+59, "%2d", &mrt->vj);
+        Nread = sscanf(inputLine+51, "%2d", &mrt->vi);
+        Nread = sscanf(inputLine+59, "%2d", &mrt->vj);
 
-	/* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
+        /* --- Subbranch (F1, F2, ...., E1, E2, ...etc) -- ---------- */
 
-	Nread = sscanf(inputLine+54, "%1d", &mrt->subi);
-	Nread = sscanf(inputLine+62, "%1d", &mrt->subj);
+        Nread = sscanf(inputLine+54, "%1d", &mrt->subi);
+        Nread = sscanf(inputLine+62, "%1d", &mrt->subj);
 
         /* --- Isotope fraction for Ti --                ------------ */
 
         Nread = sscanf(inputLine+66, "%2d", &isotope);
         switch (isotope) {
-	case 46: mrt->isotope_frac = TI_46;  break;
-	case 47: mrt->isotope_frac = TI_47;  break;
-	case 48: mrt->isotope_frac = TI_48;  break;
-	case 49: mrt->isotope_frac = TI_49;  break;
-	case 50: mrt->isotope_frac = TI_50;  break;
-	default: mrt->isotope_frac = 1.0;
-	}
+          case 46: mrt->isotope_frac = TI_46;  break;
+          case 47: mrt->isotope_frac = TI_47;  break;
+          case 48: mrt->isotope_frac = TI_48;  break;
+          case 49: mrt->isotope_frac = TI_49;  break;
+          case 50: mrt->isotope_frac = TI_50;  break;
+          default: mrt->isotope_frac = 1.0;
+        }
       }
       /* --- read additional data for Zeeman polarization -- -------- */
 
       if (strlen(inputLine) > 71) {
 
-	Nread = sscanf(inputLine+71, "%1s %1s %lf %1s %1s %lf",
-		       Hundi, Lambdai, &mrt->Si,
-		       Hundj, Lambdaj, &mrt->Sj);
+        Nread = sscanf(inputLine+71, "%1s %1s %lf %1s %1s %lf",
+                Hundi, Lambdai, &mrt->Si,
+                Hundj, Lambdaj, &mrt->Sj);
 
-	/* --- Determine the coupling case according to Hund -- ----- */
+        /* --- Determine the coupling case according to Hund -- ----- */
 
         switch (Hundi[0]) {
-	case 'A': mrt->Hundi = CASE_A;  break;
-	case 'B': mrt->Hundi = CASE_B;  break;
-        default:
-          sprintf(messageStr, "Unsupported Hund's case: %s\n", Hundi);
-	  Error(ERROR_LEVEL_2, routineName, messageStr);
-	}
+          case 'A': mrt->Hundi = CASE_A;  break;
+          case 'B': mrt->Hundi = CASE_B;  break;
+          default:
+            sprintf(messageStr, "Unsupported Hund's case: %s\n", Hundi);
+            Error(ERROR_LEVEL_2, routineName, messageStr);
+        }
         switch (Hundj[0]) {
-	case 'A': mrt->Hundj = CASE_A;  break;
-	case 'B': mrt->Hundj = CASE_B;  break;
-        default:
-          sprintf(messageStr, "Unsupported Hund's case: %s\n", Hundj);
-	  Error(ERROR_LEVEL_2, routineName, messageStr);
-	}
-	/* --- Orbital angular momemtum Lambda along nuclear axis
+          case 'A': mrt->Hundj = CASE_A;  break;
+          case 'B': mrt->Hundj = CASE_B;  break;
+          default:
+            sprintf(messageStr, "Unsupported Hund's case: %s\n", Hundj);
+            Error(ERROR_LEVEL_2, routineName, messageStr);
+        }
+        /* --- Orbital angular momemtum Lambda along nuclear axis
 
-               S --> Sigma
-               P --> Pi
-               D --> Delta
-               F --> Phi
-           --                                          -------------- */
+            S --> Sigma
+            P --> Pi
+            D --> Delta
+            F --> Phi
+        --                                          -------------- */
 
         switch (Lambdai[0]) {
-	case 'S': mrt->Lambdai = 0;  break;
-	case 'P': mrt->Lambdai = 1;  break;
-	case 'D': mrt->Lambdai = 2;  break;
-	case 'F': mrt->Lambdai = 3;  break;
-        default:
-          sprintf(messageStr,
-		  "Unsupported orbital projection Lambda: %s\n", Lambdai);
-	  Error(ERROR_LEVEL_2, routineName, messageStr);
-	}
+          case 'S': mrt->Lambdai = 0;  break;
+          case 'P': mrt->Lambdai = 1;  break;
+          case 'D': mrt->Lambdai = 2;  break;
+          case 'F': mrt->Lambdai = 3;  break;
+          default:
+            sprintf(messageStr, "Unsupported orbital projection Lambda: %s\n", Lambdai);
+            Error(ERROR_LEVEL_2, routineName, messageStr);
+        }
         switch (Lambdaj[0]) {
-	case 'S': mrt->Lambdaj = 0;  break;
-	case 'P': mrt->Lambdaj = 1;  break;
-	case 'D': mrt->Lambdaj = 2;  break;
-	case 'F': mrt->Lambdaj = 3;  break;
-        default:
-          sprintf(messageStr,
-		  "Unsupported orbital projection Lambda: %s\n", Lambdaj);
-	  Error(ERROR_LEVEL_2, routineName, messageStr);
-	}
-	/* --- Set the polarized flag only if the atmosphere has magnetic
-	       fields --                               -------------- */
-	
-	if (atmos.Stokes) mrt->polarizable = TRUE;
+          case 'S': mrt->Lambdaj = 0;  break;
+          case 'P': mrt->Lambdaj = 1;  break;
+          case 'D': mrt->Lambdaj = 2;  break;
+          case 'F': mrt->Lambdaj = 3;  break;
+          default:
+            sprintf(messageStr, "Unsupported orbital projection Lambda: %s\n", Lambdaj);
+            Error(ERROR_LEVEL_2, routineName, messageStr);
+	      }
+
+        /* --- Set the polarized flag only if the atmosphere has magnetic
+              fields --                               -------------- */
+        
+        if (atmos.Stokes) mrt->polarizable = TRUE;
       } else
-	mrt->polarizable = FALSE;
+        mrt->polarizable = FALSE;
     }
   } else {
     sprintf(messageStr, "Unknown molecular line format: %s", format_string);
     Error(ERROR_LEVEL_2, routineName, messageStr);
   }
+  
   molecule->Nrt += Nrt;
+
+  // printf("N lines read: %d\n", molecule->Nrt);
 
   fclose(fp_lines);
   sprintf(messageStr, " --- read %d %s lines for molecule %2s\n\n",

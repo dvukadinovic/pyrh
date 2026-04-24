@@ -759,68 +759,65 @@ flags MolecularOpacity(double lambda, int nspect, int mu, bool_t to_obs,
     molecule = &atmos.molecules[n];
 
     if ((molecule->Nrt > 0  &&  !molecule->active)) {
-      dlamb_char0 = lambda * molecule->mrt[0].qwing *
-	(atmos.vmicro_char / CLIGHT);
-      dlamb_charN = lambda * molecule->mrt[molecule->Nrt-1].qwing *
-	(atmos.vmicro_char / CLIGHT);
+      dlamb_char0 = lambda * molecule->mrt[0].qwing * (atmos.vmicro_char / CLIGHT);
+      dlamb_charN = lambda * molecule->mrt[molecule->Nrt-1].qwing * (atmos.vmicro_char / CLIGHT);
 
-      if (lambda >= molecule->mrt[0].lambda0 - dlamb_char0 &&
-	  lambda <= molecule->mrt[molecule->Nrt-1].lambda0 + dlamb_charN) {
+      if (lambda >= molecule->mrt[0].lambda0 - dlamb_char0 && lambda <= molecule->mrt[molecule->Nrt-1].lambda0 + dlamb_charN) {
 
-	for (kr = 0;  kr < molecule->Nrt;  kr++) {
-	  mrt = &molecule->mrt[kr];
+	      for (kr = 0;  kr < molecule->Nrt;  kr++) {
+	        mrt = &molecule->mrt[kr];
           dlamb_char0 = lambda * mrt->qwing * (atmos.vmicro_char / CLIGHT);
 
-	  if (fabs(mrt->lambda0 - lambda) <= dlamb_char0) {
-	    hc_la      = (HPLANCK * CLIGHT) / (mrt->lambda0 * NM_TO_M);
-	    Bijhc_4PI  = hc_4PI * mrt->Bij * mrt->isotope_frac * mrt->gi;
-	    twohnu3_c2 = mrt->Aji / mrt->Bji;
+	        if (fabs(mrt->lambda0 - lambda) <= dlamb_char0) {
+            hc_la      = (HPLANCK * CLIGHT) / (mrt->lambda0 * NM_TO_M);
+            Bijhc_4PI  = hc_4PI * mrt->Bij * mrt->isotope_frac * mrt->gi;
+            twohnu3_c2 = mrt->Aji / mrt->Bji;
 
-	    backgrflags.hasline = TRUE;
-	    if (mrt->polarizable) {
-	      backgrflags.ispolarized = TRUE;
-	      if (mrt->zm == NULL) mrt->zm = MolZeeman(mrt);
-	    }
+            backgrflags.hasline = TRUE;
+            if (mrt->polarizable) {
+              backgrflags.ispolarized = TRUE;
+              if (mrt->zm == NULL) mrt->zm = MolZeeman(mrt);
+            }
 
-	    for (k = 0;  k < atmos.Nspace;  k++) {
-	      if (molecule->n[k] > 0.0) {
-            phi = MolProfile(mrt, k, mu, to_obs, lambda,
-			 &phi_Q, &phi_U, &phi_V,
-			 &psi_Q, &psi_U, &psi_V);
+	          for (k = 0;  k < atmos.Nspace;  k++) {
+              if (molecule->n[k] > 0.0) {
+                phi = MolProfile(mrt, k, mu, to_obs, lambda,
+                                  &phi_Q, &phi_U, &phi_V,
+                                  &psi_Q, &psi_U, &psi_V);
 
-			kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
-			ni_gi = molecule->n[k] * exp(-mrt->Ei * kT) /
-			  molecule->pf[k];
-            nj_gj = ni_gi * exp(-hc_la * kT);
+                kT    = 1.0 / (KBOLTZMANN * atmos.T[k]);
+                ni_gi = molecule->n[k] * exp(-mrt->Ei * kT) / molecule->pf[k];
+                nj_gj = ni_gi * exp(-hc_la * kT);
 
-            chi_l = Bijhc_4PI * (ni_gi - nj_gj);
-			eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
+                chi_l = Bijhc_4PI * (ni_gi - nj_gj);
+                eta_l = Bijhc_4PI * twohnu3_c2 * nj_gj;
 
-			chi[k] += chi_l * phi;
-			eta[k] += eta_l * phi;
+                chi[k] += chi_l * phi;
+                eta[k] += eta_l * phi;
 
-		if (mrt->zm != NULL) {
-		  chi_Q[k] += chi_l * phi_Q;
-		  chi_U[k] += chi_l * phi_U;
-		  chi_V[k] += chi_l * phi_V;
+                if (mrt->zm != NULL) {
+                  chi_Q[k] += chi_l * phi_Q;
+                  chi_U[k] += chi_l * phi_U;
+                  chi_V[k] += chi_l * phi_V;
 
-		  eta_Q[k] += eta_l * phi_Q;
-		  eta_U[k] += eta_l * phi_U;
-		  eta_V[k] += eta_l * phi_V;
+                  eta_Q[k] += eta_l * phi_Q;
+                  eta_U[k] += eta_l * phi_U;
+                  eta_V[k] += eta_l * phi_V;
 
-		  if (input.magneto_optical) {
-		    chip_Q[k] += chi_l * psi_Q;
-		    chip_U[k] += chi_l * psi_U;
-		    chip_V[k] += chi_l * psi_V;
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+                  if (input.magneto_optical) {
+                    chip_Q[k] += chi_l * psi_Q;
+                    chip_U[k] += chi_l * psi_U;
+                    chip_V[k] += chi_l * psi_V;
+                  }
+                }
+              }
+            } // k-loop
+          }
+        } // molecules transition loop
       }
     }
-  }
+  } // molecules loop
+
   return backgrflags;
 }
 /* ------- end ---------------------------- MolecularOpacity.c ------ */
@@ -842,8 +839,7 @@ double MolProfile(MolecularLine *mrt, int k, int mu, bool_t to_obs,
   /* --- Returns the normalized profile for a molecular line,
          and calculates the Stokes profile components if necessary -- */
 
-  adamp = mrt->Aji * (mrt->lambda0 * NM_TO_M) / (4.0*PI *
-						 molecule->vbroad[k]);
+  adamp = mrt->Aji * (mrt->lambda0 * NM_TO_M) / (4.0*PI * molecule->vbroad[k]);
   v = (lambda/mrt->lambda0 - 1.0) * CLIGHT/molecule->vbroad[k];
   if (atmos.moving) {
     if (to_obs)

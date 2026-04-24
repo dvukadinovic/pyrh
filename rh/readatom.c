@@ -875,6 +875,7 @@ void readAtomicModels(void)
            treated in Non-LTE --                       -------------- */
 
     atom = &atmos.atoms[n];
+    // printf("Read -- %s\n", atomID);
     readAtom(atom, filename,
 	     active=(strstr(actionKey, "ACTIVE") ? TRUE : FALSE));
 

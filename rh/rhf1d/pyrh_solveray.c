@@ -121,6 +121,8 @@ void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh
   int index = 0;
   int index_rfs = 0;
   double tmp;
+
+  // printf("All good\n");
   
   for (idl=0; idl<Nlw+1; idl++){
     // skip referent wavelength
