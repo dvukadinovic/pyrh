@@ -38,9 +38,11 @@ scale = atmos[0]
 cwd = "."
 atm_scale = 0 # tau
 
-wave = np.linspace(630.25, 630.5, num=100)
+wave = np.linspace(630.25, 630.5, num=100, dtype=np.float64)
 
-spec = pyrh.compute1d(cwd, 1.0, atm_scale, atmos, wave)
+spec = np.zeros((len(wave), 4), dtype=np.float64)
+
+pyrh.compute1d(cwd, 1.0, atm_scale, spec, atmos, wave)
 
 plt.plot(spec[-1], spec[0])
 plt.show()

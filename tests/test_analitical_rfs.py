@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from time import time
 import pyrh
 import sys
+import subprocess as sp
 
 def spinor2multi(atm):
 	"""
@@ -34,8 +35,18 @@ def spinor2multi(atm):
 
 def compute_numerical_rf():
 	start = time()
-	pyrh.compute1d(cwd, mu, atm_scale, spec_plus, atmos, wave, loggf_ids=IDs[:1], loggf_values=values[:1]+perturbation)
-	pyrh.compute1d(cwd, mu, atm_scale, spec_minus, atmos, wave, loggf_ids=IDs[:1], loggf_values=values[:1]-perturbation)
+	pyrh.compute1d(cwd, mu, atm_scale, spec_plus, atmos, wave, 
+				loggf_ids=IDs, 
+				loggf_values=values+perturbation
+				# lam_ids=IDs,
+				# lam_values=values/1e4+perturbation/1e4
+				)
+	pyrh.compute1d(cwd, mu, atm_scale, spec_minus, atmos, wave, 
+				loggf_ids=IDs, 
+				loggf_values=values-perturbation
+				# lam_ids=IDs,
+				# lam_values=values/1e4-perturbation/1e4
+				)
 
 	# plt.plot(spec_plus[:,0] - spec_minus[:,0], label="diff")
 	# plt.plot(spec_plus[:,0], label="plus")
@@ -51,11 +62,12 @@ def compute_numerical_rf():
 	return rf
 
 perturbation = 1e-3
-atmos = np.loadtxt("falc.dat", skiprows=1).T
+# perturbation = 1
+atmos = np.loadtxt("falc_short.dat", skiprows=1).T
 atmos = spinor2multi(atmos)
 
-atmos[6] = np.deg2rad(45.0)  # inclination
-atmos[7] = np.deg2rad(10.0)  # azimuth
+atmos[6] = np.deg2rad(45)  # inclination
+atmos[7] = np.deg2rad(55.0)  # azimuth
 atmos[4] = 0.0  # microturbulence
 
 mu = 1.0
@@ -66,46 +78,87 @@ wave = np.linspace(630.255, 630.5, num=201)
 
 IDs = np.array([0], dtype=np.int32)
 values = np.array([-0.71], dtype=np.float64)
+# values = np.array([0], dtype=np.float64)
 
 spec = np.zeros((len(wave), 4), dtype=np.float64)
 spec_plus = np.zeros((len(wave), 4), dtype=np.float64)
 spec_minus = np.zeros((len(wave), 4), dtype=np.float64)
 
 rfs_analytical = np.zeros((len(wave), 4, len(values)), dtype=np.float64)
-analytical
 ids = 0
 
 # for idb, B in enumerate([0,500,2000,8000]):
-for idb, B in enumerate([1500]):
+for idb, B in enumerate([0, 1000, 3000]):
 	atmos[5] = B
 
 	scale = atmos[0]
 
-	rf_num = compute_numerical_rf()
-	print("----")
+	# rf_num = compute_numerical_rf()
+	# print("----")
 
 	start = time()
+	# out = pyrh.compute1d(cwd, mu, atm_scale, spec, atmos, wave, 
+	# 					loggf_ids=IDs,
+	# 					loggf_values=values
+	# 					)
+	# sp.run(f"rm I.txt", shell=True)
+
+	out = pyrh.compute1d(cwd, mu, atm_scale, spec, atmos, wave, 
+						loggf_ids=IDs,
+						loggf_values=values+perturbation,
+						)
+	sp.run(f"mv I.txt I_perturbed_B{B:05d}G_nodiffuse.txt", shell=True)
+	sp.run(f"mv chi.txt chi_perturbed_B{B:05d}G.txt", shell=True)
+	sp.run(f"mv eta.txt eta_perturbed_B{B:05d}G.txt", shell=True)
+
 	out = pyrh.compute1d(cwd, mu, atm_scale, spec, atmos, wave, 
 						loggf_ids=IDs,
 						loggf_values=values,
 						get_atomic_rfs=True,
 						rfs=rfs_analytical
 						)
-	print(f"Analytical RFs: {time() - start:.3f}")
+	# sp.run(f"mv I.txt I_for_S_pert_B{B:04d}G_nodiffuse.txt", shell=True)
+	# sp.run("rm dI.txt", shell=True)
+	sp.run(f"mv I.txt I_nonperturbed_B{B:05d}G_nodiffuse.txt", shell=True)
+	sp.run(f"mv dI.txt dI_B{B:05d}G_nodiffuse.txt", shell=True)
+	sp.run(f"mv chi.txt chi_nonperturbed_B{B:05d}G.txt", shell=True)
+	sp.run(f"mv eta.txt eta_nonperturbed_B{B:05d}G.txt", shell=True)
+	
+	print("--------")
+	# print(f"Analytical RFs: {time() - start:.3f}")
+	continue
 
 	print("==========================")
+	
+	print(rf_num[:,49])
+	print(rfs_analytical[49,:,0])
 
-	plt.plot(rfs_analytical[:,ids,0]/spec[0][0], c=f"C{idb}", label="Analytical RF")
-	plt.plot(rf_num[ids]/spec[0][0], linestyle="--", c=f"C{idb}", label="Numerical RF")
+	# plt.plot(rfs_analytical[:,ids,0]/spec[0][0], c=f"C{idb}", label="Analytical RF")
+	# plt.plot(rf_num[ids]/spec[0][0], linestyle="--", c=f"C{idb}", label="Numerical RF")
 
-	# plt.plot((rfs_analytical[0,:,ids]/rf_num[ids] - 1)*100, label=f"rel. diff B={B}")
+	# plt.plot((rfs_analytical[:,ids,0]/rf_num[ids] - 1)*100, label=f"rel. diff B={B}")
 	# maxRf = np.max(np.abs(rf_num[0]))
 	# plt.plot((rfs_analytical[0,:,ids] - rf_num[ids])/maxRf, label=B)
 
 	# plt.yscale("symlog")
 
-	print(rf_num[:,49], rfs_analytical[49,0,:])
 
-plt.legend()
+# plt.legend()
 
-plt.show()
+# plt.show()
+
+# Stokes Free: B=0
+# [-1.14008283e-08  0.00000000e+00  0.00000000e+00  0.00000000e+00]
+# [-1.14006067e-08  0.00000000e+00  0.00000000e+00  0.00000000e+00]
+
+# Stokes Full: B=0
+# [-1.14007922e-08 -4.09572721e-26 -1.49068656e-26  0.00000000e+00]
+# [-1.14005696e-08 -4.09044574e-26 -1.48880039e-26  0.00000000e+00]
+
+# B=100
+# [-1.14168831e-08  7.81864267e-12  2.84572289e-12  3.78844138e-10]
+# [-1.14191145e-08  7.89102861e-12  2.87209957e-12  3.82413088e-10]
+
+# B=1000
+# [-1.29844153e-08  8.90950015e-10  3.24287641e-10  3.71647451e-09]
+# [-1.29615867e-08  9.03720166e-10  3.28927283e-10  3.76872503e-09]

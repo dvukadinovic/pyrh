@@ -184,8 +184,8 @@
 # Input Stokes mode (KEYWORD_OPTIONAL). 
 # Options are: NO_STOKES, FIELD_FREE, POLARIZATION_FREE, and FULL_STOKES.
 
-  STOKES_MODE = FULL_STOKES
-#   STOKES_MODE = NO_STOKES
+#  STOKES_MODE = FULL_STOKES
+   STOKES_MODE = NO_STOKES
 
 # Include magneto-optical effects (KEYWORD_DEFAULT). Default is TRUE.
 
@@ -208,7 +208,7 @@
 # Set this value to TRUE to get printout on CPU usage (may take some
 # extra CPU usage though!).
 
-  PRINT_CPU = FALSE
+  PRINT_CPU = TRUE
 
 # Enable program to do the formal solution for N_THREADS wavelengths
 # concurrently (KEYWORD_OPTIONAL). Maximum number of threads is limited
