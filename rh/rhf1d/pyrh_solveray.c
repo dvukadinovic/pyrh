@@ -61,7 +61,7 @@ extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh_rfs);
+void _solveray(double muz, mySpectrum *spec, double *lam, int Nwave, double *pyrh_spectrum, double *pyrh_rfs);
 
 int _getnumber(int* z)
 {
@@ -70,9 +70,37 @@ int _getnumber(int* z)
   return a+z[0];
 }
 
+double interp1d(double *x, double **y, int n, double *xq, double *yq, int Nelements)
+{
+    double t;
+    int i, j;
+
+    // if (n < 2) {
+    //     return 0.0;  // not enough points
+    // }
+
+    for (j=0; j<Nelements; j++){
+      if (xq[j] <= x[0]) {
+          yq[j] = y[0][0];  // clamp left
+      }
+
+      if (xq[j] >= x[n - 1]) {
+          yq[j] = y[n - 1][0];  // clamp right
+      }
+
+      i = 0;
+      while (i < n - 1 && xq[j] > x[i + 1]) {
+          i++;
+      }
+
+      t = (xq[j] - x[i]) / (x[i + 1] - x[i]);
+      yq[j] = y[i][0] + t * (y[i + 1][0] - y[i][0]);
+    }
+}
+
 /* ------- begin -------------------------- solveray.c -------------- */
 
-void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh_rfs)
+void _solveray(double muz, mySpectrum *spec, double *lam, int Nwave, double *pyrh_spectrum, double *pyrh_rfs)
 {
   bool_t  result, exit_on_EOF, to_obs, initialize, crosscoupling,
           analyze_output, equilibria_only;
@@ -122,12 +150,19 @@ void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh
   int index_rfs = 0;
   double tmp;
 
-  // printf("All good\n");
-  
+  if (input.solve_NLTE){
+    interp1d(spectrum.lambda, spectrum.I, spectrum.Nspect, lam, pyrh_spectrum, Nwave);
+    interp1d(spectrum.lambda, spectrum.Stokes_Q, spectrum.Nspect, lam, pyrh_spectrum+Nwave, Nwave);
+    interp1d(spectrum.lambda, spectrum.Stokes_U, spectrum.Nspect, lam, pyrh_spectrum+2*Nwave, Nwave);
+    interp1d(spectrum.lambda, spectrum.Stokes_V, spectrum.Nspect, lam, pyrh_spectrum+3*Nwave, Nwave);
+
+    return;
+  }
+
   for (idl=0; idl<Nlw+1; idl++){
+    // printf("%f\n", spectrum.lambda[idl]);
     // skip referent wavelength
     if (spectrum.lambda[idl]==atmos.lambda_ref) continue;
-    // this will "fail" for NLTE spectra
     pyrh_spectrum[index] = spectrum.I[idl][0];
     if (atmos.Stokes){
       pyrh_spectrum[index+1] = spectrum.Stokes_Q[idl][0];
@@ -135,7 +170,6 @@ void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh
       pyrh_spectrum[index+3] = spectrum.Stokes_V[idl][0];
       spec->stokes = 1;
     }
-
     if (input.get_atomic_rfs){
       for (int ids=0; ids<4; ids++){
         for (int idp=0; idp<input.n_atomic_pars; idp++){
@@ -144,6 +178,7 @@ void _solveray(double muz, mySpectrum *spec, double *pyrh_spectrum, double *pyrh
         }
       }
     }
+
     index += 4;
   }
   spec->nlw = Nlw;

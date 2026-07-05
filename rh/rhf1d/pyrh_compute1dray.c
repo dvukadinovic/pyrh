@@ -356,7 +356,6 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   convertScales(&atmos, &geometry);
   // verifyed: pyrh and RH return the same tau scale from given populations (ne, nH)!
 
-  
   // call in NLTE
   if (input.solve_NLTE) getProfiles();
   // here it initializes the spectrum and J;
@@ -392,7 +391,7 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
   spec.Nrays = atmos.Nrays;
 
   if (input.solve_NLTE && get_atomic_rfs) input.get_atomic_rfs = TRUE;
-  _solveray(mu, &spec, pyrh_spectrum, pyrh_rfs);
+  _solveray(mu, &spec, lam, Nwave, pyrh_spectrum, pyrh_rfs);
 
   // revert units (since we pass pointers...)
   for (int k=0; k<geometry.Ndep; k++){
@@ -403,8 +402,8 @@ mySpectrum rhf1d(char *cwd, double mu, int pyrh_Ndep,
     atmos.B[k]      *= 1e4; // T --> G
   }
 
-  clean_from_memory();
-
-  return spec;
+  // printf("Cleaning memory...\n");
+  if (!input.solve_NLTE) clean_from_memory();
+  // printf("Finished!\n");
 }
 /* ------- end ---------------------------- rhf1d.c ----------------- */
