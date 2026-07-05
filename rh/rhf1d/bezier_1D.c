@@ -75,9 +75,13 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   float Md[4][4];
   double *z = geometry.height;
 
-  // FILE *fptr;
-  // fptr = fopen("I.txt", "a");
-  
+  bool_t debug_flag = FALSE;
+
+  FILE *fptr;
+  if (debug_flag) {
+    fptr = fopen("I.txt", "a");
+  }
+
   if (to_obs) {
     dk      = -1;
     k_start = Ndep-1;
@@ -166,7 +170,7 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   /* --- Solve transfer along ray --                   -------------- */
 
-  // if (to_obs) fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", I[0][k_start], I[1][k_start], I[2][k_start], I[3][k_start]);
+  if (to_obs && debug_flag) fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", I[0][k_start], I[1][k_start], I[2][k_start], I[3][k_start]);
 
   for (k = k_start+dk;  k != k_end;  k += dk) { 
 
@@ -193,6 +197,8 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
       
     dtau_dw = 0.25 * dsdn * (chi[k] + chi[k+dk] + c1 + c2);
     dt = dtau_uw, dt03 = dt / 3.0;
+
+    // if (k==5 && to_obs && nspect==56) printf("%.16e\n", dtau_uw);
   
     /* --- Bezier3 coeffs. --                      ------------------ */
       
@@ -262,11 +268,11 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
 
     for(i=0;i<4;i++){
       I[i][k] = V1[i];
-      // if (to_obs) fprintf(fptr, "%2.8e ", I[i][k]);
+      if (to_obs && debug_flag) fprintf(fptr, "%2.8e ", I[i][k]);
     }
-    // if (to_obs) fprintf(fptr, "\n");
+    if (to_obs && debug_flag) fprintf(fptr, "\n");
       
-    /* --- Shift values for next depth --          ------------------ */
+    // /* --- Shift values for next depth --          ------------------ */
       
     memcpy(Su,   S0, 4*sizeof(double));
     memcpy(S0,   Sd, 4*sizeof(double));
@@ -317,11 +323,11 @@ void Piece_Stokes_Bezier3_1D(int nspect, int mu, bool_t to_obs,
   
   for (n = 0;  n < 4;  n++){
     I[n][k] = V1[n];
-    // if (to_obs) fprintf(fptr, "%2.8e ", I[n][k]);
+    if (to_obs && debug_flag) fprintf(fptr, "%2.8e ", I[n][k]);
   }
-  // if (to_obs) fprintf(fptr, "\n");
+  if (to_obs && debug_flag) fprintf(fptr, "\n");
 
-  // fclose(fptr);
+  if (debug_flag) fclose(fptr);
 }
 /* ------- end ------------------------- Piece_Stokes_Bezier3_1D.c -- */
 
@@ -357,9 +363,10 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   double **dGu, **dG0;
   double Ml[4][4];
 
-  // FILE *fptr;
+  bool_t debug_flag = FALSE;
+  FILE *fptr;
   // Open a file in writing mode
-  // fptr = fopen("dI.txt", "a");
+  if (debug_flag) fptr = fopen("dI.txt", "a");
  
   Gu      = matrix_double(input.n_atomic_pars,4);
   G0      = matrix_double(input.n_atomic_pars,4);
@@ -392,7 +399,7 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   dchi_up= (chi[k] - chi[k-dk])/dsup;
 
   /* ---  dchi/ds at central point--               ------------------ */
-  
+
   dchi_c = cent_deriv(dsup,dsdn,chi[k-dk],chi[k],chi[k+dk]);
   
   /* --- Upwind path_length (Bezier3 integration) -- ---------------- */
@@ -406,7 +413,7 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
   
   StokesK(nspect, k_start,    chi[k_start],    Ku);
   StokesK(nspect, k_start+dk, chi[k_start+dk], K0);
-  
+
   Gvec(nspect, k_start, chi[k_start], I, Gu);
   Gvec(nspect, k_start+dk, chi[k_start+dk], I, G0);
 
@@ -421,11 +428,13 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
     }
   }
 
-  // fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", dI[0][k_start][idp], dI[1][k_start][idp], dI[2][k_start][idp], dI[3][k_start][idp]);
+  if (debug_flag) {
+    fprintf(fptr, "%2.8e %2.8e %2.8e %2.8e\n", dI[0][k_start][idp], dI[1][k_start][idp], dI[2][k_start][idp], dI[3][k_start][idp]);
+  }
 
-  /* --- Solve transfer along ray --                   -------------- */
-  for (k = k_start+dk;  k != k_end;  k += dk) {     
-
+  // /* --- Solve transfer along ray --                   -------------- */
+  for (k = k_start+dk;  k != k_end;  k += dk) {   
+    
     // if (nspect==49 && k>50 && to_obs){
     //   printf("k = %d | dchi = (%2.8e, %2.8e, %2.8e, %2.8e)\n", k, spectrum.dchi_c_lam[nspect][k][0], spectrum.dchi_Q[nspect][k][0], spectrum.dchi_U[nspect][k][0], spectrum.dchi_V[nspect][k][0]);
     // }
@@ -449,6 +458,8 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
       
     dtau_dw = 0.25 * dsdn * (chi[k] + chi[k+dk] + c1 + c2);
     dt = dtau_uw, dt03 = dt / 3.0;
+
+    // if (k==5 && to_obs && nspect==56) printf("%.16e\n", dtau_uw);
   
     /* --- Bezier3 coeffs. --                      ------------------ */
       
@@ -477,6 +488,16 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
 
         Mc[j][i] = alpha* ident[j][i] + gamma * (ident[j][i] - dt03 * K0[j][i]);
         Mb[j][i] = beta * ident[j][i] + theta * (ident[j][i] + dt03 * Ku[j][i]);
+        
+        // Flipped signs for gamma and theta coeff
+        // Ma[j][i] += dK0[j][i] + K0[j][i];
+        // Md[j][i] = ident[j][i] + alpha*K0[j][i] - gamma*(K0[j][i] - dt03*Ma[j][i]); // delta_I_k coeff
+        
+        // Ml[j][i] += dKu[j][i] + Ku[j][i];
+        // Ml[j][i] = eps*ident[j][i] - beta*Ku[j][i] + theta*(dt03*Ml[j][i] + Ku[j][i]); // delta_I_k+1 coeff --> the one from the previous iteration
+
+        // Mc[j][i] = alpha* ident[j][i] - gamma * (ident[j][i] - dt03 * K0[j][i]);
+        // Mb[j][i] = beta * ident[j][i] - theta * (ident[j][i] + dt03 * Ku[j][i]);
       }
     }
     MatInv(Md[0]);
@@ -490,6 +511,7 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
           V0[i] += Ml[i][j]*dI[j][k-dk][idp] + Mb[i][j]*Gu[idp][j] + Mc[i][j]*G0[idp][j];
         }
         V0[i] += dt03*(-gamma*dG0[idp][i] + theta*dGu[idp][i]);
+        // V0[i] += dt03*(gamma*dG0[idp][i] - theta*dGu[idp][i]);
       }
       
       /* --- Solve linear system to get the intensity perturbation -- -------------- */
@@ -499,9 +521,9 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
       for(i=0;i<4;i++)
       {
         dI[i][k][idp] = V1[i];
-        // fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+        if (debug_flag) fprintf(fptr, "%2.8e ", dI[i][k][idp]);
       }
-      // fprintf(fptr, "\n");
+      if (debug_flag) fprintf(fptr, "\n");
     }
     
     /* --- Shift values for next depth --          ------------------ */
@@ -553,12 +575,12 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
     
     for(i=0;i<4;i++) {
       dI[i][k][idp] = V1[i]; 
-      // fprintf(fptr, "%2.8e ", dI[i][k][idp]);
+      if (debug_flag) fprintf(fptr, "%2.8e ", dI[i][k][idp]);
     }
-    // fprintf(fptr, "\n");
+    if (debug_flag) fprintf(fptr, "\n");
   }
 
-  // fclose(fptr);
+  if (debug_flag) fclose(fptr);
 
   freeMatrix(Gu);
   freeMatrix(G0);

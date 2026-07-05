@@ -91,7 +91,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 #define ANGSTROM_TO_NM           0.1
 #define MAX_GAUSS_DOPPLER        7.0
 #define USE_TABULATED_WAVELENGTH 1
-#define LN10                     log(10)
+#define LN10                     2.302585092994046
 
 
 /* --- Function prototypes --                          -------------- */
@@ -259,8 +259,8 @@ void readKuruczLines(char *inputFile)
           }
         }
       	rlk->Bji = CUBE(lambda0) / (2.0 * HPLANCK * CLIGHT) * rlk->Aji;
-      	rlk->Bij = (rlk->gj / rlk->gi) * rlk->Bji;
-
+        rlk->Bij = (rlk->gj / rlk->gi) * rlk->Bji;
+        
         /* --- Store in nm --                          -------------- */
 
         rlk->lambda0 = lambda0 / NM_TO_M;
@@ -397,19 +397,19 @@ void readKuruczLines(char *inputFile)
       	//        " gi, gj: %f, %f\n"
       	//        " Ei, Ej: %e, %e\n"
       	//        " Aji: %e\n"
-       //               " Grad, GStark, GvdWaals: %e, %e, %e\n"
-       //               " VdWaals: %d\n"
+        //              " Grad, GStark, GvdWaals: %e, %e, %e\n"
+        //              " VdWaals: %d\n"
       	//        " hyperfine_frac, isotope_frac: %f, %f\n"
       	//        " cross, alpha: %e, %e\n"
       	//        " Si: %f, Li: %d, Sj: %f, Lj: %d\n"
-       //         " gL_i: %f, gL_j: %f\n\n",
+        //        " gL_i: %f, gL_j: %f\n\n",
       	//        rlk->lambda0, lambda_air,
       	//        rlk->gi, rlk->gj, rlk->Ei, rlk->Ej, rlk->Aji,
       	//        rlk->Grad, rlk->GStark, rlk->GvdWaals,
-       //               rlk->vdwaals,
+        //              rlk->vdwaals,
       	//        rlk->hyperfine_frac, rlk->isotope_frac,
       	//        rlk->cross, rlk->alpha, rlk->Si, rlk->Li, rlk->Sj, rlk->Lj,
-       //         rlk->gL_i, rlk->gL_j);
+        //        rlk->gL_i, rlk->gL_j);
       	
       	rlk++;
       } // end of if statement for the text line that does not start with the commentChar
@@ -691,7 +691,11 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	    chi[k] += chi_l * phi;
       	    eta[k] += eta_l * phi;
 
+            // if (k==5 && nspect==56 && to_obs && !rlk->get_loggf_rf) printf("nspect = %d | k = %d | chi = %.8e | eta = %.8e | ", nspect, k, chi_l, eta_l);
+            // if (k==5 && nspect==56 && to_obs) printf("nspect = %d | k = %d | phi = %.8e | phi_V = %.8e | psi_V = %.8e\n", nspect, k, phi, phi_V, psi_V);
+
             if (rlk->get_loggf_rf){
+              // if (k==5 && nspect==56 && to_obs) printf("nspect = %d | k = %d | chi = %.8e | eta = %.8e | ", nspect, k, chi_l * (1+LN10*1e-3), eta_l * (1+LN10*1e-3));
               spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LN10;
               spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LN10;
             }
@@ -715,7 +719,10 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	      eta_U[k] += eta_l * phi_U;
       	      eta_V[k] += eta_l * phi_V;
 
+              // if (k==5 && nspect==56 && to_obs && !rlk->get_loggf_rf) printf("chi_V = %.8e | eta_V = %.8e\n", nspect, k, chi_l, eta_l);
+
               if (rlk->get_loggf_rf){
+                // if (k==5 && nspect==56 && to_obs) printf("chi_V = %.8e | eta_V = %.8e\n", nspect, k, chi_l * (1+LN10*1e-3), eta_l * (1+LN10*1e-3));
                 spectrum.dchi_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_Q * LN10;
                 spectrum.dchi_U[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_U * LN10;
                 spectrum.dchi_V[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_V * LN10;
@@ -787,6 +794,7 @@ double RLKProfile(RLK_Line *rlk, int k, int mu, bool_t to_obs,
 
     case BARKLEM:
       GvdW = rlk->cross * pow(atmos.T[k], (1.0 - rlk->alpha)/2.0);
+      // if (k==40 && rlk->alpha==0.275) printf("%e\n", GvdW);
       break;
 
     default:
@@ -922,6 +930,8 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
     }
   }
 
+  // printf("%.4e %.4e\n", gLl, gLu);
+
   n = 0;
   for (Ml = -Jl;  Ml <= Jl;  Ml++) {
     for (Mu = -Ju;  Mu <= Ju;  Mu++) {
@@ -929,7 +939,9 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
       	zm->q[n]        = (int) (Ml - Mu);
       	zm->shift[n]    = gLl*Ml - gLu*Mu;
       	zm->strength[n] = ZeemanStrength(Ju, Mu, Jl, Ml);
-      	  
+      	
+        // printf("%f %f | q = %d | shift = %.4e | strength = %.4e\n", Ml, Mu, zm->q[n], zm->shift[n], zm->strength[n]);
+
       	norm[zm->q[n]+1] += zm->strength[n];
         if (zm->q[n] == 1) g_eff += zm->shift[n] * zm->strength[n];
       	n++;
@@ -939,6 +951,8 @@ ZeemanMultiplet* RLKZeeman(RLK_Line *rlk)
   for (n = 0;  n < zm->Ncomponent;  n++)
     zm->strength[n] /= norm[zm->q[n]+1];
   g_eff /= norm[2];
+
+  // printf("----\n");
 
   return zm;
 }
@@ -1039,6 +1053,7 @@ void getUnsoldcross(RLK_Line *rlk)
 	     (ABARH/FOURPIEPS0) *
 	     2*PI * SQ(Z*RBOHR)/HPLANCK * deltaR, 0.4);
   rlk->cross = 8.08 *(vrel35_H + He->abund*vrel35_He) * C625;
+  // rlk->cross *= 2; // D. Vukadinovic: suggestion from P. Barklem (2016).
 
   rlk->vdwaals = UNSOLD;
 }

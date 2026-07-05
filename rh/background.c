@@ -152,6 +152,14 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
   FILE   *fp_fudge;
   flags   backgrflags;
 
+  bool_t debug_flag = FALSE;
+
+  FILE *fptr1, *fptr2;
+  if (debug_flag) {
+    fptr1 = fopen("chi.txt", "w");
+    fptr2 = fopen("eta.txt", "w");
+  }
+
   getCPU(2, TIME_START, NULL);
 
   if (input.solve_ne == ONCE  || input.solve_ne == ITERATION ) {
@@ -533,6 +541,14 @@ void Background(bool_t write_analyze_output, bool_t equilibria_only)
               for (k = 0;  k < NrecStokes*atmos.Nspace;  k++) {
                 chi_c[k] += chi[k];
                 eta_c[k] += eta[k];
+                if (debug_flag && to_obs){
+                  fprintf(fptr1, "%.15e ", chi[k]);
+                  fprintf(fptr2, "%.15e ", eta[k]);
+                }
+              }
+              if (debug_flag && to_obs){
+                fprintf(fptr1, "\n");
+                fprintf(fptr2, "\n");
               }
 
       	      if (input.rlkscatter) {
