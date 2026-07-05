@@ -205,7 +205,11 @@ void getABOcross(RLK_Line *rlk){
   meanvelocity = sqrt(8.0 * KBOLTZMANN / (PI * reducedmass));
   crossmean    = SQ(RBOHR) * pow(meanvelocity / 1.0E4, -rlk->alpha);
 
-  rlk->cross *= 2.0 * pow(4.0/PI, rlk->alpha/2.0) * exp(gammln((4.0 - rlk->alpha)/2.0)) * meanvelocity * crossmean;  
+  rlk->cross *= 2.0 * pow(4.0/PI, rlk->alpha/2.0) * exp(gammln((4.0 - rlk->alpha)/2.0)) * meanvelocity * crossmean;
+
+  // printf("LTE -- %e\n", rlk->cross);
+
+  // if (!strcmp("CA", element->ID) != 0) printf("--> %s %e\n", element->ID, rlk->cross);
 
   rlk->vdwaals = BARKLEM;
 }
@@ -302,6 +306,8 @@ bool_t getBarklemactivecross(AtomicLine *line)
 
   line->cvdWaals[0] *= 2.0 * pow(4.0/PI, line->cvdWaals[1]/2.0) * 
     exp(gammln((4.0 - line->cvdWaals[1])/2.0)) * meanvelocity * crossmean;  
+
+  // printf("%e\n", line->cvdWaals[0]);
 
   /* --- Use UNSOLD for the contribution of Helium atoms -- ---------- */
 

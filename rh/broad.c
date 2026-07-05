@@ -133,6 +133,8 @@ void VanderWaals(AtomicLine *line, double *GvdW)
 	pow(atmos.T[k], (1.0 - line->cvdWaals[1])/2.0) +
 	cross * pow(T[k], 0.3);
 
+    // printf("%e\n", GvdW[40]);
+
     break;
 
   default:

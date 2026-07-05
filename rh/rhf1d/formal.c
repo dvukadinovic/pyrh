@@ -186,7 +186,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
 	
         for (k = 0;  k < Nspace;  k++) {
           chi[k] = as->chi[k] + as->chi_c[k];
-      	  S[k]   = as->eta[k] + as->eta_c[k];
+          S[k]   = as->eta[k] + as->eta_c[k];
           if (input.solve_NLTE) S[k] += as->sca_c[k]*Jdag[k];
       	}
 
@@ -211,14 +211,14 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
             }
           }
 
-      	  for (n = 0;  n < 4;  n++) {
-      	    for (k = 0;  k < Nspace;  k++){
-      	      Spol[n][k] /= chi[k];
+          for (n = 0;  n < 4;  n++) {
+            for (k = 0;  k < Nspace;  k++){
+              Spol[n][k] /= chi[k];
             }
           }
       	  /* --- Polarized transfer --                 -------------- */
       	  if (input.S_interpolation_stokes == DELO_BEZIER3) {
-      	    Piece_Stokes_Bezier3_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
+            Piece_Stokes_Bezier3_1D(nspect, mu, to_obs, chi, Spol, Ipol, Psi);
             if (input.get_atomic_rfs && to_obs) {
               Piece_Stokes_Bezier3_1D_RFs(nspect, mu, to_obs, chi, Spol, Ipol, dIpol);
             }

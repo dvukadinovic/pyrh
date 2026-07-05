@@ -241,48 +241,45 @@ flags passive_bb(double lambda, int nspect, int mu, bool_t to_obs,
       n = (atom->n != atom->nstar) ? atom->n : atom->nstar;
 
       for (kr = 0;  kr < atom->Nline;  kr++) {
-	line = atom->line + kr;
-	i = line->i;
-	j = line->j;
-	dlambda = line->lambda0 *
-	  line->qwing * (atmos.vmicro_char / CLIGHT);
+        line = atom->line + kr;
+        i = line->i;
+        j = line->j;
+        dlambda = line->lambda0 * line->qwing * (atmos.vmicro_char / CLIGHT);
 
-	if (fabs(lambda - line->lambda0) <= dlambda) {
-	  backgrflags.hasline = TRUE;
-	  atmos.backgrflags[nspect].hasline = TRUE;
+        if (fabs(lambda - line->lambda0) <= dlambda) {
+          backgrflags.hasline = TRUE;
+          atmos.backgrflags[nspect].hasline = TRUE;
 
-	  /* --- Add line to list if not yet present -- ----------- */ 
+        /* --- Add line to list if not yet present -- ----------- */ 
 
-	  add_to_list = TRUE;
-	  for (l = 0;  l < Nlist;  l++) {
-	    if (line == linelist[l]->line) {
-	      add_to_list = FALSE;
-	      entry = l;
-	      break;
-	    }
-	  }
-	  if (add_to_list) {
-	    if (Nlist == N_MAX_OVERLAP) {
-	      sprintf(messageStr, "Too many overlapping transitions");
-	      Error(ERROR_LEVEL_2, routineName, messageStr);
-	    }
-	    /* --- Create a new entry in the list -- -------------- */
+        add_to_list = TRUE;
+        for (l = 0;  l < Nlist;  l++) {
+          if (line == linelist[l]->line) {
+            add_to_list = FALSE;
+            entry = l;
+            break;
+          }
+        }
+        if (add_to_list) {
+          if (Nlist == N_MAX_OVERLAP) {
+            sprintf(messageStr, "Too many overlapping transitions");
+            Error(ERROR_LEVEL_2, routineName, messageStr);
+          }
+          /* --- Create a new entry in the list -- -------------- */
 
-	    linelist[Nlist] =
-	      (struct Linelist *) malloc(sizeof(struct Linelist));
-	    entry = Nlist++;
-	    linelist[entry]->line = line;
+          linelist[Nlist] = (struct Linelist *) malloc(sizeof(struct Linelist));
+          entry = Nlist++;
+          linelist[entry]->line = line;
 
-	    /* --- Calculate and store the line's damping parameter */
+          /* --- Calculate and store the line's damping parameter */
 
-	    if (line->Voigt) {
-	      linelist[entry]->adamp =
-		(double *) malloc(atmos.Nspace * sizeof(double));
-	      Damping(line, linelist[entry]->adamp);
-	    } else
-	      linelist[entry]->adamp = NULL;
-	  }
-	  linelist[entry]->used = TRUE;
+          if (line->Voigt) {
+            linelist[entry]->adamp = (double *) malloc(atmos.Nspace * sizeof(double));
+            Damping(line, linelist[entry]->adamp);
+          } else
+            linelist[entry]->adamp = NULL;
+        }
+        linelist[entry]->used = TRUE;
 
 	  gij = line->Bji / line->Bij;
 	  twohnu3_c2 = line->Aji / line->Bji;

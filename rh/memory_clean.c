@@ -15,13 +15,19 @@ void clean_from_memory()
     int nspect;
     ActiveSet *as;
 
+    // printf("Clean Stokes I\n");
     if (spectrum.I!=NULL) freeMatrix((void **) spectrum.I);
+    // printf("Clean Stokes Q\n");
     if (spectrum.Stokes_Q!=NULL) freeMatrix((void **) spectrum.Stokes_Q);
+    // printf("Clean Stokes U\n");
     if (spectrum.Stokes_U!=NULL) freeMatrix((void **) spectrum.Stokes_U);
+    // printf("Clean Stokes V\n");
     if (spectrum.Stokes_V!=NULL) freeMatrix((void **) spectrum.Stokes_V);
 
+    // printf("Clean J\n");
     if (spectrum.J!=NULL) freeMatrix((void **) spectrum.J);
     if (input.backgr_pol){
+        // printf("Clean J20\n");
         if (spectrum.J20!=NULL) freeMatrix((void **) spectrum.J20);
     }
 
@@ -38,7 +44,9 @@ void clean_from_memory()
     free(atmos.backgrrecno);
     free(atmos.backgrflags);
 
+    // printf("Clean Itop\n");
     if (geometry.Itop!=NULL) freeMatrix((void **) geometry.Itop);
+    // printf("Clean Ibottom I\n");
     if (geometry.Ibottom!=NULL) freeMatrix((void **) geometry.Ibottom);
 
     if (input.get_atomic_rfs) freeMatrix3d(atmos.atomic_rfs, spectrum.Nspect, 4);
@@ -64,6 +72,7 @@ void clean_from_memory()
     if (atmos.Nactiveatom > 0) free(atmos.activeatoms);
     if (atmos.Nactivemol > 0) free(atmos.activemols);
 
+    // printf("Clean Field projections\n");
     if (atmos.Stokes){
         freeMatrix((void **) atmos.cos_gamma);
         freeMatrix((void **) atmos.cos_2chi);
