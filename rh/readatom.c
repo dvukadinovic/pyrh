@@ -305,18 +305,35 @@ void readAtom(Atom *atom, char *atom_file, bool_t active)
       line->cvdWaals[3] = line->cvdWaals[1] = 0.0;
     } else if (strstr(vdWstr, "BARKLEM")) {
       line->vdWaals = BARKLEM;
-      if (!getBarklemactivecross(line)) {
-	sprintf(messageStr,
-		"Line %3d -> %3d: cannot treat line "
-		"with Barklem type broadening. Using UNSOLD.", j, i);
-	Error(WARNING, routineName, messageStr);
-	line->vdWaals = UNSOLD;
-	line->cvdWaals[3] = line->cvdWaals[1] = 0.0;
+      // D. Vukadinovic: we provide directly Barklem coefficients if they are available (especially for the ionized species)
+      if (line->cvdWaals[1]!=0.0){
+        double reducedmass  = AMU / (1.0/atmos.atoms[0].weight + 1.0/atom->weight);
+        double meanvelocity = sqrt(8.0 * KBOLTZMANN / (PI * reducedmass));
+        double crossmean    = SQ(RBOHR) * pow(meanvelocity / 1.0E4, -line->cvdWaals[1]);
+
+        line->cvdWaals[0] *= 2.0 * pow(4.0/PI, line->cvdWaals[1]/2.0) * 
+          exp(gammln((4.0 - line->cvdWaals[1])/2.0)) * meanvelocity * crossmean;  
+
+        /* --- Use UNSOLD for the contribution of Helium atoms -- ---------- */
+
+        line->cvdWaals[2] = 1.0;
+        line->cvdWaals[3] = 0.0;
+      }
+      else{
+        if (!getBarklemactivecross(line)) {
+          sprintf(messageStr,
+            "Line %3d -> %3d: cannot treat line "
+            "with Barklem type broadening. Using UNSOLD.", j, i);
+          Error(WARNING, routineName, messageStr);
+          line->vdWaals = UNSOLD;
+          line->cvdWaals[3] = line->cvdWaals[1] = 0.0;
+        }
       }
     } else {
       sprintf(messageStr, "Invalid value for vd Waals string: %s", vdWstr);
       Error(ERROR_LEVEL_2, routineName, messageStr);
     }
+    // printf("%e\n", line->cvdWaals[0]);
  
     line->symmetric   = (strstr(symmStr, "ASYMM")) ? FALSE : TRUE;
     line->polarizable = FALSE;
