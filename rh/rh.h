@@ -80,6 +80,7 @@ void freeMatrix4d(double ****matrix4d, int Nrow, int Ncol, int Ndep);
 void   freeMatrix(void **Matrix);
 void   SolveLinearEq(int N, double **A, double *b, bool_t improve);
 
+void concatenate(char* dest, char* str1, char* str2);
 
 /* --- Interpolation routines --                       -------------- */
 
