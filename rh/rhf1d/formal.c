@@ -357,7 +357,7 @@ double Formal(int nspect, bool_t eval_operator, bool_t redistribute)
     if (solveStokes){
       freeMatrix3d(dIpol, 4, Nspace);
     } else{
-      freeMatrix(dI);
+      freeMatrix((void **) dI);
     }
   }
 
