@@ -91,7 +91,7 @@ FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
 #define ANGSTROM_TO_NM           0.1
 #define MAX_GAUSS_DOPPLER        7.0
 #define USE_TABULATED_WAVELENGTH 1
-#define LN10                     2.302585092994046
+//#define LG10                     2.302585092994046
 
 
 /* --- Function prototypes --                          -------------- */
@@ -684,7 +684,7 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
       	      chi_l    *= epsilon; 
               eta_l    *= epsilon;
 
-              // if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LN10; // this was done from head, for log(gf) should be correct
+              // if (rlk->get_loggf_rf) dscatt[k][rlk->loggf_rf_ind] = scatt[k] * LG10; // this was done from head, for log(gf) should be correct
       	    }
 
       	    chi[k] += chi_l * phi;
@@ -694,9 +694,9 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
             // if (k==5 && nspect==56 && to_obs) printf("nspect = %d | k = %d | phi = %.8e | phi_V = %.8e | psi_V = %.8e\n", nspect, k, phi, phi_V, psi_V);
 
             if (rlk->get_loggf_rf){
-              // if (k==5 && nspect==56 && to_obs) printf("nspect = %d | k = %d | chi = %.8e | eta = %.8e | ", nspect, k, chi_l * (1+LN10*1e-3), eta_l * (1+LN10*1e-3));
-              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LN10;
-              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LN10;
+              // if (k==5 && nspect==56 && to_obs) printf("nspect = %d | k = %d | chi = %.8e | eta = %.8e | ", nspect, k, chi_l * (1+LG10*1e-3), eta_l * (1+LG10*1e-3));
+              spectrum.dchi_c_lam[nspect][k][rlk->loggf_rf_ind] = chi_l * phi * LG10;
+              spectrum.deta_c_lam[nspect][k][rlk->loggf_rf_ind] = eta_l * phi * LG10;
             }
 
             // if (rlk->get_dlam_rf){
@@ -721,14 +721,14 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
               // if (k==5 && nspect==56 && to_obs && !rlk->get_loggf_rf) printf("chi_V = %.8e | eta_V = %.8e\n", nspect, k, chi_l, eta_l);
 
               if (rlk->get_loggf_rf){
-                // if (k==5 && nspect==56 && to_obs) printf("chi_V = %.8e | eta_V = %.8e\n", nspect, k, chi_l * (1+LN10*1e-3), eta_l * (1+LN10*1e-3));
-                spectrum.dchi_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_Q * LN10;
-                spectrum.dchi_U[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_U * LN10;
-                spectrum.dchi_V[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_V * LN10;
+                // if (k==5 && nspect==56 && to_obs) printf("chi_V = %.8e | eta_V = %.8e\n", nspect, k, chi_l * (1+LG10*1e-3), eta_l * (1+LG10*1e-3));
+                spectrum.dchi_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_Q * LG10;
+                spectrum.dchi_U[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_U * LG10;
+                spectrum.dchi_V[nspect][k][rlk->loggf_rf_ind] = chi_l * phi_V * LG10;
 
-                spectrum.deta_Q[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_Q * LN10;
-                spectrum.deta_U[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_U * LN10;
-                spectrum.deta_V[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_V * LN10;
+                spectrum.deta_Q[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_Q * LG10;
+                spectrum.deta_U[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_U * LG10;
+                spectrum.deta_V[nspect][k][rlk->loggf_rf_ind] = eta_l * phi_V * LG10;
               }
 
       	      if (input.magneto_optical) {
@@ -737,9 +737,9 @@ flags rlk_opacity(double lambda, int nspect, int mu, bool_t to_obs,
             		chip_V[k] += chi_l * psi_V;
                 
                 if (rlk->get_loggf_rf){
-                  spectrum.dchip_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_Q * LN10;
-                  spectrum.dchip_U[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_U * LN10;
-                  spectrum.dchip_V[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_V * LN10;
+                  spectrum.dchip_Q[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_Q * LG10;
+                  spectrum.dchip_U[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_U * LG10;
+                  spectrum.dchip_V[nspect][k][rlk->loggf_rf_ind] = chi_l * psi_V * LG10;
                 }
       	      }
       	    }

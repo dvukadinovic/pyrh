@@ -38,3 +38,5 @@ mySpectrum rhf1d(char *cwd, double mu, int Ndep,
               // myRLK_Line *pyrh_rlk_lines,
 
 myRLK_Line get_RLK_lines(char *cwd);
+
+void _solveray(double muz, mySpectrum *spec, double *lam, int Nwave, double *pyrh_spectrum, double *pyrh_rfs);

@@ -61,7 +61,6 @@ extern char messageStr[MAX_LINE_SIZE];
 
 // functions declaration
 int _getnumber(int* z);
-void _solveray(double muz, mySpectrum *spec, double *lam, int Nwave, double *pyrh_spectrum, double *pyrh_rfs);
 
 int _getnumber(int* z)
 {
