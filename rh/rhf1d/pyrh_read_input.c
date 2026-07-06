@@ -71,7 +71,7 @@ void read_atom_model(char *cwd, char *filename){
   concatenate(absolute_path, input.pyrh_path, tmp);
 
   Atom *atom;
-  readAtom(&atom, absolute_path, active=TRUE);
+  readAtom(atom, absolute_path, active=TRUE);
 
   // printf("Done!\n");
 
