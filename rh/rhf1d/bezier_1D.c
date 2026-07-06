@@ -582,11 +582,11 @@ void Piece_Stokes_Bezier3_1D_RFs(int nspect, int mu, bool_t to_obs,
 
   if (debug_flag) fclose(fptr);
 
-  freeMatrix(Gu);
-  freeMatrix(G0);
-  freeMatrix(Gd);
-  freeMatrix(dGu);
-  freeMatrix(dG0);
+  freeMatrix((void **)Gu);
+  freeMatrix((void **)G0);
+  freeMatrix((void **)Gd);
+  freeMatrix((void **)dGu);
+  freeMatrix((void **)dG0);
 }
 /* ------- end ------------------------- Piece_Stokes_Bezier3_1D.c -- */
 
