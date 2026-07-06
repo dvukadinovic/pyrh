@@ -3,3 +3,4 @@
 
 void get_ne(bool_t fromscratch);
 void pyrh_Background(bool_t equilibria_only, double* total_opacity);
+void get_Nm_total(double* Nm, int k);

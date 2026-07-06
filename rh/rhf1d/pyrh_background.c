@@ -109,16 +109,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rh.h"
-#include "atom.h"
-#include "atmos.h"
-#include "spectrum.h"
-#include "constant.h"
-#include "background.h"
+#include "../rh.h"
+#include "../atom.h"
+#include "../atmos.h"
+#include "../spectrum.h"
+#include "../constant.h"
+#include "../background.h"
 #include "error.h"
-#include "statistics.h"
-#include "inputs.h"
-#include "xdr.h"
+#include "../statistics.h"
+#include "../inputs.h"
+#include "../../headers/xdr.h"
 
 #include "pyrh_background.h"
 
@@ -132,7 +132,6 @@
 // extern Atmosphere atmos;
 // extern Spectrum spectrum;
 // extern InputData input;
-
 
 /* --- Global variables --- */
 
