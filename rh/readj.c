@@ -16,6 +16,7 @@
              sequentially to overcome this. --         -------------- */
 
 #include <unistd.h>
+#include <string.h>
 
 #include "rh.h"
 #include "atom.h"
