@@ -31,6 +31,7 @@
 #include "../inputs.h"
 #include "../error.h"
 #include "../../headers/xdr.h"
+#include "../background.h"
 
 #include "../constant.h"
 
