@@ -105,7 +105,6 @@ void             initRLK(RLK_Line *rlk);
 bool_t           RLKdeterminate(char *labeli, char *labelj, RLK_Line *rlk);
 void             getUnsoldcross(RLK_Line *rlk);
 void             free_BS(Barklemstruct *bs);
-void             freeElements();
 
 
 /* --- Global variables --                             -------------- */

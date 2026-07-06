@@ -271,6 +271,7 @@ void   readMolecularLines(Molecule *molecule, char *line_data);
 void   readMolPops(Molecule *molecule);
 void   writeMolPops(Molecule *molecule);
 
+void   freeElements(void);
 
 /* --- Redistribution function --                      -------------- */
 
