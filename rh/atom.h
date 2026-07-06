@@ -225,6 +225,8 @@ void readPopulations(Atom *atom);
 //void SortLambda();
 void allocateOpacityEmissivity(void);
 void freeOpacityEmissivity(void);
+void allocateOpacityEmissivityDer(void);
+void freeOpacityEmissivityDer(void);
 
 void Stark(AtomicLine *line, double *GStark);
 void StarkLinear(AtomicLine *line, double *GStark);
