@@ -36,9 +36,11 @@ def my_get_config_vars(*args):
 if "arm" in _platform: 
     dsc.get_config_vars = my_get_config_vars
 
-extra_compile_args = None
+extra_compile_args = []
 if "x86" in _platform:
     extra_compile_args = ["-DSIMDON"]
+
+extra_compile_args += ["-Wimplicit-function-declaration", "-Wincompatible-pointer-types"]
 
 rh_c_files = glob.glob("rh/*.c")
 
